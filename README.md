@@ -6,7 +6,7 @@ Laboratorio privado de probabilidades deportivas: descarga resultados reales, co
 
 ## Interfaz actual de fútbol
 
-El creador combina equipo, jugador, cuotas y 28 mercados en una sola fórmula con uniones Y/O y grupos anidados. Los campos usan la grilla original de Workraken, con el mismo tamaño y sin texto suelto. Las fórmulas se pueden guardar, editar y duplicar.
+El creador combina equipo, jugador, cuotas y 28 mercados en una sola fórmula con uniones Y/O y grupos anidados. Dentro de Crear fórmula, los desplegables madre Equipos, Jugadores, Goles, Cuotas y las demás familias contienen sus campos. Usan los paneles y la grilla originales de Workraken, con campos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar.
 
 La fórmula filtra cotizaciones reales del histórico: mercado, selección, jugador y cuota corresponden a la misma apuesta. El resultado sirve para liquidarla; no se usa para decidir si cumple la fórmula. Los datos ausentes quedan sin evaluar.
 

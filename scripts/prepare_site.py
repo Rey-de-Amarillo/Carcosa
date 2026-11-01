@@ -42,7 +42,9 @@ Espacio privado de datos y fórmulas: 1X2, probabilidades de otras casas sin
 margen, EV estimado y rendimiento de las jugadas históricas coincidentes.
 
 El creador reúne equipos, jugadores, cuotas y mercados en una sola fórmula,
-con condiciones y grupos unidos por Y/O. Las fórmulas guardadas conservan
+con condiciones y grupos unidos por Y/O. Los desplegables madre Equipos,
+Jugadores, Goles, Cuotas y las demás familias contienen sus campos, usando
+los paneles originales de Workraken. Las fórmulas guardadas conservan
 íntegramente sus condiciones y agrupaciones. Los desplegables usan mercados
 reales de fútbol y conservan los controles originales de Workraken.
 Incluye resultado, doble oportunidad, empate no válido, hándicaps, goles,

@@ -1,7 +1,7 @@
 /** Test actual editor markup and delegated actions without browser dependencies. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {mountUnifiedFormulaEditor} from '../app/football-formula-editor.js';
+import {FORMULA_CATEGORIES,mountUnifiedFormulaEditor} from '../app/football-formula-editor.js';
 import {mountFootballAlertBuilder,newFootballAlert,normalizeFootballAlert} from '../app/football-alert-builder.js';
 import {normalizeUnifiedFormula} from '../app/football-unified-formula.js';
 import {FOOTBALL_MARKET_CATALOG,defaultMarketSelection} from '../app/football-market-catalog.js';
@@ -31,6 +31,8 @@ class Element {
   set disabled(value){value?this.setAttribute('disabled',''):this.removeAttribute('disabled');}
   get hidden(){return this.hasAttribute('hidden');}
   set hidden(value){value?this.setAttribute('hidden',''):this.removeAttribute('hidden');}
+  get open(){return this.hasAttribute('open');}
+  set open(value){value?this.setAttribute('open',''):this.removeAttribute('open');}
   get isConnected(){return this===documentRoot||Boolean(this.parentElement?.isConnected);}
   get classList(){return {contains:value=>(this.attrs.class||'').split(/\s+/).includes(value)};}
   hasAttribute(name){return Object.hasOwn(this.attrs,name);}
@@ -93,11 +95,29 @@ const rule=normalizeUnifiedFormula({kind:'football-formula',version:1,id:'nested
 ]}},entities);
 
 assert.throws(()=>editor.getDefinition(),/condici[oó]n|f[oó]rmula|nombre/i,'blank editor cannot become a match-all formula');
-assert.equal(qa('[data-control="field"]').length,1,'new formula starts with one blank condition');
-const fieldOptions=q('[data-control="field"]').querySelectorAll('option').map(o=>o.value);
-for(const metadata of ['team','home_team','away_team','league','player','odds'])assert.ok(fieldOptions.includes(metadata),`actual ${metadata} field is available`);
-for(const market of FOOTBALL_MARKET_CATALOG)assert.ok(fieldOptions.includes(`market:${market.id}`),`${market.name} is an actual selectable market`);
-assert.equal(new Set(fieldOptions).size,fieldOptions.length,'condition dropdown has no duplicate choices');
+const categoryIds=['teams','players','odds','results','goals','corners','cards','shots','offsides','leagues'];
+assert.deepEqual(qa('[data-formula-category]').map(n=>n.dataset.formulaCategory),categoryIds,'all mother dropdowns are available directly in the creator');
+assert.deepEqual(FORMULA_CATEGORIES.map(c=>c.id),categoryIds);
+assert.equal(q('[data-add-condition]'),null,'there is no global choose-condition action');
+assert.equal(q('dialog'),null,'mother fields belong to the creator, not a modal');
+assert.ok(q('[data-formula-logic]'),'one logic editor controls the complete expression');
+const offeredFields=[];
+for(const category of FORMULA_CATEGORIES){
+  const mother=q(`[data-formula-category="${category.id}"]`),field=mother.querySelector('[data-control="field"]');
+  assert.equal(mother.tagName,'DETAILS');
+  assert.equal(mother.querySelector('summary').textContent.trim(),category.name);
+  assert.equal(mother.querySelectorAll('[data-control="group"]').length,1,'each mother starts with one pending row');
+  assert.equal(mother.querySelector('[data-add-category]').dataset.addCategory,category.id);
+  const choices=field?field.querySelectorAll('option').map(o=>o.value).filter(Boolean):[category.initial];
+  assert.deepEqual(choices,category.fields,`${category.name} offers only its own fields`);
+  assert.equal(new Set(choices).size,choices.length,'family choices have no duplicates');
+  offeredFields.push(...choices);
+}
+for(const market of FOOTBALL_MARKET_CATALOG)assert.ok(offeredFields.includes(`market:${market.id}`),`${market.name} is offered in a mother dropdown`);
+assert.equal(offeredFields.length,new Set(offeredFields).size,'each actual field belongs to one family');
+assert.ok(qa('option').every(option=>option.textContent!=='Elegir condición'),'the flat choose-condition list is absent');
+await set(q('[data-definition="name"]'),'Sólo filas pendientes','input');
+assert.throws(()=>editor.getDefinition(),/condici[oó]n/i,'all untouched mother rows are inactive, including preset team/player/odds fields');
 
 // Build the user's complete example using only the rendered fields/actions.
 const creationContainer=new Element('div',{},document);documentRoot.append(creationContainer);let created;
@@ -107,19 +127,25 @@ const cc=(id,key)=>cq(`[data-node-id="${id}"][data-control="${key}"]`);
 const cclick=selector=>fire('click',cq(selector));
 await set(cq('[data-definition="name"]'),'Equipo, jugador y alternativas','input');
 await set(cq('[data-definition="stake"]'),3,'input');
-const rootId=cq('[data-add-condition]').dataset.addCondition,clubId=cq('[data-control="field"]').dataset.nodeId;
-await set(cc(clubId,'field'),'team');await set(cc(clubId,'value'),home.id);
-await cclick(`[data-add-condition="${rootId}"]`);
-const personId=cqa('[data-control="field"]').find(n=>n.value==='').dataset.nodeId;
-await set(cc(personId,'field'),'player');await set(cc(personId,'teamId'),home.id);await set(cc(personId,'playerId'),player.id);
+const cmother=id=>cq(`[data-formula-category="${id}"]`);
+const rootId=cq('[data-formula-logic]').querySelector('[data-add-group]').dataset.addGroup;
+const clubId=cmother('teams').querySelector('[data-control="value"]').dataset.nodeId;
+cmother('teams').open=true;cmother('players').open=true;
+await set(cc(clubId,'value'),home.id);
+assert.equal(cmother('teams').open,true,'changing a mother value preserves its expanded state');
+const personId=cmother('players').querySelector('[data-control="playerId"]').dataset.nodeId;
+await set(cc(personId,'teamId'),home.id);await set(cc(personId,'playerId'),player.id);
+assert.equal(cmother('players').open,true,'player changes preserve the open mother');
 await cclick(`[data-add-group="${rootId}"]`);
-const alternativeId=cqa('[data-add-condition]').map(n=>n.dataset.addCondition).find(id=>id!==rootId);
+const alternativeId=cq('[data-formula-logic]').querySelectorAll('[data-add-group]').map(n=>n.dataset.addGroup).find(id=>id!==rootId);
 await set(cc(alternativeId,'operator'),'O');
-const priceId=cqa('[data-control="field"]').find(n=>n.value==='').dataset.nodeId;
-await set(cc(priceId,'field'),'odds');await set(cc(priceId,'operator'),'between');await set(cc(priceId,'min'),1.8,'input');await set(cc(priceId,'max'),2.2,'input');
-await cclick(`[data-add-condition="${alternativeId}"]`);
-const goalsId=cqa('[data-control="field"]').find(n=>n.value==='').dataset.nodeId;
+const priceId=cmother('odds').querySelector('[data-control="field"]').dataset.nodeId;
+await set(cc(priceId,'operator'),'between');await set(cc(priceId,'min'),1.8,'input');await set(cc(priceId,'max'),2.2,'input');
+await set(cc(priceId,'group'),alternativeId);
+await cclick('[data-add-category="players"]');
+const goalsId=cmother('players').querySelectorAll('[data-control="field"]').map(n=>n.dataset.nodeId).find(id=>id!==personId);
 await set(cc(goalsId,'field'),'market:player_goals');
+await set(cc(goalsId,'group'),alternativeId);
 const built=creator.getDefinition();
 assert.equal(built.stake,3);assert.equal(built.expression.operator,'Y');assert.equal(built.expression.children.length,3);
 assert.equal(built.expression.children[0].value,home.id);assert.equal(built.expression.children[1].playerId,player.id);
@@ -132,6 +158,9 @@ editor.edit(rule);
 const normalized=normalizeUnifiedFormula(rule,entities);
 assert.deepEqual(editor.getDefinition(),normalized,'editing preserves nested tree, player reference, identity, stake and prices');
 assert.equal(control('root','operator').value,'Y');assert.equal(control('alternatives','operator').value,'O');
+assert.equal(control('price','group').value,'alternatives');assert.equal(control('goals','group').value,'alternatives');
+assert.equal(control('club','value').closest('[data-formula-category]').dataset.formulaCategory,'teams');
+assert.equal(control('goals','field').closest('[data-formula-category]').dataset.formulaCategory,'players','editing derives the mother from the saved market');
 assert.ok(q('[data-preview]').value.includes('('),'expression field displays parentheses for nested logic');
 assert.equal(control('goals','field').value,'market:player_goals');
 assert.deepEqual(control('goals','operator').querySelectorAll('option').map(option=>option.textContent),['Es','No es'],'market comparison identifies the quoted contract');
@@ -145,20 +174,32 @@ await click('[data-save-alert]');assert.equal(saved.at(-1).id,null);assert.deepE
 
 // Add/remove must not rewrite sibling IDs or leave a second independent formula.
 editor.edit(rule);await click('[data-add-group="alternatives"]');
-const afterGroup=qa('[data-add-condition]').map(n=>n.getAttribute('data-add-condition'));
+const afterGroup=q('[data-formula-logic]').querySelectorAll('[data-add-group]').map(n=>n.dataset.addGroup);
 assert.equal(afterGroup.length,3,'a nested group is part of the same expression');
 assert.deepEqual(editor.getDefinition(),normalized,'an entirely blank nested group is inactive');
 const addedGroup=afterGroup.find(id=>!['root','alternatives'].includes(id));assert.ok(addedGroup);
 await click(`[data-remove-node="${addedGroup}"]`);assert.deepEqual(editor.getDefinition(),normalized);
-await click('[data-add-condition="root"]');
-assert.equal(qa('[data-control="field"]').length,5,'a new condition joins the existing root');
-assert.deepEqual(editor.getDefinition(),normalized,'entirely blank additional condition is inactive');
-const addedId=qa('[data-control="field"]').map(n=>n.dataset.nodeId).find(id=>!['club','person','price','goals'].includes(id));
-await set(control(addedId,'field'),'odds');
+const oddsMother=()=>q('[data-formula-category="odds"]');
+await click('[data-add-category="odds"]');
+assert.equal(oddsMother().querySelectorAll('[data-control="group"]').length,2,'a category action adds a row to the existing formula');
+const addedId=oddsMother().querySelectorAll('[data-control="field"]').map(n=>n.dataset.nodeId).find(id=>id!=='price');
+assert.equal(control(addedId,'group').value,'root','new category rows start in the root group');
 assert.throws(()=>editor.getDefinition(),/cuota|valor|n[uú]mero|complet/i,'selected but unfinished condition cannot disappear silently');
 await click('[data-save-alert]');assert.equal(saved.length,2,'invalid formula never reaches save callback');
 assert.ok(q('[data-alert-error]').value,'validation is shown inside error input');assert.equal(q('[data-alert-error-grid]').hidden,false);
 await click(`[data-remove-node="${addedId}"]`);assert.deepEqual(editor.getDefinition(),normalized,'removing incomplete condition restores exact tree');
+
+// Category layout does not change the tree: a condition can move freely across
+// nested groups, and an untouched pending row stays inactive when moved.
+await set(control('goals','group'),'root');
+let moved=editor.getDefinition();
+assert.ok(moved.expression.children.some(n=>n.id==='goals'));
+assert.deepEqual(moved.expression.children.find(n=>n.id==='alternatives').children.map(n=>n.id),['price']);
+assert.equal(moved.expression.children.find(n=>n.id==='alternatives').operator,'O');
+assert.equal(moved.expression.children.find(n=>n.id==='goals').playerRef,'person','moving a leaf preserves its selected-player reference');
+await set(control('goals','group'),'alternatives');assert.deepEqual(editor.getDefinition(),normalized,'moving a leaf back preserves the original logical tree');
+const passiveId=q('[data-formula-category="goals"]').querySelector('[data-control="group"]').dataset.nodeId;
+await set(control(passiveId,'group'),'alternatives');assert.deepEqual(editor.getDefinition(),normalized,'moving a passive mother row does not create a predicate');
 
 // Y/O edits affect the stored expression rather than a separate global filter.
 await set(control('root','operator'),'O');assert.equal(editor.getDefinition().expression.operator,'O');
@@ -172,9 +213,9 @@ editor.edit(rule);
 const secondPlayer=entities.players.find(item=>home.playerIds.includes(item.id)&&item.id!==player.id);assert.ok(secondPlayer);
 await set(control('person','playerId'),secondPlayer.id);
 assert.equal(editor.getDefinition().expression.children[2].children[1].selection.playerId,secondPlayer.id);
-await click('[data-add-condition="root"]');
-const extraPlayerId=qa('[data-control="field"]').find(n=>n.value==='').dataset.nodeId;
-await set(control(extraPlayerId,'field'),'player');await set(control(extraPlayerId,'teamId'),home.id);await set(control(extraPlayerId,'playerId'),player.id);
+await click('[data-add-category="players"]');
+const extraPlayerId=q('[data-formula-category="players"]').querySelectorAll('[data-control="playerId"]').map(n=>n.dataset.nodeId).find(id=>id!=='person');
+await set(control(extraPlayerId,'teamId'),home.id);await set(control(extraPlayerId,'playerId'),player.id);
 assert.equal(control('goals','playerRef').tagName,'SELECT','multiple selected players expose one reference choice');
 await set(control('goals','playerRef'),extraPlayerId);
 assert.equal(editor.getDefinition().expression.children[2].children[1].selection.playerId,player.id);
@@ -192,10 +233,10 @@ assert.deepEqual(wrapperSaves[0],normalized);assert.deepEqual(wrapperSaves[2],no
 assert.deepEqual(wrapperSaves[1],wrapperSaves[3],'legacy alert remains unchanged across editor switches');
 await fire('click',wrapperContainer.querySelector('[data-cancel-alert]'));
 assert.equal(wrapperCancelled,1,'legacy cancel invokes the configured callback once');
-assert.ok(wrapperContainer.querySelector('[data-control="field"]'),'canceling a legacy edit returns to the unified creator');
+assert.equal(wrapperContainer.querySelectorAll('[data-formula-category]').length,categoryIds.length,'canceling a legacy edit returns to the mother dropdowns');
 assert.throws(()=>wrapper.getDefinition(),/condici[oó]n|f[oó]rmula|nombre/i,'legacy cancel clears the old definition');
 wrapper.edit(legacy);
-wrapper.reset();assert.ok(wrapperContainer.querySelector('[data-control="field"]'),'reset from legacy opens unified creator');
+wrapper.reset();assert.equal(wrapperContainer.querySelectorAll('[data-formula-category]').length,categoryIds.length,'reset from legacy opens the unified mother dropdowns');
 
 // Failed asynchronous saves remain retryable and report through the same field.
 const failureContainer=new Element('div',{},document);documentRoot.append(failureContainer);let calls=0;
@@ -208,5 +249,6 @@ await fire('click',failureContainer.querySelector('[data-save-alert]'));assert.e
 editor.edit(rule);await click('[data-cancel-alert]');assert.equal(cancelled,1,'cancel callback fires');
 assert.throws(()=>editor.getDefinition(),/condici[oó]n|f[oó]rmula|nombre/i,'cancel returns to a blank formula');
 editor.edit(rule);editor.reset();assert.throws(()=>editor.getDefinition(),/condici[oó]n|f[oó]rmula|nombre/i,'reset cannot retain an old expression');
-assert.equal(qa('[data-control="field"]').length,1,'reset contains one blank condition');
-console.log('Unified formula editor: nested Y/O, all market fields, exact edit/duplicate/save, empty and incomplete conditions, group actions, retry and reset passed.');
+assert.equal(qa('[data-formula-category]').length,categoryIds.length,'reset restores every mother dropdown');
+for(const category of FORMULA_CATEGORIES)assert.equal(q(`[data-formula-category="${category.id}"]`).querySelectorAll('[data-control="group"]').length,1,'reset restores one inactive row per mother');
+console.log('Unified formula editor: mother categories, filtered markets, passive rows, open-state retention, nested Y/O group moves, exact edit/duplicate/save, retry and reset passed.');
