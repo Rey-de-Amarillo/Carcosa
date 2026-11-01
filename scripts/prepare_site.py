@@ -13,6 +13,7 @@ target = root / 'site/dist'
 manifest = json.loads((source / 'data/workspace.json').read_text())
 assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'formula-builder.js', 'workspace-data.js', 'entity-presentation.js',
+          'football-data-archive.js', 'football-data-browser.js', 'data/legacy-sgodds-provenance.json',
           'football-alert-builder.js', 'football-formula-editor.js', 'football-unified-formula.js',
           'football-formula-library.js',
           'football-price-engine.js', 'football-price-editor.js', 'football-reference-price-editor.js', 'football-price-library.js',
@@ -22,6 +23,15 @@ assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'data/football-market-history.json.gz',
           'data/workspace.json', 'data/' + manifest['tables']['events']['path']]
 assets += ['data/' + part['path'] for part in manifest['tables']['offers']['parts']]
+for archive_name in ['expanded-football-manifest.json', 'additional-market-manifest.json', 'research-market-manifest.json']:
+    archive_manifest = json.loads((source / 'data' / archive_name).read_text())
+    assets.append('data/' + archive_name)
+    for partition in archive_manifest['partitions']:
+        name = partition['path']
+        if Path(name).name != name or not name.endswith('.json.gz'):
+            raise ValueError(f'Invalid archive partition: {name}')
+        assets.append('data/' + name)
+assets = list(dict.fromkeys(assets))
 assets += [p.relative_to(source).as_posix() for p in (source / 'assets/football').rglob('*.png')]
 assets += [p.relative_to(source).as_posix() for p in (source / 'vendor/workraken').rglob('*')
            if p.is_file() and p.suffix != '.md']
@@ -63,6 +73,18 @@ las marcas originales sin inventar capturas. El retorno mínimo y el ROI de
 escenarios se distinguen de una captura verificada. Las
 fórmulas propias anteriores se conservan en el archivo; se respalda la colección
 antes de reemplazar ejemplos automáticos sin editar.
+
+La pestaña Datos muestra fuentes, casas de apuestas, URL de origen, fecha de
+consulta, mercados y SHA-256 en grillas con búsqueda y paginación. El archivo
+ampliado contiene 6.595.472 cotizaciones de 21 casas, 22 ligas y 27 temporadas;
+se conservan separadas las fases previas y de cierre. SGodds aporta 94.798
+precios adicionales atribuidos a Singapore Pools. Otros 6.429.081 registros de
+investigación incluyen series temporales y muestras; no son partidos únicos.
+Cada proveedor conserva su identidad. Los LTP de Betfair son operaciones
+publicadas, y el archivo atribuido a Betcity tiene formato/duración no verificados.
+El explorador carga un archivo por vez. Los datos normalizados pueden aplicarse
+a las fórmulas eligiendo una sola fase; la colección de investigación se consulta
+sin transformar sus contratos en apuestas normalizadas.
 
 Datos derivados de Football-Data.co.uk, para uso personal privado. La carpeta
 dist no incluye claves, archivos originales ni conexiones autenticadas.

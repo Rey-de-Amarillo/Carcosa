@@ -4,6 +4,30 @@ Laboratorio privado de cuotas y pagos deportivos: crea fórmulas sobre importes,
 
 [Abrir la app privada publicada](https://kraken-edge-joaquin.workraken.chatgpt.site) · [Abrir la app local](http://127.0.0.1:8765). La primera muestra una captura privada; la segunda necesita iniciar el servidor de esta computadora.
 
+## Fuentes y archivo de datos
+
+La pestaña Datos incluye un catálogo de archivos y grillas con la casa de apuestas,
+proveedor, URL, descarga, mercado, fase, fila/columna originales y SHA-256. Cada
+grilla comparte búsqueda y paginación. Se carga una partición por vez.
+
+El archivo ampliado de [Football-Data](https://www.football-data.co.uk/data.php)
+contiene **6.595.472 cotizaciones individuales**, 199.033 registros de partido,
+21 casas, 22 ligas y 27 temporadas (2000/01–2026/27). No incluye máximos/promedios
+como casas de apuestas y mantiene separados precios previos y de cierre.
+[SGodds](https://sgodds.com/football/data) aporta **94.798 precios adicionales**
+de Singapore Pools, identificando 21 fixtures nuevos y reutilizando 3.257 identidades.
+El proveedor SGodds no se presenta como la web oficial de Singapore Pools.
+
+Se exponen además **6.429.081 observaciones de investigación** ya conservadas
+localmente: Betcity, OddsPapi, SharpAPI y Betfair. Son precios y actualizaciones,
+no esa cantidad de partidos ni apuestas diferentes. Las muestras, contratos de
+torneo, LTP, actividad, límites y formatos no verificados conservan sus etiquetas.
+Los registros de distintos proveedores no se suman como partidos únicos.
+
+El botón «Usar archivo en fórmulas» selecciona un archivo normalizado y una fase.
+La colección de investigación conserva contratos sin normalizar y se consulta
+sin introducirla automáticamente al motor. El archivo original sigue disponible.
+
 ## Interfaz actual de fútbol
 
 El creador matemático combina cuotas, importes y pagos de una misma casa en una sola fórmula con uniones Y/O y grupos anidados. Sus condiciones son suma inversa, pago mínimo, beneficio mínimo y retorno mínimo; funcionan con cualquier equipo y cualquier casa que ofrezca los mismos contratos y cuotas. Los desplegables madre contienen los campos originales de Workraken, todos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar.

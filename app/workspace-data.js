@@ -1,6 +1,7 @@
 /** Derived, indexed football tables. Prices and probabilities retain source precision. */
 import {UNIFIED_FORMULA_KIND} from './football-unified-formula.js';
 import {PRICE_FORMULA_KIND} from './football-price-engine.js';
+import {FootballDataArchive,sourceForWorkspaceEvent} from './football-data-archive.js';
 export const periodMatches=(row,period)=>period==='all'||(period==='test'?row.date>='2022-01-01':row.date<'2022-01-01');
 export async function readData(path,gzip=false){
   const response=await fetch(`data/${path}`);if(!response.ok)throw new Error(`No se pudo cargar ${path} (${response.status}).`);
@@ -9,10 +10,15 @@ export async function readData(path,gzip=false){
   return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).json();
 }
 export class FootballData {
-  constructor(){this.events=[];this.offers=[];this.byEvent=new Map();this.loaded=new Set();this.loading=new Map();}
+  constructor(){this.events=[];this.offers=[];this.byEvent=new Map();this.loaded=new Set();this.loading=new Map();this.archive=new FootballDataArchive({read:readData});}
   async initialize(){
     [this.manifest,this.entities,this.badges]=await Promise.all([readData('workspace.json'),readData('entities.json'),readData('entity-badges.json')]);const table=await readData(this.manifest.tables.events.path,true);
-    this.events=table.rows.map(raw=>{const e=Object.fromEntries(table.columns.map((k,i)=>[k,raw[i]]));return {...e,home:e.home_team,away:e.away_team};});
+    // The helper resolves a recorded source file. Neither the fixture date nor
+    // the file download date becomes a fabricated quote capture timestamp.
+    this.events=table.rows.map(raw=>{
+      const e=Object.fromEntries(table.columns.map((k,i)=>[k,raw[i]])),source=sourceForWorkspaceEvent(this,e);
+      return {...e,home:e.home_team,away:e.away_team,sourceProvider:source.provider,sourceUrl:source.url||null,sourceSha256:source.sha256,sourceRetrievedAt:source.retrievedAt};
+    });
     this.books=new Map(this.manifest.books.map(b=>[b.code,b.name]));this.books.set('SGP','Singapore Pools');this.leagues=new Map(this.entities.leagues.map(l=>[l.id,l.name]));return this;
   }
   async ensureOffers(period){
@@ -25,6 +31,8 @@ export class FootballData {
         // Retain contract provenance verbatim; optional aliases only copy
         // source values. A date of the match is never a quote capture time.
         for(const r of table.rows){const raw=Object.fromEntries(table.columns.map((key,index)=>[key,r[index]])),e=this.events[raw.event];const row={...raw,id:e.id,event:raw.event,date:e.date,league:e.league,home:e.home,away:e.away,book:raw.book,side:raw.side,odds:raw.odds,probability:raw.probability,referenceMean:raw.referenceMean??raw.reference_mean,referenceSd:raw.referenceSd??raw.reference_sd,references:raw.references,ev:raw.ev,won:typeof raw.won==='boolean'?raw.won:null,profit:raw.profit,ownProbability:raw.ownProbability??raw.own_probability,bookmakerMargin:raw.bookmakerMargin??raw.bookmaker_margin};
+          for(const key of ['sourceProvider','sourceUrl','sourceSha256','sourceRetrievedAt'])if(row[key]==null)row[key]=e[key]??null;
+          row.sourceTable=part.path;
           if(raw.quoteId!=null||raw.id!=null)row.quoteId=raw.quoteId??raw.id;
           for(const [canonical,alias] of [['referenceProbability','reference_probability'],['pushProbability','push_probability'],['snapshotId','snapshot_id'],['rulesId','rules_id']])if(row[canonical]==null&&raw[alias]!=null)row[canonical]=raw[alias];
           this.offers.push(row);if(!this.byEvent.has(row.event))this.byEvent.set(row.event,[]);this.byEvent.get(row.event).push(row);}
@@ -34,7 +42,7 @@ export class FootballData {
   }
   async ensureMarketHistory(){
     if(this.marketHistory)return this.marketHistory;
-    if(!this.marketLoading)this.marketLoading=readData('football-market-history.json.gz',true).then(payload=>{this.marketHistory=payload;this.marketEventById=new Map(payload.events.map(e=>[e.id,e]));return payload;}).finally(()=>this.marketLoading=null);
+    if(!this.marketLoading)this.marketLoading=readData('football-market-history.json.gz',true).then(payload=>{this.marketHistory=payload;for(const event of payload.events){event.sourceProvider??=payload.source?.name||null;event.sourceUrl??=payload.source?.url||null;for(const quote of event.marketQuotes||[]){quote.sourceProvider??=payload.source?.name||null;quote.sourceUrl??=event.sourceUrl;}}this.marketEventById=new Map(payload.events.map(e=>[e.id,e]));return payload;}).finally(()=>this.marketLoading=null);
     return this.marketLoading;
   }
   usesGoalArchive(rule){

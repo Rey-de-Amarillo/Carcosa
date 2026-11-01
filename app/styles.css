@@ -59,3 +59,11 @@
 #formula-builder .football-builder-fields{margin:0}
 #formula-builder .football-builder-fields>label>.button{box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:42px;min-height:42px;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #formula-builder [data-alert-error]{color:var(--error,#e88383)}
+.football-data-grid-scroll{overflow-x:auto}
+.football-data-grid{min-width:var(--football-data-min-width,1200px)}
+.football-data-grid :is(.wk-grid-head,.wk-grid-row){grid-template-columns:var(--football-data-columns);column-gap:10px;min-width:0;white-space:normal}
+.football-data-grid>[data-grid-body]{display:grid}
+.football-data-grid .wk-grid-row>*{min-width:0;overflow-wrap:anywhere}
+.football-data-grid .football-formula-empty{grid-template-columns:1fr}
+.football-data-grid [data-number]{text-align:right}
+.football-data-fields button{height:42px;min-height:42px;width:100%}

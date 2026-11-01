@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "provider": "SGodds",
+  "bookmaker": "Singapore Pools",
+  "providerUrl": "https://sgodds.com/football/data",
+  "retrievedAt": "2026-11-01T03:47:30+00:00",
+  "books": [
+    {
+      "code": "SGP",
+      "name": "Singapore Pools",
+      "provider": "SGodds"
+    }
+  ],
+  "markets": [
+    {
+      "id": "asian_handicap",
+      "name": "Hándicap asiático",
+      "quoteCount": 13052
+    },
+    {
+      "id": "btts",
+      "name": "Ambos equipos marcarán",
+      "quoteCount": 60
+    },
+    {
+      "id": "correct_score",
+      "name": "Marcador exacto",
+      "quoteCount": 924
+    },
+    {
+      "id": "first_team_to_score",
+      "name": "Primer equipo en marcar",
+      "quoteCount": 18432
+    },
+    {
+      "id": "half_time_full_time",
+      "name": "Descanso / Final",
+      "quoteCount": 29502
+    },
+    {
+      "id": "match_result",
+      "name": "Resultado (1X2)",
+      "quoteCount": 126
+    },
+    {
+      "id": "odd_even",
+      "name": "Goles: impar / par",
+      "quoteCount": 12704
+    },
+    {
+      "id": "sgp_correct_score_other",
+      "name": "Marcador: cualquier otro resultado",
+      "quoteCount": 6556
+    },
+    {
+      "id": "sgp_half_goal_handicap",
+      "name": "Hándicap «1/2 Goal» original SGP",
+      "quoteCount": 6552
+    },
+    {
+      "id": "total_goals",
+      "name": "Total de goles",
+      "quoteCount": 6890
+    }
+  ],
+  "leagues": [
+    {
+      "id": "D1",
+      "name": "German League"
+    },
+    {
+      "id": "E0",
+      "name": "English Premier"
+    },
+    {
+      "id": "E1",
+      "name": "English League Champ"
+    },
+    {
+      "id": "F1",
+      "name": "French League"
+    },
+    {
+      "id": "I1",
+      "name": "Italian League"
+    },
+    {
+      "id": "N1",
+      "name": "Dutch League"
+    },
+    {
+      "id": "SGP_AUS",
+      "name": "A League"
+    },
+    {
+      "id": "SGP_JPN",
+      "name": "J League"
+    },
+    {
+      "id": "SGP_KOR",
+      "name": "K League"
+    },
+    {
+      "id": "SGP_SWE",
+      "name": "Swedish League"
+    },
+    {
+      "id": "SGP_USA",
+      "name": "US Soccer League"
+    },
+    {
+      "id": "SP1",
+      "name": "Spanish League"
+    }
+  ],
+  "partitions": [
+    {
+      "id": "d1-64792b0fff",
+      "path": "additional-market-d1-64792b0fff.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493902-german-league.csv",
+        "retrievedAt": "2026-11-01T03:47:21+00:00",
+        "sha256": "64792b0fff85bd2eef0d35c31c107e26433e145bcdb080b098e2173ff85d8cfe"
+      },
+      "sha256": "0a2ea76931df78866c9132a7a0aab03c7925d0160360aaec1ffcd68d6963ee93",
+      "bytes": 194662,
+      "eventCount": 248,
+      "newEventCount": 0,
+      "quoteCount": 7190,
+      "dateMin": "2026-01-10",
+      "dateMax": "2026-11-02",
+      "league": "D1",
+      "season": null
+    },
+    {
+      "id": "e0-59fcda60ad",
+      "path": "additional-market-e0-59fcda60ad.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793320801-english-premier.csv",
+        "retrievedAt": "2026-10-30T18:39:20+00:00",
+        "sha256": "59fcda60ad8848073f220fe636d56f6320fd2e682d2b77d13cf0fca9f47ffa28"
+      },
+      "sha256": "86711197a951cc646bd46376709572d7b7951a93eb1ed3b6ef755d38ea37c7a4",
+      "bytes": 5720,
+      "eventCount": 6,
+      "newEventCount": 0,
+      "quoteCount": 174,
+      "dateMin": "2025-12-31",
+      "dateMax": "2025-12-31",
+      "league": "E0",
+      "season": null
+    },
+    {
+      "id": "e0-7f72bfbe14",
+      "path": "additional-market-e0-7f72bfbe14.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493601-english-premier.csv",
+        "retrievedAt": "2026-11-01T03:47:14+00:00",
+        "sha256": "7f72bfbe1442c6249a5c5de4e38f6acba11dcacad701f38960d0bcf5b7044682"
+      },
+      "sha256": "24aaaec2202bcdf7a04240265c5366a705dd5584a211460f3b9038b86090372d",
+      "bytes": 224145,
+      "eventCount": 284,
+      "newEventCount": 1,
+      "quoteCount": 8306,
+      "dateMin": "2026-01-02",
+      "dateMax": "2026-11-03",
+      "league": "E0",
+      "season": null
+    },
+    {
+      "id": "e1-99a5457521",
+      "path": "additional-market-e1-99a5457521.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493781-english-league-champ.csv",
+        "retrievedAt": "2026-11-01T03:47:18+00:00",
+        "sha256": "99a5457521909266d857c167664dea10b5b37fbd908fd8b975836d04d9bdb392"
+      },
+      "sha256": "90217e353e83733a69ea12546d62d281d7e50b1d6ed559ce4ff0936bb38cecee",
+      "bytes": 333213,
+      "eventCount": 430,
+      "newEventCount": 0,
+      "quoteCount": 12466,
+      "dateMin": "2026-01-01",
+      "dateMax": "2026-10-31",
+      "league": "E1",
+      "season": null
+    },
+    {
+      "id": "f1-9cd0aa2732",
+      "path": "additional-market-f1-9cd0aa2732.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493841-french-league.csv",
+        "retrievedAt": "2026-11-01T03:47:19+00:00",
+        "sha256": "9cd0aa2732930591c212df7edbb02faaed7a37f02ae481724d29cfc2a3453881"
+      },
+      "sha256": "fd697955c81ad7645a23d78f0ea1aa3ad29e32574a8998cef574d4f3c37ccf2e",
+      "bytes": 192098,
+      "eventCount": 246,
+      "newEventCount": 0,
+      "quoteCount": 7128,
+      "dateMin": "2026-01-03",
+      "dateMax": "2026-11-03",
+      "league": "F1",
+      "season": null
+    },
+    {
+      "id": "i1-877cc34d98",
+      "path": "additional-market-i1-877cc34d98.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493962-italian-league.csv",
+        "retrievedAt": "2026-11-01T03:47:22+00:00",
+        "sha256": "877cc34d986e0ec9b8dd5fb4c3f0c26fafdede5b3ecb8dddc670e7c1c4911ee6"
+      },
+      "sha256": "310f373deaec3f879b959bf233432f1abd18e499b01c1a22c49179d2d0d53350",
+      "bytes": 261607,
+      "eventCount": 314,
+      "newEventCount": 7,
+      "quoteCount": 9584,
+      "dateMin": "2026-01-03",
+      "dateMax": "2026-11-03",
+      "league": "I1",
+      "season": null
+    },
+    {
+      "id": "n1-efb5aac4f4",
+      "path": "additional-market-n1-efb5aac4f4.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493721-dutch-league.csv",
+        "retrievedAt": "2026-11-01T03:47:16+00:00",
+        "sha256": "efb5aac4f4960223991b640288e6539e55ee5f66a4f9926f43cd3ff107107a8b"
+      },
+      "sha256": "01607e1d51dbb62fc44a4507dfca174648a278bffbf83388f7935f810870c88b",
+      "bytes": 201381,
+      "eventCount": 257,
+      "newEventCount": 0,
+      "quoteCount": 7443,
+      "dateMin": "2026-01-10",
+      "dateMax": "2026-11-01",
+      "league": "N1",
+      "season": null
+    },
+    {
+      "id": "sgp-aus-e73c8639c9",
+      "path": "additional-market-sgp-aus-e73c8639c9.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793320861-a-league.csv",
+        "retrievedAt": "2026-10-30T18:39:19+00:00",
+        "sha256": "e73c8639c91135462252ddfb7782dc0eed7aedd19bcfa8419172c828aa51847c"
+      },
+      "sha256": "dddc656d6be62f30aef818675f96ebac5c61fbb71667a303b21eb03a43d5b2a4",
+      "bytes": 1718,
+      "eventCount": 1,
+      "newEventCount": 0,
+      "quoteCount": 29,
+      "dateMin": "2025-12-31",
+      "dateMax": "2025-12-31",
+      "league": "SGP_AUS",
+      "season": null
+    },
+    {
+      "id": "sgp-aus-fb42b2148c",
+      "path": "additional-market-sgp-aus-fb42b2148c.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793493661-a-league.csv",
+        "retrievedAt": "2026-11-01T03:47:13+00:00",
+        "sha256": "fb42b2148c56a8178572db0b8e11ca312bf3de6943f56a3679ab039d23184b51"
+      },
+      "sha256": "3580aed835f62f8c593246222e80e5d4b1ec6ed4e1f7b9fab9733369df808025",
+      "bytes": 96225,
+      "eventCount": 122,
+      "newEventCount": 0,
+      "quoteCount": 3534,
+      "dateMin": "2026-01-01",
+      "dateMax": "2026-11-01",
+      "league": "SGP_AUS",
+      "season": null
+    },
+    {
+      "id": "sgp-jpn-77e22fed7b",
+      "path": "additional-market-sgp-jpn-77e22fed7b.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793494021-j-league.csv",
+        "retrievedAt": "2026-11-01T03:47:23+00:00",
+        "sha256": "77e22fed7bb91496121eed5cdd3ad82f6541109ff70083fb493306b4ae4f5b25"
+      },
+      "sha256": "d112939a274f42ac8606051658978530611f3f016071ac6f103ea8525afb5106",
+      "bytes": 103204,
+      "eventCount": 130,
+      "newEventCount": 0,
+      "quoteCount": 3770,
+      "dateMin": "2026-08-07",
+      "dateMax": "2026-11-01",
+      "league": "SGP_JPN",
+      "season": null
+    },
+    {
+      "id": "sgp-kor-a6001e6c36",
+      "path": "additional-market-sgp-kor-a6001e6c36.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793494081-k-league.csv",
+        "retrievedAt": "2026-11-01T03:47:25+00:00",
+        "sha256": "a6001e6c36331baac78d53ed11fc9b051f493056a53b1cd9d68e25c864f18636"
+      },
+      "sha256": "5e49e69f27a09284fa85e8b930a6b06722b8d0858ac1a2f07f943f3c0366a2e5",
+      "bytes": 128563,
+      "eventCount": 204,
+      "newEventCount": 6,
+      "quoteCount": 4680,
+      "dateMin": "2026-02-28",
+      "dateMax": "2026-11-01",
+      "league": "SGP_KOR",
+      "season": null
+    },
+    {
+      "id": "sgp-swe-2a1b2145a3",
+      "path": "additional-market-sgp-swe-2a1b2145a3.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793494201-swedish-league.csv",
+        "retrievedAt": "2026-11-01T03:47:28+00:00",
+        "sha256": "2a1b2145a3baf164a17aec9f54a42da623d7a9732c59b04107b1ba03ea4b489e"
+      },
+      "sha256": "b80146b42c0dc1f298fe8399ef3da436be8e5da72210eaebd2d07bd060953d1e",
+      "bytes": 186339,
+      "eventCount": 216,
+      "newEventCount": 7,
+      "quoteCount": 6738,
+      "dateMin": "2026-04-04",
+      "dateMax": "2026-11-03",
+      "league": "SGP_SWE",
+      "season": null
+    },
+    {
+      "id": "sgp-usa-5584f2f653",
+      "path": "additional-market-sgp-usa-5584f2f653.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793494262-us-soccer-league.csv",
+        "retrievedAt": "2026-11-01T03:47:30+00:00",
+        "sha256": "5584f2f65358564d6fb744f178aab8991608dbf9eabdd84ae5f9d4430f041341"
+      },
+      "sha256": "5de44d972903f9250951bc94009e3128a8054334dc6897a7f7661a2e0cba2c82",
+      "bytes": 388978,
+      "eventCount": 498,
+      "newEventCount": 0,
+      "quoteCount": 14432,
+      "dateMin": "2026-02-22",
+      "dateMax": "2026-11-02",
+      "league": "SGP_USA",
+      "season": null
+    },
+    {
+      "id": "sp1-89489a0cb1",
+      "path": "additional-market-sp1-89489a0cb1.json.gz",
+      "source": {
+        "url": "https://sgodds.com/downloads/sgodds-1793494141-spanish-league.csv",
+        "retrievedAt": "2026-11-01T03:47:26+00:00",
+        "sha256": "89489a0cb1c5df722e9b7bc41f117d05637ab3c1f69c82a661b00fe4042c69d2"
+      },
+      "sha256": "364becfd04f1539214dd90d7301d155da3885a9320f7e16b899360813c46ff93",
+      "bytes": 250539,
+      "eventCount": 322,
+      "newEventCount": 0,
+      "quoteCount": 9324,
+      "dateMin": "2026-01-03",
+      "dateMax": "2026-11-03",
+      "league": "SP1",
+      "season": null
+    }
+  ],
+  "eventCount": 3278,
+  "newEventCount": 21,
+  "existingEventCount": 3257,
+  "quoteCount": 94798,
+  "dateMin": "2025-12-31",
+  "dateMax": "2026-11-03",
+  "sourceMarketQuoteCounts": {
+    "ft_asian_handicap": 6502,
+    "ht_asian_handicap": 6550,
+    "ht_ft_result": 29502,
+    "ft_correct_score": 4013,
+    "ft_exact_total_goals": 3465,
+    "ft_first_team_to_score": 9216,
+    "ft_odd_even": 6556,
+    "ht_correct_score": 3467,
+    "ft_half_goal_handicap_source_label": 6552,
+    "ht_odd_even": 6148,
+    "ht_exact_total_goals": 3341,
+    "ht_first_team_to_score": 9216,
+    "ft_1x2": 63,
+    "ht_1x2": 63,
+    "ft_goal_total": 42,
+    "ht_goal_total": 42,
+    "ft_btts": 30,
+    "ht_btts": 30
+  },
+  "excluded": {
+    "already_exported_quotes": 227180,
+    "changed_existing_opening_quotes_not_added": 28
+  },
+  "rawRowsRead": 6528,
+  "uniqueSourceRows": 3278,
+  "existingArchive": {
+    "path": "football-market-history.json.gz",
+    "eventCount": 3257,
+    "quoteCount": 227180,
+    "sha256": "1219c61f2a2c0db805c4ae9127c40df31ae8631a52981264b11ac3b91eb8a99d"
+  },
+  "sources": [
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793494201-swedish-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793494201-swedish-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793494201-swedish-league.csv",
+      "retrievedAt": "2026-11-01T03:47:28+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:50:01 GMT",
+      "bytes": 148385,
+      "sha256": "2a1b2145a3baf164a17aec9f54a42da623d7a9732c59b04107b1ba03ea4b489e"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793494262-us-soccer-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793494262-us-soccer-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793494262-us-soccer-league.csv",
+      "retrievedAt": "2026-11-01T03:47:30+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:51:02 GMT",
+      "bytes": 343619,
+      "sha256": "5584f2f65358564d6fb744f178aab8991608dbf9eabdd84ae5f9d4430f041341"
+    },
+    {
+      "path": "data/raw/sgodds/20261030T183915Z/sgodds-1793320801-english-premier.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793320801-english-premier.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793320801-english-premier.csv",
+      "retrievedAt": "2026-10-30T18:39:20+00:00",
+      "lastModified": "Fri, 30 Oct 2026 00:40:01 GMT",
+      "bytes": 198716,
+      "sha256": "59fcda60ad8848073f220fe636d56f6320fd2e682d2b77d13cf0fca9f47ffa28"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493902-german-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493902-german-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493902-german-league.csv",
+      "retrievedAt": "2026-11-01T03:47:21+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:45:02 GMT",
+      "bytes": 169851,
+      "sha256": "64792b0fff85bd2eef0d35c31c107e26433e145bcdb080b098e2173ff85d8cfe"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793494021-j-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793494021-j-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793494021-j-league.csv",
+      "retrievedAt": "2026-11-01T03:47:23+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:47:01 GMT",
+      "bytes": 89821,
+      "sha256": "77e22fed7bb91496121eed5cdd3ad82f6541109ff70083fb493306b4ae4f5b25"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493601-english-premier.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493601-english-premier.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493601-english-premier.csv",
+      "retrievedAt": "2026-11-01T03:47:14+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:40:01 GMT",
+      "bytes": 195261,
+      "sha256": "7f72bfbe1442c6249a5c5de4e38f6acba11dcacad701f38960d0bcf5b7044682"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493962-italian-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493962-italian-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493962-italian-league.csv",
+      "retrievedAt": "2026-11-01T03:47:22+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:46:02 GMT",
+      "bytes": 214286,
+      "sha256": "877cc34d986e0ec9b8dd5fb4c3f0c26fafdede5b3ecb8dddc670e7c1c4911ee6"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793494141-spanish-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793494141-spanish-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793494141-spanish-league.csv",
+      "retrievedAt": "2026-11-01T03:47:26+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:49:01 GMT",
+      "bytes": 220734,
+      "sha256": "89489a0cb1c5df722e9b7bc41f117d05637ab3c1f69c82a661b00fe4042c69d2"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493781-english-league-champ.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493781-english-league-champ.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493781-english-league-champ.csv",
+      "retrievedAt": "2026-11-01T03:47:18+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:43:01 GMT",
+      "bytes": 297463,
+      "sha256": "99a5457521909266d857c167664dea10b5b37fbd908fd8b975836d04d9bdb392"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493841-french-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493841-french-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493841-french-league.csv",
+      "retrievedAt": "2026-11-01T03:47:19+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:44:01 GMT",
+      "bytes": 167359,
+      "sha256": "9cd0aa2732930591c212df7edbb02faaed7a37f02ae481724d29cfc2a3453881"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793494081-k-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793494081-k-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793494081-k-league.csv",
+      "retrievedAt": "2026-11-01T03:47:25+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:48:01 GMT",
+      "bytes": 128174,
+      "sha256": "a6001e6c36331baac78d53ed11fc9b051f493056a53b1cd9d68e25c864f18636"
+    },
+    {
+      "path": "data/raw/sgodds/20261030T183915Z/sgodds-1793320861-a-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793320861-a-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793320861-a-league.csv",
+      "retrievedAt": "2026-10-30T18:39:19+00:00",
+      "lastModified": "Fri, 30 Oct 2026 00:41:01 GMT",
+      "bytes": 84472,
+      "sha256": "e73c8639c91135462252ddfb7782dc0eed7aedd19bcfa8419172c828aa51847c"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493721-dutch-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493721-dutch-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493721-dutch-league.csv",
+      "retrievedAt": "2026-11-01T03:47:16+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:42:01 GMT",
+      "bytes": 175374,
+      "sha256": "efb5aac4f4960223991b640288e6539e55ee5f66a4f9926f43cd3ff107107a8b"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/sgodds-1793493661-a-league.csv",
+      "url": "https://sgodds.com/downloads/sgodds-1793493661-a-league.csv",
+      "resolvedUrl": "https://sgodds.com/downloads/sgodds-1793493661-a-league.csv",
+      "retrievedAt": "2026-11-01T03:47:13+00:00",
+      "lastModified": "Sun, 01 Nov 2026 00:41:01 GMT",
+      "bytes": 83773,
+      "sha256": "fb42b2148c56a8178572db0b8e11ca312bf3de6943f56a3679ab039d23184b51"
+    }
+  ],
+  "documents": [
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/data.html",
+      "url": "https://sgodds.com/football/data",
+      "resolvedUrl": "https://sgodds.com/football/data",
+      "retrievedAt": "2026-11-01T03:47:11+00:00",
+      "lastModified": null,
+      "bytes": 68779,
+      "sha256": "5f25a7037d2cd49b068b16dd594d6371c2fe2442a06e4e227fb721c53de9299c"
+    },
+    {
+      "path": "data/raw/additional-markets-sgodds/20261101T034709Z/help.html",
+      "url": "https://sgodds.com/help",
+      "resolvedUrl": "https://sgodds.com/help",
+      "retrievedAt": "2026-11-01T03:47:32+00:00",
+      "lastModified": null,
+      "bytes": 58644,
+      "sha256": "ef20f87d724bf712b2e738b7999c00be3d5a3f763bd989fe5b6ffef147b50ca5"
+    }
+  ],
+  "limitations": [
+    "Public CSV archive advertises opening prices for twelve leagues in 2026; older years are not advertised on this page.",
+    "Source Start Time is retained as supplied; source timezone is not independently verified.",
+    "Exact quote timestamps and simultaneous availability are not provided: retrievedAt is a file download time, not capturedAt.",
+    "SGodds documents possible historical handicap/total line and price mismatches when Singapore Pools changes a line.",
+    "First-goal markets cannot generally be settled from HT/FT scores alone; no goal sequence is supplied.",
+    "The original 1/2 Goal and Any Other Score selections remain explicitly source-specific where the app has no equivalent settlement contract."
+  ]
+}

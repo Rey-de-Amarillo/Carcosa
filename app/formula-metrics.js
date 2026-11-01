@@ -5,13 +5,26 @@ import {isPaymentFormula} from './football-price-library.js';
 import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strategy-engine.js';
 import {matchAndRank,summarize} from './formula-engine.js';
 import {periodMatches} from './workspace-data.js';
+import {FootballDataArchive} from './football-data-archive.js';
 
 const finite=value=>typeof value==='number'&&Number.isFinite(value);
 const nullable=value=>finite(value)?value:null;
 const canonicalMarket=value=>({h2h:'match_result',three_way:'match_result',correctScore:'correct_score',totals:'total_goals',totals25:'total_goals',both_teams_to_score:'btts'})[value]||value||'match_result';
 export function normalizeMetricsScope(scope={}){
-  return {period:['test','validation','all'].includes(scope.period)?scope.period:'test',league:String(scope.league||''),book:String(scope.book||'')};
+  const view={period:['test','validation','all'].includes(scope.period)?scope.period:'test',league:String(scope.league||''),book:String(scope.book||'')};
+  if(scope.archive!=null){
+    const raw=scope.archive;
+    if(!raw||typeof raw!=='object'||Array.isArray(raw)||!['expanded','additional'].includes(raw.dataset))throw new Error('Elegí un archivo de cuotas apto para fórmulas.');
+    const text=(value,label)=>{if(typeof value!=='string'||!value.trim()||value.length>200)throw new Error(`Elegí ${label} del archivo.`);return value.trim();};
+    const partitionId=text(raw.partitionId,'la partición'),phase=text(raw.phase,'una fase');
+    if(['all','both','*'].includes(phase))throw new Error('Elegí una sola fase: previa o cierre.');
+    const archive={dataset:raw.dataset,partitionId,phase};
+    for(const key of ['book','market'])if(raw[key]!=null&&raw[key]!==''){if(typeof raw[key]!=='string'||raw[key].length>200)throw new Error('El filtro del archivo no es válido.');archive[key]=raw[key];}
+    view.archive=archive;
+  }
+  return view;
 }
+
 export function formulaMetricsKey(rule,scope={}){
   // Names and saved IDs do not change a result. Everything else is retained,
   // including stake, contract identities, references and legacy configuration.
@@ -69,15 +82,21 @@ export class FormulaMetricsEngine {
     await this.initialize();const view=normalizeMetricsScope(scope),key=formulaMetricsKey(rule,view);
     if(this.cache.has(key)){const cached=this.cache.get(key);return this.remember(this.cache,key,cached,this.cacheLimit);}
     let metrics;
+    if(view.archive&&![PRICE_FORMULA_KIND,UNIFIED_FORMULA_KIND].includes(rule.kind))throw new Error('Esta fórmula anterior no admite archivos ampliados; elegí una fórmula de pagos.');
+    const getUniverse=async()=>{
+      if(!view.archive)return this.data.unifiedStrategyUniverse();
+      const archive=this.data.archive||(this.archive??=new FootballDataArchive());
+      await archive.initialize();return archive.strategyUniverse(view.archive);
+    };
     if(rule.kind===PRICE_FORMULA_KIND){
-      const universe=await this.data.unifiedStrategyUniverse(),scopeKey=JSON.stringify(view);
+      const universe=await getUniverse(),scopeKey=JSON.stringify(view);
       const index=this.scopeIndexes.get(scopeKey)||this.remember(this.scopeIndexes,scopeKey,createOfferIndex(universe.offers,view),this.scopeLimit);
       // Coverage needs all complementary contracts in the selected scope. A
       // single-market/branch optimization could silently remove a portfolio leg.
       const result=evaluatePriceFormula({events:universe.events,offers:index.offers},rule,{entities:this.data.entities,universe:universe.name,summaryOnly:true,immutableUniverse:true,archiveScenario:isPaymentFormula(rule)});
       metrics=metricsFromSummary(result.summary,result.coverage.unknownCandidates,result.coverage);
     }else if(rule.kind===UNIFIED_FORMULA_KIND){
-      const universe=await this.data.unifiedStrategyUniverse(),scopeKey=JSON.stringify(view);
+      const universe=await getUniverse(),scopeKey=JSON.stringify(view);
       const index=this.scopeIndexes.get(scopeKey)||this.remember(this.scopeIndexes,scopeKey,createOfferIndex(universe.offers,view),this.scopeLimit);
       const result=evaluateUnifiedFormula({events:universe.events,offers:candidateOffers(index,rule)},rule,{entities:this.data.entities,universe:universe.name,summaryOnly:true});
       metrics=metricsFromSummary(result.summary,result.coverage.unknownCandidates);

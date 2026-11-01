@@ -14,7 +14,7 @@ for(const item of manifest.files){
 }
 const html=readFileSync(join(root,'app/index.html'),'utf8');
 assert.ok(!/<textarea\b/i.test(html));
-const details=[...html.matchAll(/<details\b([^>]*)>/gi)];assert.equal(details.length,9);
+const details=[...html.matchAll(/<details\b([^>]*)>/gi)];assert.equal(details.length,11);
 for(const [,attributes]of details){assert.ok(attributes.includes('panel table-panel collapsible-panel'));assert.ok(!/\sopen(?:\s|=|$)/.test(attributes),'mother panel defaults open');}
 let previous=-1;
 for(const path of manifest.css_order){const index=html.indexOf('vendor/workraken/'+path);assert.ok(index>previous,'stylesheet order');previous=index;}

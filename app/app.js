@@ -4,6 +4,8 @@ import {loadStrategies,saveStrategies} from './strategy-store.js';
 import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strategy-engine.js';
 import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
+import {sourceForWorkspaceEvent,sourceForPlayer,safeSourceURL} from './football-data-archive.js';
+import {mountFootballDataBrowser} from './football-data-browser.js';
 import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
 import {seedPriceFormulaLibrary,isPaymentFormula} from './football-price-library.js';
 import {PRICE_FORMULA_KIND,formatPriceFormula,evaluatePriceFormula} from './football-price-engine.js';
@@ -21,7 +23,7 @@ const date=s=>s?s.split('-').reverse().join('/'):'—';
 const cls=n=>n>0?'football-positive':n<0?'football-negative':'';
 const pair=(e,a,b)=>e[a]==null||e[b]==null?'—':`${e[a]}–${e[b]}`;
 const data=new FootballData();let ready=false,formulas=loadStrategies(),builder,active=formulas[0].id,selected=[],appliedFormula=formulas[0],tradeToken=0,offerToken=0,messageTimer,currentSummary,alertByKey=new Map(),goalToken=0,entityPresentation=null;
-const tables={};
+const tables={};let dataBrowser,activeArchive=null,activeArchiveName='Archivo original',activeArchiveBooks=[],activeArchiveLeagues=[];
 const formulaMetrics=new Map();let formulaWorker,formulaMetricsRequest=0,formulaMetricsScope='',formulaMetricErrors=0,formulaMetricFatal='',formulaMetricsTotal=0;
 function notify(text){$('message').textContent=text;$('message').hidden=false;clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('message').hidden=true,2800);}
 function searchHTML(id,label,placeholder){return `<div class="expandable-filter-search is-expanded" data-filter-search data-filter-search-always-expanded role="search" aria-label="Buscar ${label}"><button class="expandable-filter-search-toggle" type="button" data-filter-search-toggle aria-label="Buscar ${label}" aria-expanded="true" aria-controls="${id}-search" title="Buscar ${label}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 4.5 4.5"/></svg></button><span class="expandable-filter-search-field"><input id="${id}-search" type="search" data-filter-search-input aria-label="Buscar ${label}" aria-hidden="false" autocomplete="off" placeholder="${placeholder}" tabindex="0"><button class="expandable-filter-search-clear" type="button" data-filter-search-clear aria-label="Limpiar búsqueda de ${label}" title="Limpiar búsqueda" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 7 10 10"/><path d="m17 7-10 10"/></svg></button></span><span class="record-page-announcement" data-search-status role="status" aria-live="polite" aria-atomic="true"></span></div>`;}
@@ -30,7 +32,8 @@ class Table {
   constructor(id,label,columns,render,searchText,placeholder){
     Object.assign(this,{id,label,columns,renderRow:render,searchText,rows:[],filtered:[],page:1,pageSize:10,query:'',pageCount:0});
     $(`${id}-toolbar`).innerHTML=`<div class="record-pagination-controls"><label class="record-page-size-control"><span>Mostrar</span><select class="record-page-size-select" aria-label="Cantidad de ${label} por página" aria-controls="${id}-table">${[10,20,50,100,200].map(n=>`<option value="${n}">${n}</option>`).join('')}</select></label><span class="record-pagination" role="group" aria-label="Paginación de ${label}"><button class="mini-button record-page-button" type="button" data-prev hidden aria-label="Página anterior" title="Página anterior" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button><label class="record-page-picker"><span>Página</span><select class="record-page-select" aria-label="Página de ${label}" aria-controls="${id}-table"><option value="1">1</option></select><span>de <span data-page-total>1</span></span></label><button class="mini-button record-page-button" type="button" data-next aria-label="Página siguiente" title="Página siguiente" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button><span class="record-page-announcement" data-page-status role="status" aria-live="polite" aria-atomic="true"></span></span></div>${searchHTML(id,label,placeholder||(id==='formulas'?'Nombre, pago o condición':'Equipo o partido'))}`;
-    this.root=$(`${id}-toolbar`);this.isGrid=id==='formulas';this.body=this.isGrid?$(`${id}-table`).querySelector('[data-grid-body]'):$(`${id}-table`).tBodies[0];
+    this.root=$(`${id}-toolbar`);this.isGrid=Boolean($(`${id}-table`).querySelector('[data-grid-body]'));this.body=this.isGrid?$(`${id}-table`).querySelector('[data-grid-body]'):$(`${id}-table`).tBodies[0];
+    this.renderRow=record=>{const html=render(record);return this.isGrid&&/^\s*<tr\b/i.test(html)?html.replace(/<tr\b([^>]*)>/gi,(_,attrs)=>`<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" ${attrs.replace(/\brole="[^"]*"/g,'')}>`).replace(/<\/tr>/gi,'</div>').replace(/<td\b/gi,'<div role="cell"').replace(/<\/td>/gi,'</div>'):html;};
     this.size=this.root.querySelector('.record-page-size-select');this.picker=this.root.querySelector('.record-page-select');
     this.size.onchange=()=>{this.pageSize=Number(this.size.value);this.page=1;this.render();};
     this.picker.onchange=()=>{this.page=Number(this.picker.value);this.render();};
@@ -47,18 +50,37 @@ class Table {
     this.picker.value=String(this.page);this.root.querySelector('[data-page-total]').textContent=num(pages,0);this.root.querySelector('[data-prev]').hidden=this.page===1;this.root.querySelector('[data-next]').hidden=this.page===pages;
     this.root.querySelector('[data-page-status]').textContent=`Página ${this.page} de ${pages}. ${total} ${this.label}.`;
     this.body.innerHTML=this.filtered.slice((this.page-1)*this.pageSize,this.page*this.pageSize).map(this.renderRow).join('')||this.empty(`No hay ${this.label} que coincidan con la búsqueda y los filtros.`);
-    const count=$(`${this.id}-count`);if(count)count.textContent=`${num(total,0)} ${this.label}`;
+    const count=$(`${this.id}-count`);if(count){const value=`${num(total,0)} ${this.label}`;if(count.tagName==='INPUT')count.value=value;else count.textContent=value;}
   }
 }
-function scope(prefix){return {period:$(`${prefix}-period`).value,league:$(`${prefix}-league`).value,book:$(`${prefix}-book`).value};}
+async function applyArchive(selection,label){
+  const universe=await data.archive.strategyUniverse(selection);activeArchive={...selection};activeArchiveName=label||universe.name;const presentBooks=new Set(universe.offers.map(q=>q.book)),presentLeagues=new Set(universe.offers.map(q=>q.league));activeArchiveBooks=(universe.books||[]).filter(b=>presentBooks.has(String(b.code)));activeArchiveLeagues=(universe.leagues||[]).filter(l=>presentLeagues.has(String(l.id)));
+  for(const book of universe.books||[])data.books.set(String(book.code),book.name);for(const league of universe.leagues||[])data.leagues.set(String(league.id),league.name);
+  updateArchiveFilters();
+  for(const prefix of ['formulas','trades']){for(const field of ['period','league','book'])$(`${prefix}-${field}`).value=field==='period'?'all':'';$(`${prefix}-origin`).value=activeArchiveName;}
+  initCommonSimpleSelects(document);if($('formulas-panel').open)calculateFormulaMetrics();if($('trades-panel').open)refreshTrades();
+}
+function clearArchive(){activeArchive=null;activeArchiveName='Archivo original';activeArchiveBooks=[];activeArchiveLeagues=[];updateArchiveFilters();for(const prefix of ['formulas','trades'])$(`${prefix}-origin`).value=activeArchiveName;if($('formulas-panel').open)calculateFormulaMetrics();if($('trades-panel').open)refreshTrades();}
+function updateArchiveFilters(){
+  if(!data.manifest)return;
+  const books=activeArchive?activeArchiveBooks:data.manifest.books,leagues=activeArchive?activeArchiveLeagues:data.entities.leagues;
+  const names=[...new Set(books.map(b=>b.name))];
+  for(const prefix of ['formulas','trades']){
+    $(`${prefix}-book`).innerHTML='<option value="">Todas las casas</option>'+names.map(name=>`<option value="${esc(books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('')+(!activeArchive?'<option value="SGP">Singapore Pools</option>':'');
+    $(`${prefix}-league`).innerHTML='<option value="">Todas las ligas</option>'+leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
+  }
+}
+function scope(prefix){return {period:$(`${prefix}-period`).value,league:$(`${prefix}-league`).value,book:$(`${prefix}-book`).value,...(activeArchive&&['formulas','trades'].includes(prefix)?{archive:activeArchive}:{})};}
 function offerMatches(r,s){return periodMatches(r,s.period)&&(!s.league||r.league===s.league)&&(!s.book||s.book.split('|').includes(r.book));}
 const matchSearch=r=>[r.home,r.away,data.leagues?.get(r.league),r.book?data.books?.get(r.book):''];
 const side=r=>r.side===0?'1 · '+r.home:r.side===1?'X · Empate':'2 · '+r.away;
-function offerRow(r,stake=1){const e=data.events[r.event];return `<tr role="button" tabindex="0" data-trade="${r.event}|${esc(r.book)}|${r.side}" aria-label="Ver detalle de ${esc(r.home)} contra ${esc(r.away)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}<span class="football-sub">${leagueHTML(r.league)}</span></td><td>${esc(side(r))}</td><td>${esc(data.books.get(r.book)||r.book)}</td><td data-number>${num(r.odds)}</td><td data-number>${pct(r.probability)}</td><td data-number class="${cls(r.ev)}">${pct(r.ev,true)}</td><td>${r.won?'Ganada':'Perdida'} · ${pair(e,'home_score','away_score')}</td><td data-number class="${cls(r.profit)}">${signed(r.profit*stake)} u</td></tr>`;}
+const localTime=value=>{if(!value)return 'No informada';const d=new Date(value);return Number.isNaN(d.valueOf())?String(value):new Intl.DateTimeFormat('es-AR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Argentina/Salta'}).format(d);};
+const sourceLink=(url,label='Origen')=>{const safe=safeSourceURL(url);return safe?`<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`:'No identificado';};
+function offerRow(r,stake=1){const e=data.events[r.event],source=sourceForWorkspaceEvent(data,e);return `<tr role="button" tabindex="0" data-trade="${r.event}|${esc(r.book)}|${r.side}" aria-label="Ver procedencia de ${esc(r.home)} contra ${esc(r.away)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}</td><td>${esc(side(r))}</td><td>${esc(data.books.get(r.book)||r.book)}</td><td data-number>${num(r.odds)}</td><td>Previa al cierre</td><td>${r.won==null?'Sin resultado':r.won?'Ganada':'Perdida'} · ${pair(e,'home_score','away_score')}</td><td data-number>${r.profit==null?'—':signed(r.profit*stake)} u</td><td>${esc(source.provider)}</td><td>${sourceLink(source.url,'CSV de origen')}</td><td>${esc(localTime(source.retrievedAt))}</td></tr>`;}
 const teamHTML=(name,league)=>entityPresentation?entityPresentation.teamHTML(name,league):esc(name);
 const leagueHTML=id=>entityPresentation?entityPresentation.leagueHTML(id):esc(data.leagues?.get(id)||id);
 const matchHTML=r=>`${teamHTML(r.home,r.league)} <span class="football-match-separator">—</span> ${teamHTML(r.away,r.league)}`;
-function eventRow(e){return `<tr><td>${date(e.date)}</td><td>${teamHTML(e.home,e.league)}</td><td>${teamHTML(e.away,e.league)}</td><td>${leagueHTML(e.league)}</td>${[['home_score','away_score'],['home_ht_score','away_ht_score'],['home_corners','away_corners'],['home_shots','away_shots'],['home_shots_on_target','away_shots_on_target'],['home_yellow','away_yellow']].map(([a,b])=>`<td data-number>${pair(e,a,b)}</td>`).join('')}</tr>`;}
+function eventRow(e){const source=sourceForWorkspaceEvent(data,e);return `<tr><td>${date(e.date)}</td><td>${teamHTML(e.home,e.league)}</td><td>${teamHTML(e.away,e.league)}</td><td>${leagueHTML(e.league)}</td>${[['home_score','away_score'],['home_ht_score','away_ht_score'],['home_corners','away_corners'],['home_shots','away_shots'],['home_shots_on_target','away_shots_on_target'],['home_yellow','away_yellow']].map(([a,b])=>`<td data-number>${pair(e,a,b)}</td>`).join('')}<td>${esc(source.provider)}</td><td>${sourceLink(source.url,'CSV de origen')}</td><td>${esc(localTime(source.retrievedAt))}</td></tr>`;}
 const stakeOf=f=>f.kind==='football-alert'?f.action.stake:f.stake;
 function describeAction(action,context={}){return footballSelectionLabel(action,data.entities||{},context);}
 function conditionLabel(condition){const signal=ALERT_SIGNALS.find(s=>s.id===condition.field),percent=signal?.unit==='percentage',value=v=>percent?pct(v):num(v),name=condition.selection?footballSelectionLabel(condition.selection,data.entities):signal?.name||condition.field;return `${name} ${condition.ui?.operator==='around'?value(condition.ui.value)+' ± '+value(condition.ui.margin):condition.operator==='between'?value(condition.min)+'–'+value(condition.max):condition.operator+' '+value(condition.value)}`;}
@@ -118,10 +140,11 @@ async function refreshOffers(){
 function metric(label,value,kind){return `<article class="kpi-card" ${kind?`data-availability-kpi="${kind}"`:''}><span data-kpi-label>${label}</span><strong data-kpi-value>${value}</strong></article>`;}
 function setStrategyBooks(f,preferredBook){
   const old=preferredBook??$('trades-book').value,sg=f.kind==='football-alert'&&data.usesGoalArchive(f);
-  const available=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>[data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
-  available.push(['SGP','Singapore Pools']);
-  const options=sg?[['SGP','Singapore Pools']]:available.filter(([key])=>key!=='SGP');
-  if((f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND)&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
+  const bookList=activeArchive?activeArchiveBooks:data.manifest.books;
+  const available=[...new Set(bookList.map(b=>b.name))].map(name=>[bookList.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
+  if(!activeArchive&&!available.some(([key])=>key==='SGP'))available.push(['SGP','Singapore Pools']);
+  const options=activeArchive?available:sg?[['SGP','Singapore Pools']]:available.filter(([key])=>key!=='SGP');
+  if(!activeArchive&&(f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND)&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
   const retained=available.find(([key])=>key===old);if(retained&&!options.some(([key])=>key===old))options.push(retained);
   $('trades-book').innerHTML='<option value="">Todas las casas</option>'+options.map(([key,name])=>`<option value="${esc(key)}">${esc(name)}</option>`).join('');
   $('trades-book').value=options.some(([key])=>key===old)?old:'';
@@ -141,8 +164,9 @@ async function refreshTrades(){
   setStrategyBooks(f);initCommonSimpleSelects(document);const view=scope('trades');tables.trades.loading('Buscando coincidencias…');$('trades-export').disabled=true;$('trade-metrics').hidden=true;$('results-panel').hidden=true;
   try{
     let rows,summary;
+    if(activeArchive&&!['football-price','football-formula'].includes(f.kind))throw new Error('Esta fórmula anterior requiere el archivo original.');
     if(f.kind==='football-alert'||f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND){
-      const universe=await data.strategyUniverse(f);if(token!==tradeToken)return;
+      const universe=activeArchive?await data.archive.strategyUniverse(activeArchive):await data.strategyUniverse(f);if(token!==tradeToken)return;
       const offers=universe.offers.filter(r=>(!unified||periodMatches(r,view.period))&&(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
       const evaluate=f.kind===PRICE_FORMULA_KIND?evaluatePriceFormula:f.kind===UNIFIED_FORMULA_KIND?evaluateUnifiedFormula:evaluateFootballStrategy;
       const result=evaluate({events:universe.events,offers},f,{entities:data.entities,universe:universe.name,archiveScenario:payment});
@@ -193,26 +217,23 @@ function showPriceAlert(r){
     fields.push(field('Base del cálculo',r.captureVerified===false?'Histórico hipotético · captura no verificada':'Reparto simulado con capturas verificadas'));
     fields.push(field('Pago mínimo (u)',num(r.minPayout)),field('Beneficio mínimo (u)',signed(r.minProfit)),field('Retorno mínimo (%)',num(r.minReturn*100)),field('Suma de inversas',num(r.inverseSum,6)));
     for(const [outcome,payment]of Object.entries(r.payoutByOutcome||{}))fields.push(field(`Pago si ${labels[outcome]||outcome} (u)`,num(payment)));
-    for(const [i,leg]of r.legs.entries())fields.push(field(`Apuesta ${i+1}`,labels[leg.selection]||leg.selection),field(`Casa ${i+1}`,data.books.get(leg.book)||leg.book),field(`Cuota ${i+1}`,num(leg.effectiveOdds)),field(`Importe ${i+1} (u)`,num(leg.stake)),field(`Captura ${i+1}`,leg.capturedAt||leg.snapshotId||'No verificada'),field(`Reglas ${i+1}`,leg.rulesId||'Contrato declarado · no verificadas'));
+    for(const [i,leg]of r.legs.entries())fields.push(field(`Apuesta ${i+1}`,labels[leg.selection]||leg.selection),field(`Casa ${i+1}`,data.books.get(leg.book)||leg.book),field(`Cuota ${i+1}`,num(leg.effectiveOdds)),field(`Importe ${i+1} (u)`,num(leg.stake)),field(`Captura ${i+1}`,leg.capturedAt||leg.snapshotId||'No verificada'),field(`Reglas ${i+1}`,leg.rulesId||'Contrato declarado · no verificadas'),field(`Proveedor ${i+1}`,leg.sourceQuote?.sourceProvider||leg.sourceQuote?.source||'No conservado'),field(`Archivo ${i+1}`,safeSourceURL(leg.sourceQuote?.sourceUrl)||'No conservado'),field(`Campo / fila ${i+1}`,`${leg.sourceQuote?.sourceColumn||leg.sourceQuote?.sourceField||'—'} / ${leg.sourceQuote?.sourceRow??'—'}`));
   }else{
     const v=r.contextValues||{};fields.push(field('Casa',data.books.get(r.book)||r.book),field('Cuota',num(r.odds)),field('Pago al acertar (u)',num(v.gross_payout)),field('Pago de equilibrio (u)',num(v.fair_payout)),field('Ventaja de pago (u)',signed(v.payout_edge)),field('Probabilidad de referencia (%)',r.probability==null?'Sin referencia':num(r.probability*100)),field('Casas de referencia',num(r.probabilityN,0)),field('EV',`p × cuota + p devolución − 1 − costo`));
   }
   $('trade-details').innerHTML=`<div class="entry-form record-filter-form wk-field-grid football-builder-fields">${fields.join('')}</div>`;$('trade-dialog').showModal();
 }
 function showTrade(key){
-  const [event,book,selection]=key.split('|'),rows=data.byEvent.get(Number(event))||[],r=rows.find(r=>r.book===book&&r.side===Number(selection));if(!r)return;
-  const e=data.events[r.event],stake=$('formulas-view').hidden?1:appliedFormula.stake;
-  const cell=(label,value)=>`<div><span>${label}</span><strong>${value}</strong></div>`;
-  const refs=rows.filter(o=>o.side===r.side&&r.references.includes(o.book)).sort((a,b)=>a.ownProbability-b.ownProbability);
-  $('trade-details').innerHTML=`<h3>${esc(r.home)} — ${esc(r.away)}</h3><p>${date(r.date)} · ${esc(side(r))} · ${esc(data.books.get(r.book))}</p><div class="football-detail-grid">${cell('Cuota',num(r.odds))}${cell('Probabilidad de equilibrio',pct(1/r.odds))}${cell('Probabilidad mínima',pct(r.probability))}${cell('EV estimado',pct(r.ev,true))}${cell('Otras casas',r.references.length)}${cell('Resultado final',pair(e,'home_score','away_score'))}${cell('Importe',`${num(stake)} u`)}${cell('Beneficio',`${signed(r.profit*stake)} u`)}</div><p>EV = ${num(r.probability,6)} × ${num(r.odds)} − 1 = ${pct(r.ev,true)}</p><div class="table-wrap"><table><thead><tr><th>Casa de referencia</th><th>Cuota</th><th>Probabilidad sin margen</th></tr></thead><tbody>${refs.map(o=>`<tr><td>${esc(data.books.get(o.book))}</td><td>${num(o.odds)}</td><td>${pct(o.ownProbability)}</td></tr>`).join('')}</tbody></table></div><p class="football-sub">Referencia mínima entre otras casas tras retirar el margen por potencia. Fuente: Football-Data.co.uk, archivo pre-cierre.</p>`;
-  $('trade-dialog').showModal();
+  const [event,book,selection]=key.split('|'),r=(data.byEvent.get(Number(event))||[]).find(q=>q.book===book&&q.side===Number(selection));if(!r)return;
+  const e=data.events[r.event],source=sourceForWorkspaceEvent(data,e),field=(label,value)=>`<label>${esc(label)}<input type="text" readonly value="${esc(value)}" title="${esc(value)}"></label>`;
+  $('trade-details').innerHTML=`<div class="entry-form record-filter-form wk-field-grid">${field('Partido',r.home+' — '+r.away)}${field('Fecha',date(r.date))}${field('Casa / sala',data.books.get(r.book)||r.book)}${field('Selección',side(r))}${field('Cuota',num(r.odds))}${field('Fase','Previa al cierre')}${field('Resultado',pair(e,'home_score','away_score'))}${field('Beneficio con importe 1',signed(r.profit))}${field('Proveedor',source.provider)}${field('Archivo de origen',source.url)}${field('Descargado',localTime(source.retrievedAt))}${field('SHA-256',source.sha256||'No conservado')}${field('Captura de la cuota',r.capturedAt||'Hora exacta no conservada')}${field('Fila original',r.sourceRow??'No conservada')}</div>`;$('trade-dialog').showModal();
 }
 function exportCSV(table,columns,filename){
   const quote=x=>`"${String(x??'').replace(/"/g,'""')}"`,rows=table.filtered;
   const csv='\uFEFF'+[columns.map(([name])=>quote(name)).join(','),...rows.map(r=>columns.map(([,getter])=>quote(getter(r))).join(','))].join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify(`${num(rows.length,0)} registros exportados`);
 }
-const offerColumns=[['id',r=>r.id],['fecha',r=>r.date],['liga',r=>r.league],['local',r=>r.home],['visitante',r=>r.away],['casa',r=>r.book],['seleccion',r=>['1','X','2'][r.side]],['cuota',r=>r.odds],['probabilidad_min',r=>r.probability],['referencias',r=>r.references.join('|')],['ev_estimado',r=>r.ev],['acierto',r=>r.won],['beneficio_1u',r=>r.profit]];
+const offerColumns=[['id',r=>r.id],['fecha',r=>r.date],['liga',r=>r.league],['local',r=>r.home],['visitante',r=>r.away],['casa',r=>r.book],['seleccion',r=>['1','X','2'][r.side]],['cuota',r=>r.odds],['probabilidad_min',r=>r.probability],['referencias',r=>r.references.join('|')],['ev_estimado',r=>r.ev],['acierto',r=>r.won],['beneficio_1u',r=>r.profit],['fuente',r=>sourceForWorkspaceEvent(data,data.events[r.event]).provider],['archivo_origen',r=>sourceForWorkspaceEvent(data,data.events[r.event]).url],['descargado',r=>sourceForWorkspaceEvent(data,data.events[r.event]).retrievedAt]];
 function setView(){const view=location.hash==='#formulas'?'formulas':'datos';$('datos-view').hidden=view!=='datos';$('formulas-view').hidden=view!=='formulas';document.querySelectorAll('[data-view]').forEach(a=>{const selected=a.dataset.view===view;a.classList.toggle('is-active',selected);if(selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});}
 function playerStatus(p){return {a:'Disponible',i:'Lesionado',d:'En duda',s:'Suspendido'}[p.providerStatus]||'No indicado';}
 function refreshPlayerTeams(){
@@ -234,8 +255,8 @@ async function refreshGoals(){
 }
 function initializeEntityTables(){
   const teamName=id=>data.entities.teams.find(t=>t.id===id)?.name||id;
-  tables.players=new Table('players','jugadores',6,p=>`<tr><td>${esc(p.name)}</td><td>${teamHTML(p.teamId,p.leagueId)}</td><td>${leagueHTML(p.leagueId)}</td><td>${esc(p.position)}</td><td>${playerStatus(p)}</td><td>${date(p.asOf?.slice(0,10))}</td></tr>`,p=>[p.name,teamName(p.teamId),p.position]);
-  tables.goals=new Table('goals','cuotas',7,r=>`<tr><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}</td><td>${esc(ALERT_MARKETS.find(m=>m.id===r.quote.market)?.name)}</td><td>${marketSelection(r.quote)}</td><td>${num(r.quote.odds)}</td><td>Singapore Pools</td><td>${pair(r,'home_score','away_score')}</td></tr>`,matchSearch);
+  tables.players=new Table('players','jugadores',9,p=>`<tr><td>${esc(p.name)}</td><td>${teamHTML(p.teamId,p.leagueId)}</td><td>${leagueHTML(p.leagueId)}</td><td>${esc(p.position)}</td><td>${playerStatus(p)}</td><td>${date(p.asOf?.slice(0,10))}</td><td>${esc(sourceForPlayer(data,p).provider)}</td><td>${sourceLink(sourceForPlayer(data,p).url,'Fuente del plantel')}</td><td>${esc(localTime(sourceForPlayer(data,p).retrievedAt))}</td></tr>`,p=>[p.name,teamName(p.teamId),p.position]);
+  tables.goals=new Table('goals','cuotas',11,r=>{const provenance=data.sgoddsProvenance?.events?.[r.id],source=data.sgoddsProvenance?.sources?.find(s=>s.id===provenance?.sourceId)||{};return `<tr><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}</td><td>${esc(ALERT_MARKETS.find(m=>m.id===r.quote.market)?.name||r.quote.market)}</td><td>${marketSelection(r.quote)}</td><td data-number>${num(r.quote.odds)}</td><td>Singapore Pools</td><td>${pair(r,'home_score','away_score')}</td><td>SGodds</td><td>${sourceLink(source.url||'https://sgodds.com/football/data','CSV de origen')}</td><td>${esc(r.quote.sourceField||'No conservado')} · ${provenance?.sourceRow??'—'}</td><td>${esc(localTime(source.retrievedAt))}</td></tr>`;},matchSearch);
   const leagues=new Set(data.entities.players.map(p=>p.leagueId));$('players-league').innerHTML='<option value="">Todas las ligas con plantel</option>'+data.entities.leagues.filter(l=>leagues.has(l.id)).map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
   $('players-position').innerHTML='<option value="">Todas</option>'+[...new Set(data.entities.players.map(p=>p.position).filter(Boolean))].sort().map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
   $('goals-league').innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');refreshPlayerTeams();
@@ -243,7 +264,7 @@ function initializeEntityTables(){
 }
 
 async function initialize(){
-  tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',10,formulaRow,f=>[f.name,formulaDescription(f)]);
+  tables.events=new Table('events','partidos',13,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',11,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',10,formulaRow,f=>[f.name,formulaDescription(f)]);
   tables.years=new Table('years','años',6,y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(isPaymentFormula(appliedFormula)?y.meanMinReturn:y.meanEV)}">${pct(isPaymentFormula(appliedFormula)?y.meanMinReturn:y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`,y=>y.year,'Año');
   tables.dictionary=new Table('dictionary','campos',3,f=>`<tr><td>${esc(f.name)}${f.label?`<span class="football-sub">${esc(f.label)}</span>`:''}</td><td>${esc(f.formula||f.description)}</td><td>${f.preMatch===false?'Resultado':'Condición'}</td></tr>`,f=>[f.name,f.label,f.formula,f.description],'Nombre o cálculo');
   builder=mountFootballAlertBuilder($('formula-builder'),{onSave:definition=>{
@@ -252,7 +273,9 @@ async function initialize(){
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
-    await data.initialize();formulas=seedPriceFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList(false);initializeEntityTables();
+    await data.initialize();try{const provenance=await fetch('data/legacy-sgodds-provenance.json');if(provenance.ok)data.sgoddsProvenance=await provenance.json();}catch{}
+    dataBrowser=mountFootballDataBrowser({data,Table,archive:data.archive,onApply:applyArchive,onClear:clearArchive,formatters:{esc,num,date,pair,sourceLink,localTime}});await dataBrowser.initialize();
+    formulas=seedPriceFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList(false);initializeEntityTables();
     for(const id of ['events','offers','trades','formulas'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
     const bookOptions=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>`<option value="${esc(data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('');
     for(const id of ['offers','trades'])$(`${id}-book`).innerHTML='<option value="">Todas las casas</option>'+bookOptions;
