@@ -8,7 +8,7 @@ Laboratorio privado de probabilidades deportivas: descarga resultados reales, co
 
 El creador combina equipo, jugador, cuotas y 28 mercados en una sola fórmula con uniones Y/O y grupos anidados. Dentro de Crear fórmula, los desplegables madre Equipos, Jugadores, Goles, Cuotas y las demás familias contienen sus campos. Usan los paneles y la grilla originales de Workraken, con campos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar.
 
-Incluye 120 fórmulas guardadas iniciales, editables y duplicables, que se agregan sin reemplazar las propias. Cada simulación se ejecuta al elegir una fórmula.
+Incluye 120 fórmulas guardadas iniciales, editables y duplicables, que se agregan sin reemplazar las propias. La grilla permite buscar, paginar, ordenar y filtrar por EV, ROI y rendimiento de las cotizaciones coincidentes.
 
 La fórmula filtra cotizaciones reales del histórico: mercado, selección, jugador y cuota corresponden a la misma apuesta. El resultado sirve para liquidarla; no se usa para decidir si cumple la fórmula. Los datos ausentes quedan sin evaluar.
 

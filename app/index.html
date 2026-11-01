@@ -63,7 +63,23 @@
       </details>
       <details class="panel table-panel collapsible-panel" id="formulas-panel">
         <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Fórmulas guardadas</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
-        <div class="parking-directory-body"><div id="formulas-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="formulas-table"><thead><tr><th>Nombre</th><th>Cuándo avisar</th><th>Qué apostar</th><th>Importe</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="parking-directory-body">
+          <form class="entry-form record-filter-form wk-field-grid" id="formulas-filters">
+            <label>Período<select id="formulas-period"><option value="test">2022–2026</option><option value="validation">2018–2021</option><option value="all">2018–2026</option></select></label>
+            <label>Liga<select id="formulas-league"><option value="">Todas las ligas</option></select></label>
+            <label>Casa<select id="formulas-book"><option value="">Todas las casas</option></select></label>
+            <label>Ordenar<select id="formulas-sort"><option value="ev_desc">EV mayor</option><option value="roi_desc">ROI mayor</option><option value="profit_desc">Beneficio mayor</option><option value="n_desc">Más apuestas</option><option value="winRate_desc">Mayor acierto</option><option value="odds_desc">Cuota media mayor</option><option value="name_asc">Nombre A–Z</option></select></label>
+            <label>EV mínimo (%)<input id="formulas-min-ev" type="number" step="any" placeholder="0"></label>
+            <label>ROI mínimo (%)<input id="formulas-min-roi" type="number" step="any" placeholder="0"></label>
+            <label>Apuestas mínimas<input id="formulas-min-n" type="number" min="0" step="1" placeholder="0"></label>
+            <label>Datos<input id="formulas-progress" type="text" readonly value="Pendiente" aria-live="polite"></label>
+          </form>
+          <div id="formulas-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div>
+          <div class="football-formula-grid-scroll"><div id="formulas-table" role="table" aria-label="Fórmulas guardadas" class="football-formula-grid">
+            <div class="wk-grid-head wk-grid-row" role="row"><div role="columnheader">Nombre / fórmula</div><div role="columnheader" data-number>EV estimado</div><div role="columnheader" data-number>ROI</div><div role="columnheader" data-number>Beneficio (u)</div><div role="columnheader" data-number>Apuestas</div><div role="columnheader" data-number>Acierto</div><div role="columnheader" data-number>Cuota media</div><div role="columnheader" data-number>Sin datos</div><div role="columnheader" aria-label="Acciones"></div></div>
+            <div data-grid-body class="wk-row-list" role="rowgroup"></div>
+          </div></div>
+        </div>
       </details>
       <details class="panel table-panel collapsible-panel" id="trades-panel">
         <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Jugadas coincidentes</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
@@ -73,10 +89,10 @@
           <div id="trade-metrics" class="kpi-grid kpi-grid-wide parking-occupancy-kpis" aria-live="polite"></div>
           <div class="table-wrap"><table id="trades-table"><thead><tr><th>Fecha</th><th>Partido</th><th>Apuesta</th><th>Casa</th><th>Cuota apuesta</th><th>Probabilidad</th><th>EV estimado</th><th>Ganancia esperada</th><th>Resultado</th><th>Beneficio</th></tr></thead><tbody></tbody></table></div>
           <div class="football-panel-actions"><span id="trades-count" role="status"></span><button type="button" class="button button-neutral" id="trades-export" disabled>Exportar CSV</button></div>
-          <details class="panel table-panel collapsible-panel football-nested" id="results-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Resultado por año</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="table-wrap"><table id="years-table"><thead><tr><th>Año</th><th>Jugadas</th><th>Aciertos</th><th>EV estimado</th><th>ROI histórico</th><th>Beneficio</th></tr></thead><tbody></tbody></table></div></details>
+          <details class="panel table-panel collapsible-panel football-nested" id="results-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Resultado por año</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body"><div id="years-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="years-table"><thead><tr><th>Año</th><th>Jugadas</th><th>Aciertos</th><th>EV estimado</th><th>ROI histórico</th><th>Beneficio</th></tr></thead><tbody></tbody></table></div></div></details>
         </div>
       </details>
-      <details class="panel table-panel collapsible-panel" id="dictionary-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Datos y cálculos</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body"><div class="table-wrap"><table id="dictionary-table"><thead><tr><th>Nombre del dato</th><th>Cálculo / significado</th><th>Uso</th></tr></thead><tbody></tbody></table></div></div></details>
+      <details class="panel table-panel collapsible-panel" id="dictionary-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Datos y cálculos</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body"><div id="dictionary-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="dictionary-table"><thead><tr><th>Nombre del dato</th><th>Cálculo / significado</th><th>Uso</th></tr></thead><tbody></tbody></table></div></div></details>
     </div>
   </main>
 </div>

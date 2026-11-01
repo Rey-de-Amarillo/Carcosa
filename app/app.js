@@ -6,6 +6,7 @@ import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
 import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
 import {seedFormulaLibrary} from './football-formula-library.js';
+import {filterAndSortFormulas} from './formula-metrics-view.js';
 import {initExpandableFilterSearch,filterSearchMatches} from './vendor/workraken/search.js';
 import {initDatePicker} from './vendor/workraken/date-picker.js';
 import {initCommonSimpleSelects} from './vendor/workraken/single-select.js';
@@ -20,29 +21,31 @@ const cls=n=>n>0?'football-positive':n<0?'football-negative':'';
 const pair=(e,a,b)=>e[a]==null||e[b]==null?'—':`${e[a]}–${e[b]}`;
 const data=new FootballData();let ready=false,formulas=loadStrategies(),builder,active=formulas[0].id,selected=[],appliedFormula=formulas[0],tradeToken=0,offerToken=0,messageTimer,currentSummary,alertByKey=new Map(),goalToken=0,entityPresentation=null;
 const tables={};
+const formulaMetrics=new Map();let formulaWorker,formulaMetricsRequest=0,formulaMetricsScope='',formulaMetricErrors=0,formulaMetricFatal='';
 function notify(text){$('message').textContent=text;$('message').hidden=false;clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('message').hidden=true,2800);}
 function searchHTML(id,label,placeholder){return `<div class="expandable-filter-search is-expanded" data-filter-search data-filter-search-always-expanded role="search" aria-label="Buscar ${label}"><button class="expandable-filter-search-toggle" type="button" data-filter-search-toggle aria-label="Buscar ${label}" aria-expanded="true" aria-controls="${id}-search" title="Buscar ${label}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 4.5 4.5"/></svg></button><span class="expandable-filter-search-field"><input id="${id}-search" type="search" data-filter-search-input aria-label="Buscar ${label}" aria-hidden="false" autocomplete="off" placeholder="${placeholder}" tabindex="0"><button class="expandable-filter-search-clear" type="button" data-filter-search-clear aria-label="Limpiar búsqueda de ${label}" title="Limpiar búsqueda" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 7 10 10"/><path d="m17 7-10 10"/></svg></button></span><span class="record-page-announcement" data-search-status role="status" aria-live="polite" aria-atomic="true"></span></div>`;}
 // Markup retained from Workraken templates/_pagination.html. Domain callbacks only.
 class Table {
-  constructor(id,label,columns,render,searchText){
+  constructor(id,label,columns,render,searchText,placeholder){
     Object.assign(this,{id,label,columns,renderRow:render,searchText,rows:[],filtered:[],page:1,pageSize:10,query:'',pageCount:0});
-    $(`${id}-toolbar`).innerHTML=`<div class="record-pagination-controls"><label class="record-page-size-control"><span>Mostrar</span><select class="record-page-size-select" aria-label="Cantidad de ${label} por página" aria-controls="${id}-table">${[10,20,50,100,200].map(n=>`<option value="${n}">${n}</option>`).join('')}</select></label><span class="record-pagination" role="group" aria-label="Paginación de ${label}"><button class="mini-button record-page-button" type="button" data-prev hidden aria-label="Página anterior" title="Página anterior" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button><label class="record-page-picker"><span>Página</span><select class="record-page-select" aria-label="Página de ${label}" aria-controls="${id}-table"><option value="1">1</option></select><span>de <span data-page-total>1</span></span></label><button class="mini-button record-page-button" type="button" data-next aria-label="Página siguiente" title="Página siguiente" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button><span class="record-page-announcement" data-page-status role="status" aria-live="polite" aria-atomic="true"></span></span></div>${searchHTML(id,label,id==='formulas'?'Nombre de la fórmula':'Equipo o partido')}`;
-    this.root=$(`${id}-toolbar`);this.body=$(`${id}-table`).tBodies[0];
+    $(`${id}-toolbar`).innerHTML=`<div class="record-pagination-controls"><label class="record-page-size-control"><span>Mostrar</span><select class="record-page-size-select" aria-label="Cantidad de ${label} por página" aria-controls="${id}-table">${[10,20,50,100,200].map(n=>`<option value="${n}">${n}</option>`).join('')}</select></label><span class="record-pagination" role="group" aria-label="Paginación de ${label}"><button class="mini-button record-page-button" type="button" data-prev hidden aria-label="Página anterior" title="Página anterior" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button><label class="record-page-picker"><span>Página</span><select class="record-page-select" aria-label="Página de ${label}" aria-controls="${id}-table"><option value="1">1</option></select><span>de <span data-page-total>1</span></span></label><button class="mini-button record-page-button" type="button" data-next aria-label="Página siguiente" title="Página siguiente" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button><span class="record-page-announcement" data-page-status role="status" aria-live="polite" aria-atomic="true"></span></span></div>${searchHTML(id,label,placeholder||(id==='formulas'?'Nombre, equipo o mercado':'Equipo o partido'))}`;
+    this.root=$(`${id}-toolbar`);this.isGrid=id==='formulas';this.body=this.isGrid?$(`${id}-table`).querySelector('[data-grid-body]'):$(`${id}-table`).tBodies[0];
     this.size=this.root.querySelector('.record-page-size-select');this.picker=this.root.querySelector('.record-page-select');
     this.size.onchange=()=>{this.pageSize=Number(this.size.value);this.page=1;this.render();};
     this.picker.onchange=()=>{this.page=Number(this.picker.value);this.render();};
     this.root.querySelector('[data-prev]').onclick=()=>{this.page--;this.render();};this.root.querySelector('[data-next]').onclick=()=>{this.page++;this.render();};
     initExpandableFilterSearch(this.root.querySelector('[data-filter-search]'),{onSearch:query=>{this.query=query;this.page=1;clearTimeout(this.searchTimer);this.searchTimer=setTimeout(()=>this.filter(),160);}});
   }
-  setRows(rows){this.busy=false;this.root.querySelectorAll('select,button,input').forEach(e=>e.disabled=false);this.rows=rows;this.page=1;this.filter();}
+  setRows(rows,{resetPage=true}={}){this.busy=false;this.root.querySelectorAll('select,button,input').forEach(e=>e.disabled=false);this.rows=rows;if(resetPage)this.page=1;this.filter();}
   filter(){if(this.busy)return;this.filtered=this.query?this.rows.filter(r=>filterSearchMatches(this.searchText(r),this.query)):this.rows;this.render();}
-  loading(text='Cargando datos…'){this.busy=true;this.root.querySelectorAll('select,button,input').forEach(e=>e.disabled=true);this.body.innerHTML=`<tr><td colspan="${this.columns}"><div class="empty-state" role="status">${esc(text)}</div></td></tr>`;}
+  empty(text){return this.isGrid?`<div role="row" class="wk-grid-row wk-row-outline wk-row-surface football-formula-empty"><span role="cell">${esc(text)}</span></div>`:`<tr><td colspan="${this.columns}"><div class="empty-state" role="status">${esc(text)}</div></td></tr>`;}
+  loading(text='Cargando datos…'){this.busy=true;this.root.querySelectorAll('select,button,input').forEach(e=>e.disabled=true);this.body.innerHTML=this.empty(text);}
   render(){
     const total=this.filtered.length,pages=Math.max(1,Math.ceil(total/this.pageSize));this.page=Math.min(pages,Math.max(1,this.page));
     if(this.pageCount!==pages){this.picker.innerHTML=Array.from({length:pages},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');this.pageCount=pages;}
     this.picker.value=String(this.page);this.root.querySelector('[data-page-total]').textContent=num(pages,0);this.root.querySelector('[data-prev]').hidden=this.page===1;this.root.querySelector('[data-next]').hidden=this.page===pages;
     this.root.querySelector('[data-page-status]').textContent=`Página ${this.page} de ${pages}. ${total} ${this.label}.`;
-    this.body.innerHTML=this.filtered.slice((this.page-1)*this.pageSize,this.page*this.pageSize).map(this.renderRow).join('')||`<tr><td colspan="${this.columns}"><div class="empty-state">No hay ${esc(this.label)} que coincidan con la búsqueda y los filtros.</div></td></tr>`;
+    this.body.innerHTML=this.filtered.slice((this.page-1)*this.pageSize,this.page*this.pageSize).map(this.renderRow).join('')||this.empty(`No hay ${this.label} que coincidan con la búsqueda y los filtros.`);
     const count=$(`${this.id}-count`);if(count)count.textContent=`${num(total,0)} ${this.label}`;
   }
 }
@@ -58,8 +61,42 @@ function eventRow(e){return `<tr><td>${date(e.date)}</td><td>${teamHTML(e.home,e
 const stakeOf=f=>f.kind==='football-alert'?f.action.stake:f.stake;
 function describeAction(action,context={}){return footballSelectionLabel(action,data.entities||{},context);}
 function conditionLabel(condition){const signal=ALERT_SIGNALS.find(s=>s.id===condition.field),percent=signal?.unit==='percentage',value=v=>percent?pct(v):num(v),name=condition.selection?footballSelectionLabel(condition.selection,data.entities):signal?.name||condition.field;return `${name} ${condition.ui?.operator==='around'?value(condition.ui.value)+' ± '+value(condition.ui.margin):condition.operator==='between'?value(condition.min)+'–'+value(condition.max):condition.operator+' '+value(condition.value)}`;}
-function formulaRow(f){const unified=f.kind===UNIFIED_FORMULA_KIND,domain=f.kind==='football-alert',trigger=unified?formatUnifiedFormula(f,data.entities||{}):domain?f.conditions.map(conditionLabel).join(' · '):'EV mínimo · referencias entre casas',bet=unified?'—':domain?describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';return `<tr><td>${esc(f.name)}</td><td>${esc(trigger)}</td><td>${esc(bet)}</td><td>${num(stakeOf(f))} u</td><td><div class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></td></tr>`;}
-function refreshFormulaList(){tables.formulas.setRows(formulas);const value=$('trades-formula').value||active;$('trades-formula').innerHTML=formulas.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');$('trades-formula').value=formulas.some(f=>f.id===value)?value:formulas[0].id;}
+function formulaDescription(f){return f.kind===UNIFIED_FORMULA_KIND?formatUnifiedFormula(f,data.entities||{}):f.kind==='football-alert'?f.conditions.map(conditionLabel).join(' · ')+' → '+describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';}
+function formulaRow(f){
+  const unified=f.kind===UNIFIED_FORMULA_KIND,domain=f.kind==='football-alert',raw=formulaMetrics.get(f.id),m=raw?.state==='ready'?raw:null;
+  const state=raw?.state==='error'?'Error':raw?.state==='loading'?'Calculando…':'Pendiente',cell=(text,kind='',extra='')=>`<div role="cell" data-number class="${kind}">${text}${extra}</div>`;
+  const hint=text=>`<span class="football-sub">${esc(text)}</span>`;
+  return `<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" data-formula-row="${esc(f.id)}"><div role="cell"><strong>${esc(f.name)}</strong>${hint(formulaDescription(f))}</div>${cell(m?pct(m.meanEV,true):'—',cls(m?.meanEV),hint(m?`${num(m.expectedPriced,0)} con EV`:state))}${cell(m?pct(m.roi,true):'—',cls(m?.roi),m?hint(`${m.scenario?'Simulado · ':''}${num(m.settledPriced,0)} liquidadas`):'')}${cell(m&&m.profit!=null?signed(m.profit):'—',cls(m?.profit))}${cell(m?num(m.n,0):'—')}${cell(m?pct(m.winRate):'—')}${cell(m?num(m.meanOdds):'—')}${cell(m?num(m.unknownCandidates,0):'—','',raw?.state==='error'?hint(raw.message):'')}<div role="cell" class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></div>`;
+}
+function refreshFormulaGrid(resetPage=false){
+  if(!tables.formulas)return;
+  tables.formulas.setRows(filterAndSortFormulas(formulas,formulaMetrics,{sort:$('formulas-sort').value,minEV:$('formulas-min-ev').value,minROI:$('formulas-min-roi').value,minN:$('formulas-min-n').value}),{resetPage});
+}
+function refreshFormulaList(evaluate=true){refreshFormulaGrid();const value=$('trades-formula').value||active;$('trades-formula').innerHTML=formulas.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');$('trades-formula').value=formulas.some(f=>f.id===value)?value:formulas[0].id;if(evaluate&&ready&&$('formulas-panel').open)calculateFormulaMetrics();}
+function calculateFormulaMetrics(){
+  if(!ready||!$('formulas-panel').open)return;
+  const requestId=++formulaMetricsRequest,view=scope('formulas'),key=JSON.stringify(view);
+  formulaMetricErrors=0;formulaMetricFatal='';
+  if(key!==formulaMetricsScope){formulaMetrics.clear();formulaMetricsScope=key;}
+  for(const f of formulas)formulaMetrics.set(f.id,{state:'loading'});
+  refreshFormulaGrid();$('formulas-progress').value=`Calculando 0/${formulas.length}`;
+  if(!formulaWorker){
+    formulaWorker=new Worker(new URL('./formula-metrics-worker.js',import.meta.url),{type:'module'});
+    formulaWorker.onmessage=({data:message})=>{
+      if(message.requestId!==formulaMetricsRequest)return;
+      if(message.type==='metric'){formulaMetrics.set(message.id,{...message.metrics,state:'ready'});refreshFormulaGrid();}
+      else if(message.type==='progress')$('formulas-progress').value=`Calculando ${message.completed}/${message.total}`;
+      else if(message.type==='complete'){$('formulas-progress').value=formulaMetricFatal||(formulaMetricErrors?`${formulas.length-formulaMetricErrors} evaluadas · ${formulaMetricErrors} sin evaluar`:`${formulas.length} fórmulas evaluadas`);refreshFormulaGrid();}
+      else if(message.type==='error'){
+        if(message.id){formulaMetricErrors++;formulaMetrics.set(message.id,{state:'error',message:message.message});}
+        else {formulaMetricFatal=message.message;for(const f of formulas)formulaMetrics.set(f.id,{state:'error',message:message.message});$('formulas-progress').value=message.message;}
+        refreshFormulaGrid();
+      }
+    };
+    formulaWorker.onerror=event=>{for(const f of formulas)formulaMetrics.set(f.id,{state:'error',message:event.message||'No se pudieron calcular las métricas.'});$('formulas-progress').value='No se pudieron calcular las métricas.';refreshFormulaGrid();formulaWorker.terminate();formulaWorker=null;};
+  }
+  formulaWorker.postMessage({type:'evaluate',requestId,formulas,scope:view});
+}
 function refreshEvents(){
   if(!ready)return;const from=$('events-from').value,to=$('events-to').value,league=$('events-league').value,result=$('events-result').value;
   const rows=data.events.filter(e=>(!from||e.date>=from)&&(!to||e.date<=to)&&(!league||e.league===league)&&(!result||Number(result)===(e.home_score>e.away_score?0:e.home_score===e.away_score?1:2))).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id));
@@ -70,10 +107,13 @@ async function refreshOffers(){
   try{await data.ensureOffers(s.period);if(token!==offerToken)return;const sideValue=$('offers-side').value;tables.offers.setRows(data.offers.filter(r=>offerMatches(r,s)&&(!sideValue||r.side===Number(sideValue))).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)||a.book.localeCompare(b.book)||a.side-b.side));$('offers-export').disabled=false;}catch(e){if(token===offerToken)tables.offers.loading(e.message);}
 }
 function metric(label,value,kind){return `<article class="kpi-card" ${kind?`data-availability-kpi="${kind}"`:''}><span data-kpi-label>${label}</span><strong data-kpi-value>${value}</strong></article>`;}
-function setStrategyBooks(f){
-  const old=$('trades-book').value,sg=f.kind==='football-alert'&&data.usesGoalArchive(f);
-  const options=sg?[['SGP','Singapore Pools']]:[...new Set(data.manifest.books.map(b=>b.name))].map(name=>[data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
+function setStrategyBooks(f,preferredBook){
+  const old=preferredBook??$('trades-book').value,sg=f.kind==='football-alert'&&data.usesGoalArchive(f);
+  const available=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>[data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
+  available.push(['SGP','Singapore Pools']);
+  const options=sg?[['SGP','Singapore Pools']]:available.filter(([key])=>key!=='SGP');
   if(f.kind===UNIFIED_FORMULA_KIND&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
+  const retained=available.find(([key])=>key===old);if(retained&&!options.some(([key])=>key===old))options.push(retained);
   $('trades-book').innerHTML='<option value="">Todas las casas</option>'+options.map(([key,name])=>`<option value="${esc(key)}">${esc(name)}</option>`).join('');
   $('trades-book').value=options.some(([key])=>key===old)?old:'';
 }
@@ -108,7 +148,7 @@ async function refreshTrades(){
     const valued=summary.expectedPriced??summary.n;
     $('trade-metrics').innerHTML=metric('Alertas',num(summary.n,0))+metric(`EV estimado · ${num(valued,0)}`,pct(summary.meanEV,true))+metric('Ganancia esperada',summary.expectedProfit==null?'—':`${signed(summary.expectedProfit)} u`)+metric(summary.isScenario?'ROI simulado':'ROI histórico',pct(summary.roi,true));
     $('trades-count').textContent=`${num(summary.n,0)} alertas · ${num(valued,0)} con EV · ${summary.profit==null?'—':signed(summary.profit)+' u'} ${summary.isScenario?'simuladas':'realizadas'}`;
-    $('years-table').tBodies[0].innerHTML=summary.years.map(y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(y.meanEV)}">${pct(y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`).join('');
+    tables.years.setRows(summary.years);
   }catch(e){if(token===tradeToken){tables.trades.loading(e.message);if(unified)$('trades-coverage').value=e.message;}}
 }
 function showAlert(key){
@@ -162,29 +202,41 @@ function initializeEntityTables(){
 }
 
 async function initialize(){
-  tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',5,formulaRow,f=>f.name);
+  tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',9,formulaRow,f=>[f.name,formulaDescription(f)]);
+  tables.years=new Table('years','años',6,y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(y.meanEV)}">${pct(y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`,y=>y.year,'Año');
+  tables.dictionary=new Table('dictionary','campos',3,f=>`<tr><td>${esc(f.name)}${f.label?`<span class="football-sub">${esc(f.label)}</span>`:''}</td><td>${esc(f.formula||f.description)}</td><td>${f.preMatch===false?'Resultado':'Condición'}</td></tr>`,f=>[f.name,f.label,f.formula,f.description],'Nombre o cálculo');
   builder=mountFootballAlertBuilder($('formula-builder'),{onSave:definition=>{
     const f={...definition,id:definition.id||crypto.randomUUID()},next=formulas.some(x=>x.id===f.id)?formulas.map(x=>x.id===f.id?f:x):[...formulas,f];
     formulas=saveStrategies(next,data.entities);active=f.id;refreshFormulaList();$('trades-formula').value=f.id;initCommonSimpleSelects(document);builder.reset();$('create-title').textContent='Crear fórmula';$('create-panel').open=false;$('formulas-panel').open=true;if($('trades-panel').open)refreshTrades();
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
-    await data.initialize();formulas=seedFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList();initializeEntityTables();
-    for(const id of ['events','offers','trades'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
+    await data.initialize();formulas=seedFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList(false);initializeEntityTables();
+    for(const id of ['events','offers','trades','formulas'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
     const bookOptions=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>`<option value="${esc(data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('');
     for(const id of ['offers','trades'])$(`${id}-book`).innerHTML='<option value="">Todas las casas</option>'+bookOptions;
+    $('formulas-book').innerHTML='<option value="">Todas las casas</option>'+bookOptions+'<option value="SGP">Singapore Pools</option>';
     $('events-from').value=data.manifest.date_range[0];$('events-to').value=data.manifest.date_range[1];
-    $('dictionary-table').tBodies[0].innerHTML=FIELD_DICTIONARY.map(f=>`<tr><td>${esc(f.name)}<span class="football-sub">${esc(f.label)}</span></td><td>${esc(f.formula||f.description)}</td><td>${f.preMatch===false?'Resultado':'Condición'}</td></tr>`).join('')+'<tr><td>roi</td><td>Suma de beneficios históricos / importe total apostado</td><td>Resultado</td></tr>';
+    tables.dictionary.setRows([...FIELD_DICTIONARY,{name:'roi',description:'Suma de beneficios históricos / importe total apostado',preMatch:false}]);
     if($('events-panel').open)refreshEvents();if($('offers-panel').open)refreshOffers();if($('trades-panel').open)refreshTrades();
+    if($('formulas-panel').open)calculateFormulaMetrics();
   }catch(e){$('load-error').textContent=e.message;$('load-error').hidden=false;}
 }
 window.addEventListener('hashchange',setView);
+$('formulas-panel').addEventListener('toggle',()=>{if($('formulas-panel').open)calculateFormulaMetrics();});
+$('formulas-filters').addEventListener('submit',event=>event.preventDefault());
+$('formulas-filters').addEventListener('change',event=>{if(['formulas-period','formulas-league','formulas-book'].includes(event.target.id))calculateFormulaMetrics();else refreshFormulaGrid(true);});
+$('formulas-filters').addEventListener('input',event=>{if(['formulas-min-ev','formulas-min-roi','formulas-min-n'].includes(event.target.id))refreshFormulaGrid(true);});
 for(const [id,refresh]of [['events',refreshEvents],['offers',refreshOffers],['trades',refreshTrades],['players',refreshPlayers],['goals',refreshGoals]]){
   $(`${id}-panel`).addEventListener('toggle',()=>{if($(`${id}-panel`).open)refresh();});$(`${id}-filters`).addEventListener('change',refresh);$(`${id}-filters`).addEventListener('submit',e=>e.preventDefault());
 }
 document.addEventListener('click',event=>{
   const use=event.target.closest('[data-use]'),edit=event.target.closest('[data-edit]'),duplicate=event.target.closest('[data-duplicate]'),row=event.target.closest('[data-trade]');
-  if(use){$('trades-formula').value=use.dataset.use;$('trades-panel').open=true;refreshTrades();$('trades-panel').scrollIntoView({behavior:'smooth',block:'start'});}
+  if(use){
+    $('trades-formula').value=use.dataset.use;
+    if(use.closest('[data-formula-row]')){const view=scope('formulas'),rule=formulas.find(f=>f.id===use.dataset.use);if(rule){setStrategyBooks(rule,view.book);for(const key of ['period','league','book'])$(`trades-${key}`).value=view[key];initCommonSimpleSelects(document);}}
+    const wasOpen=$('trades-panel').open;$('trades-panel').open=true;if(wasOpen)refreshTrades();$('trades-panel').scrollIntoView({behavior:'smooth',block:'start'});
+  }
   if(edit||duplicate){const f=formulas.find(f=>f.id===(edit?.dataset.edit||duplicate.dataset.duplicate));if(f?.kind==='football-alert'||f?.kind===UNIFIED_FORMULA_KIND){builder.edit(duplicate?{...f,id:null,name:f.name+' · copia'}:f);$('create-title').textContent='Crear fórmula';$('create-panel').open=true;$('create-panel').scrollIntoView({behavior:'smooth',block:'start'});}}
   const alert=event.target.closest('[data-alert]');if(alert)showAlert(alert.dataset.alert);if(row)showTrade(row.dataset.trade);
 });

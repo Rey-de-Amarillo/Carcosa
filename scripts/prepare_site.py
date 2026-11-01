@@ -15,6 +15,7 @@ assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'formula-builder.js', 'workspace-data.js', 'entity-presentation.js',
           'football-alert-builder.js', 'football-formula-editor.js', 'football-unified-formula.js',
           'football-formula-library.js',
+          'formula-metrics.js', 'formula-metrics-worker.js', 'formula-metrics-view.js',
           'football-market-catalog.js', 'football-situations.js', 'football-strategy-engine.js', 'strategy-store.js',
           'data/entities.json', 'data/entity-badges.json', 'data/football-market-history.json',
           'data/football-market-history.json.gz',
@@ -49,7 +50,8 @@ los paneles originales de Workraken. Las fórmulas guardadas conservan
 íntegramente sus condiciones y agrupaciones. Los desplegables usan mercados
 reales de fútbol y conservan los controles originales de Workraken.
 Incluye 120 fórmulas guardadas iniciales; se agregan sin reemplazar las propias
-y se pueden editar o duplicar. Las simulaciones se ejecutan al elegir una fórmula.
+y se pueden editar o duplicar. La grilla incluye búsqueda y paginación,
+orden por rendimiento y filtros de EV, ROI y número de apuestas.
 Incluye resultado, doble oportunidad, empate no válido, hándicaps, goles,
 descanso/final, córners, tarjetas y mercados de jugadores.
 Los jugadores se vinculan a equipos mediante identidades verificadas y capturas
