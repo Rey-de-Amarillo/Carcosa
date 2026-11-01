@@ -1,0 +1,332 @@
+{
+  "source_repository": "Workraken/WorKraken-web",
+  "source_commit": "59c900cbeb9135b0a282f3311d9598ff8e9e4d93",
+  "css_order": [
+    "static/styles.css",
+    "static/neptuno-merged.css",
+    "static/neptuno-vertical.css",
+    "static/account-profile.css",
+    "static/shell.css"
+  ],
+  "transform": "Only CSS url roots /static and /assets move below /vendor/workraken; all CSS declarations retained.",
+  "reference_templates": [
+    {
+      "path": "webapp/templates/base.html",
+      "sha256": "0003b69e23d00e5d408aa6f5c1bd125ed206f4602d9d42c4515f1b3e7e3e0c49"
+    },
+    {
+      "path": "webapp/templates/_pagination.html",
+      "sha256": "8983e1991bbd7abb8b289f84726a68c359d469416b17df1445404edd5352fa17"
+    },
+    {
+      "path": "webapp/templates/_parking_contracts_panel.html",
+      "sha256": "c4c578bb995425f65e8851335d9de54d8423fd9da12ead690b54413d67e6627b"
+    }
+  ],
+  "files": [
+    {
+      "source_path": "webapp/static/styles.css",
+      "path": "static/styles.css",
+      "source_sha256": "4072bfaf4239e9512a4f0ff239ab3daf22cdeff165e46c8e59153ba4e1a87370",
+      "sha256": "202128a1721f0688b383ae96164b89f851a513017d3cc4ff4a3f669ab0e3e4b2",
+      "bytes": 2325061,
+      "url_roots_relocated": true
+    },
+    {
+      "source_path": "assets/fonts/documentos/inter/Inter-Regular.ttf",
+      "path": "assets/fonts/documentos/inter/Inter-Regular.ttf",
+      "source_sha256": "b66d36f426475c5528c40a29e96424626e6fcc186d7c968ea39315e3f341c22a",
+      "sha256": "b66d36f426475c5528c40a29e96424626e6fcc186d7c968ea39315e3f341c22a",
+      "bytes": 341396,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/inter/Inter-SemiBold.ttf",
+      "path": "assets/fonts/documentos/inter/Inter-SemiBold.ttf",
+      "source_sha256": "716bf044daa787ae00829e65bb1b995af86fc266d84521ed95532ea9a5efbf35",
+      "sha256": "716bf044daa787ae00829e65bb1b995af86fc266d84521ed95532ea9a5efbf35",
+      "bytes": 342688,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/lato/Lato-Regular.ttf",
+      "path": "assets/fonts/documentos/lato/Lato-Regular.ttf",
+      "source_sha256": "d636e4683231f931eda222d588e944d082bfd3bdba02f928bee461c0f185b251",
+      "sha256": "d636e4683231f931eda222d588e944d082bfd3bdba02f928bee461c0f185b251",
+      "bytes": 656568,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/lato/Lato-SemiBold.ttf",
+      "path": "assets/fonts/documentos/lato/Lato-SemiBold.ttf",
+      "source_sha256": "71b8b7decbe75a881ed267be539d402bd1e9420b799658aada4e0d1bd5af803c",
+      "sha256": "71b8b7decbe75a881ed267be539d402bd1e9420b799658aada4e0d1bd5af803c",
+      "bytes": 668548,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/montserrat/Montserrat-Regular.ttf",
+      "path": "assets/fonts/documentos/montserrat/Montserrat-Regular.ttf",
+      "source_sha256": "b58893dc39da08e9d7f240d62f2c08f303d48728886e44b1f142081060dbdffd",
+      "sha256": "b58893dc39da08e9d7f240d62f2c08f303d48728886e44b1f142081060dbdffd",
+      "bytes": 374488,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/montserrat/Montserrat-SemiBold.ttf",
+      "path": "assets/fonts/documentos/montserrat/Montserrat-SemiBold.ttf",
+      "source_sha256": "f7452c480916414aa18b87803697296152d053a12b2f8835a3c406f7d2e5e2bd",
+      "sha256": "f7452c480916414aa18b87803697296152d053a12b2f8835a3c406f7d2e5e2bd",
+      "bytes": 374640,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/notosans/NotoSans-Regular.ttf",
+      "path": "assets/fonts/documentos/notosans/NotoSans-Regular.ttf",
+      "source_sha256": "9833610caab48c94d28e10d6d2f5d9dca51cdec373430e4c420634dedeb3d853",
+      "sha256": "9833610caab48c94d28e10d6d2f5d9dca51cdec373430e4c420634dedeb3d853",
+      "bytes": 646160,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/notosans/NotoSans-SemiBold.ttf",
+      "path": "assets/fonts/documentos/notosans/NotoSans-SemiBold.ttf",
+      "source_sha256": "2acf8baae725d7ff7dba7673046d8087511887fb4dc12729e2e99c0bc0c0e70b",
+      "sha256": "2acf8baae725d7ff7dba7673046d8087511887fb4dc12729e2e99c0bc0c0e70b",
+      "bytes": 648648,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/notoserif/NotoSerif-Regular.ttf",
+      "path": "assets/fonts/documentos/notoserif/NotoSerif-Regular.ttf",
+      "source_sha256": "9ea2a64fed18f577e6ffe9883a4bae6702cde7d884aae58a395b2ff160e738e3",
+      "sha256": "9ea2a64fed18f577e6ffe9883a4bae6702cde7d884aae58a395b2ff160e738e3",
+      "bytes": 513124,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/notoserif/NotoSerif-SemiBold.ttf",
+      "path": "assets/fonts/documentos/notoserif/NotoSerif-SemiBold.ttf",
+      "source_sha256": "9471c063b5ad9e3b7a239da15b36302d775b1d6c4234e0dffa903d0dfd840662",
+      "sha256": "9471c063b5ad9e3b7a239da15b36302d775b1d6c4234e0dffa903d0dfd840662",
+      "bytes": 515040,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/opensans/OpenSans-Regular.ttf",
+      "path": "assets/fonts/documentos/opensans/OpenSans-Regular.ttf",
+      "source_sha256": "de4d8c5c299f4074e1b8bd1d7cd265d9629d7a8702f13c4d0a3b35974959ea85",
+      "sha256": "de4d8c5c299f4074e1b8bd1d7cd265d9629d7a8702f13c4d0a3b35974959ea85",
+      "bytes": 130504,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/opensans/OpenSans-SemiBold.ttf",
+      "path": "assets/fonts/documentos/opensans/OpenSans-SemiBold.ttf",
+      "source_sha256": "9d67331e0efef72aa38a4248f0be88f486ef8f81cce08eda94026c32b018b315",
+      "sha256": "9d67331e0efef72aa38a4248f0be88f486ef8f81cce08eda94026c32b018b315",
+      "bytes": 130424,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/roboto/Roboto-Regular.ttf",
+      "path": "assets/fonts/documentos/roboto/Roboto-Regular.ttf",
+      "source_sha256": "e52ee689b76ddf19f8cebe7ad0fcd39bcca4fa8da7f02ea99594970071b909e2",
+      "sha256": "e52ee689b76ddf19f8cebe7ad0fcd39bcca4fa8da7f02ea99594970071b909e2",
+      "bytes": 157584,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/roboto/Roboto-SemiBold.ttf",
+      "path": "assets/fonts/documentos/roboto/Roboto-SemiBold.ttf",
+      "source_sha256": "b055e29a4e9e176eed403a1d85ccbb6219b303accb0c5c04e28e0e6e1963e23a",
+      "sha256": "b055e29a4e9e176eed403a1d85ccbb6219b303accb0c5c04e28e0e6e1963e23a",
+      "bytes": 158304,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/robotoslab/RobotoSlab-Regular.ttf",
+      "path": "assets/fonts/documentos/robotoslab/RobotoSlab-Regular.ttf",
+      "source_sha256": "a05e1ee9ad0b7efd52a19ac0c8dda7f68eaa8bc51246bd5f5cb085eae91235b6",
+      "sha256": "a05e1ee9ad0b7efd52a19ac0c8dda7f68eaa8bc51246bd5f5cb085eae91235b6",
+      "bytes": 128792,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/robotoslab/RobotoSlab-SemiBold.ttf",
+      "path": "assets/fonts/documentos/robotoslab/RobotoSlab-SemiBold.ttf",
+      "source_sha256": "94f69b799c063e9b553aa102b99cfc377ffe90692f5b07d85033ffd9df639963",
+      "sha256": "94f69b799c063e9b553aa102b99cfc377ffe90692f5b07d85033ffd9df639963",
+      "bytes": 129672,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/sourceserif4/SourceSerif4-Regular.ttf",
+      "path": "assets/fonts/documentos/sourceserif4/SourceSerif4-Regular.ttf",
+      "source_sha256": "cc68274dedf00c0d183aa968bb14663d8b3226d93b5ef256506c96ba2e350757",
+      "sha256": "cc68274dedf00c0d183aa968bb14663d8b3226d93b5ef256506c96ba2e350757",
+      "bytes": 330284,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/fonts/documentos/sourceserif4/SourceSerif4-SemiBold.ttf",
+      "path": "assets/fonts/documentos/sourceserif4/SourceSerif4-SemiBold.ttf",
+      "source_sha256": "4494fc9348b084be3ab769dade9496c0256fefc8ea2666c637a470ce14ff93e2",
+      "sha256": "4494fc9348b084be3ab769dade9496c0256fefc8ea2666c637a470ce14ff93e2",
+      "bytes": 330496,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/contact-icons/mail.png",
+      "path": "static/contact-icons/mail.png",
+      "source_sha256": "eca0ea9b8a47c433e9ebb6565f47c733c66f1b1cccf77311caad8a1d1c0c5768",
+      "sha256": "eca0ea9b8a47c433e9ebb6565f47c733c66f1b1cccf77311caad8a1d1c0c5768",
+      "bytes": 14193,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/contact-icons/telefono.png",
+      "path": "static/contact-icons/telefono.png",
+      "source_sha256": "3f2ab487ba5c81ec6fdd1b70ea245e4a2d19cdce60f07274129b21282612c23e",
+      "sha256": "3f2ab487ba5c81ec6fdd1b70ea245e4a2d19cdce60f07274129b21282612c23e",
+      "bytes": 12608,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/fonts/inter-latin-v1.woff2",
+      "path": "static/fonts/inter-latin-v1.woff2",
+      "source_sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+      "bytes": 48256,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/fonts/montserrat-semibold-latin-v1.woff2",
+      "path": "static/fonts/montserrat-semibold-latin-v1.woff2",
+      "source_sha256": "d857325c360f7128b347ca924c1974967aaa886ba47dad22e4042d6c38b26a83",
+      "sha256": "d857325c360f7128b347ca924c1974967aaa886ba47dad22e4042d6c38b26a83",
+      "bytes": 18688,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/icons/trash.svg",
+      "path": "static/icons/trash.svg",
+      "source_sha256": "dafba60bb4ef8fe90d4bf8d37f16447ad8ade394f9477cd2cf013d266a2bed02",
+      "sha256": "dafba60bb4ef8fe90d4bf8d37f16447ad8ade394f9477cd2cf013d266a2bed02",
+      "bytes": 336,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/neptuno-merged.css",
+      "path": "static/neptuno-merged.css",
+      "source_sha256": "9f575e60051c61b9f5ce71010c1d703be354bdf34dc22ed00215e8436549838b",
+      "sha256": "9f575e60051c61b9f5ce71010c1d703be354bdf34dc22ed00215e8436549838b",
+      "bytes": 21580,
+      "url_roots_relocated": true
+    },
+    {
+      "source_path": "webapp/static/neptuno-vertical.css",
+      "path": "static/neptuno-vertical.css",
+      "source_sha256": "1a3e08bce51c19d291ed8219916842d01866105ac0605e7391f82ece44a62b3e",
+      "sha256": "1a3e08bce51c19d291ed8219916842d01866105ac0605e7391f82ece44a62b3e",
+      "bytes": 4409,
+      "url_roots_relocated": true
+    },
+    {
+      "source_path": "webapp/static/account-profile.css",
+      "path": "static/account-profile.css",
+      "source_sha256": "f13e69ca149f0ba1bbf6e32d015a6bc9317fd3b8ed912da94362b5d06222a7e9",
+      "sha256": "f13e69ca149f0ba1bbf6e32d015a6bc9317fd3b8ed912da94362b5d06222a7e9",
+      "bytes": 17567,
+      "url_roots_relocated": true
+    },
+    {
+      "source_path": "webapp/static/shell.css",
+      "path": "static/shell.css",
+      "source_sha256": "fde4acad0ae403a351a50825f0c6fed077f8e45a80ac2d5193430f652d413a99",
+      "sha256": "fde4acad0ae403a351a50825f0c6fed077f8e45a80ac2d5193430f652d413a99",
+      "bytes": 20168,
+      "url_roots_relocated": true
+    },
+    {
+      "source_path": "assets/branding/workraken_mark.png",
+      "path": "assets/branding/workraken_mark.png",
+      "source_sha256": "e421ed242970593ddc610df4d0e3c8b866c81e3a48e27bb18f4baf53d44b757d",
+      "sha256": "e421ed242970593ddc610df4d0e3c8b866c81e3a48e27bb18f4baf53d44b757d",
+      "bytes": 119612,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/branding/workraken_wordmark_light.png",
+      "path": "assets/branding/workraken_wordmark_light.png",
+      "source_sha256": "236a22dcbdde2bf2b86850362a26f3e2a3acf7d6f7c43a4f0c5eb26342752a47",
+      "sha256": "236a22dcbdde2bf2b86850362a26f3e2a3acf7d6f7c43a4f0c5eb26342752a47",
+      "bytes": 212283,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/branding/workraken_wordmark_dark.png",
+      "path": "assets/branding/workraken_wordmark_dark.png",
+      "source_sha256": "8f87c6b3ce0672592de3f91a0f7bf7b21459a2899bfd73ef85ccde9378bfc7b7",
+      "sha256": "8f87c6b3ce0672592de3f91a0f7bf7b21459a2899bfd73ef85ccde9378bfc7b7",
+      "bytes": 272532,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/branding/favicon.png",
+      "path": "assets/branding/favicon.png",
+      "source_sha256": "207ac853c8ecfb4fe784c1720e52656bf41afaf6bca08c263c25d5a4921a7442",
+      "sha256": "207ac853c8ecfb4fe784c1720e52656bf41afaf6bca08c263c25d5a4921a7442",
+      "bytes": 41180,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/sidebar/engranaje.png",
+      "path": "assets/sidebar/engranaje.png",
+      "source_sha256": "662962e9b71463b898d824c40b3d1318ffab7f93f073f0bd6aa6eaefbbec9d9e",
+      "sha256": "662962e9b71463b898d824c40b3d1318ffab7f93f073f0bd6aa6eaefbbec9d9e",
+      "bytes": 10981,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "assets/sidebar/engranaje-dark.png",
+      "path": "assets/sidebar/engranaje-dark.png",
+      "source_sha256": "5001f719ac54bb64b79f64253e04d2753e2f013a18642305014aa235f77789fc",
+      "sha256": "5001f719ac54bb64b79f64253e04d2753e2f013a18642305014aa235f77789fc",
+      "bytes": 13196,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/js/modules/estacionamiento/compartido/busqueda.js",
+      "path": "search.js",
+      "source_sha256": "d48156c0a166332533d37303e65f06e1160f4c0c4e209979e13879b81cfa9ea4",
+      "sha256": "d48156c0a166332533d37303e65f06e1160f4c0c4e209979e13879b81cfa9ea4",
+      "bytes": 5264,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/js/shared/date-picker.js",
+      "path": "date-picker.js",
+      "source_sha256": "18c4080698f93c1e13ab21c1899fe1fcf127cf62799f8373b766d3460abb43f6",
+      "sha256": "18c4080698f93c1e13ab21c1899fe1fcf127cf62799f8373b766d3460abb43f6",
+      "bytes": 23377,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/js/shared/currency-country-picker.js",
+      "path": "single-select.js",
+      "source_sha256": "ca0bf450458ea797337ff13653400aacd4dc309081feaebb12ae3de2beb7555b",
+      "sha256": "ca0bf450458ea797337ff13653400aacd4dc309081feaebb12ae3de2beb7555b",
+      "bytes": 19074,
+      "url_roots_relocated": false
+    },
+    {
+      "source_path": "webapp/static/js/shared/floating-dropdowns.js",
+      "path": "floating-dropdowns.js",
+      "source_sha256": "aeecfc60383d0b5bc758c3cca277ed8c2b80698751b7e35e4ae086427e30e0b1",
+      "sha256": "aeecfc60383d0b5bc758c3cca277ed8c2b80698751b7e35e4ae086427e30e0b1",
+      "bytes": 8325,
+      "url_roots_relocated": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "purpose": "Buscar pagos positivos entre apuestas existentes, sin inventar cuotas de combinadas.",
+  "mathematics": {
+    "portfolio": "Nonnegative straight-bet stakes summing to the stated budget.",
+    "strict_cover": "Positive net payout in every feasible outcome.",
+    "weak_cover": "Nonnegative net payout in every outcome and positive in at least one feasible outcome; refund can yield zero.",
+    "expected_value": "A profitable historical sample or a cover with losing outcomes does not prove positive true expected value.",
+    "correlation": "Settle every leg on the SAME coherent event state. Do not multiply correlated marginal probabilities or invent same-match parlay prices."
+  },
+  "searches": [
+    {"script": "scripts/football_score_combinations.py", "result": "data/analysis/football_score_combinations.json", "report": "COMBINACIONES_MARCADORES.md"},
+    {"script": "scripts/sgodds_portfolio_search.py", "result": "data/analysis/sgodds_portfolio_search.json", "report": "COMBINACIONES_SGODDS.md"},
+    {"script": "scripts/betcity_crossmarket_search.py", "result": "data/analysis/betcity_crossmarket_search.json", "report": "COMBINACIONES_BETCITY.md"},
+    {"script": "scripts/oddspapi_temporal_arb.py", "result": "data/analysis/oddspapi_temporal_arb.json", "report": "COMBINACIONES_ODDSPAPI.md"}
+  ],
+  "quarantine": "config/football_market_quarantine.json",
+  "summary_script": "scripts/build_football_combination_report.py",
+  "summary_report": "COMBINACIONES_FUTBOL.md",
+  "scope_limits": [
+    "Available datasets only: not every football price ever offered or a currently executable betting board.",
+    "No bets, deposits, paid subscriptions or bookmaker account execution.",
+    "Betfair sample LTP is last traded price, not an available offer; it is excluded from executable-quote cover claims.",
+    "SharpAPI small mixed-provider snapshot is inventoried but not normalized into this temporal portfolio search.",
+    "Player-event dependencies, unknown participant/void rules, exchange lays, boosts and unquoted BetBuilder combinations are not claimed exhaustively searched."
+  ]
+}

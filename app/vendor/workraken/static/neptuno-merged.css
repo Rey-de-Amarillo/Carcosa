@@ -1,0 +1,570 @@
+/* Neptuno public parking refinements loaded after the shared stylesheet. */
+.public-template-nocturna.public-design-visual {
+    --public-accent: #8de2eb;
+    --public-accent-strong: #c8f261;
+    --public-bg: #071416;
+    --public-surface: #10262b;
+    --public-soft: #152f35;
+    --public-ink: #ffffff;
+    --public-muted: #ffffff;
+    background: #071416;
+    color: #ffffff;
+}
+
+.public-template-nocturna .public-sticky-nav {
+    border-bottom-color: rgba(141, 226, 235, 0.22);
+    background: rgba(5, 13, 18, 0.96);
+    box-shadow: 0 18px 54px rgba(0, 0, 0, 0.36);
+}
+
+.public-template-nocturna .visual-media::after {
+    background:
+        linear-gradient(90deg, rgba(4, 12, 18, 0.96), rgba(7, 20, 22, 0.74) 58%, rgba(12, 30, 40, 0.36)),
+        linear-gradient(180deg, rgba(141, 226, 235, 0.14), rgba(200, 242, 97, 0.08));
+}
+
+.public-template-nocturna .visual-copy > span,
+.public-template-nocturna .public-section-head span,
+.public-template-nocturna .visual-vehicles > div > span,
+.public-template-nocturna .visual-models > div > span,
+.public-template-nocturna .visual-rates > div > span,
+.public-template-nocturna .visual-location > div > span {
+    color: #c8f261;
+}
+
+.public-template-nocturna .visual-primary,
+.public-template-nocturna .visual-nav-cta,
+.public-template-nocturna .public-banner-primary,
+.public-template-nocturna .public-contact-submit {
+    border-color: rgba(141, 226, 235, 0.58);
+    background: linear-gradient(135deg, #c8f261 0%, #8de2eb 48%, #30a4b2 100%);
+    color: #000000;
+    box-shadow: 0 16px 38px rgba(48, 164, 178, 0.22);
+}
+
+.public-template-nocturna .visual-secondary,
+.public-template-nocturna .public-banner-secondary {
+    border-color: rgba(200, 242, 97, 0.5);
+    background: rgba(200, 242, 97, 0.1);
+    color: #e8ffc2;
+}
+
+.public-template-nocturna :is(.visual-intro, .visual-vehicles, .visual-models, .visual-rates, .visual-location, .visual-gallery, .visual-blog, .visual-comments) {
+    background: #0d2024;
+    color: #ffffff;
+}
+
+.public-template-nocturna .visual-availability {
+    background: linear-gradient(135deg, #0d2024 0%, #0f2930 54%, #101b27 100%);
+}
+
+.public-template-nocturna .visual-calculation {
+    background: linear-gradient(135deg, #071416 0%, #12242d 58%, #172322 100%);
+}
+
+.public-template-nocturna .visual-blog {
+    background: linear-gradient(135deg, #08171d 0%, #122b31 100%);
+}
+
+.public-template-nocturna .visual-location {
+    background: linear-gradient(135deg, #0c1c23 0%, #0f2d34 55%, #182313 100%);
+}
+
+.public-template-nocturna :is(.visual-intro h2, .visual-vehicles h2, .visual-models h2, .visual-rates h2, .visual-location h2, .public-section-head h2) {
+    color: #ffffff;
+}
+
+.public-template-nocturna :is(.visual-feature-grid article, .visual-rate-grid article, .visual-model-grid article, .public-blog-grid article, .public-blog-card, .public-blog-entry, .public-reference-card) {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #122b31;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.public-template-nocturna .visual-feature-grid .public-availability-card-spaces {
+    border-color: rgba(141, 226, 235, 0.58);
+    background: linear-gradient(135deg, #0b2630 0%, #117080 58%, #8de2eb 100%);
+}
+
+.public-template-nocturna .visual-feature-grid .public-availability-card-address {
+    border-color: rgba(200, 242, 97, 0.5);
+    background: linear-gradient(135deg, #102317 0%, #355725 58%, #c8f261 100%);
+}
+
+.public-template-nocturna .visual-feature-grid .public-availability-card-contact {
+    border-color: rgba(211, 151, 255, 0.46);
+    background: linear-gradient(135deg, #241b35 0%, #524071 58%, #d397ff 100%);
+}
+
+.public-template-nocturna :is(.public-availability-card h3, .public-availability-card p, .public-availability-card-spaces span, .public-availability-card-spaces strong, .public-category-card-head strong) {
+    color: #ffffff !important;
+}
+
+.public-template-nocturna .public-availability-card p {
+    color: #ffffff !important;
+}
+
+.public-template-nocturna :is(.visual-chip-wall span, .visual-calculator, .visual-result, .public-category-note, .public-calculation-result-panel) {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #10262b;
+    color: #8de2eb;
+}
+
+.public-template-nocturna .public-vehicle-category-grid article:nth-child(3n + 1) {
+    border-color: rgba(141, 226, 235, 0.42);
+    background: linear-gradient(145deg, #0f252c 0%, #123944 54%, #145565 100%);
+}
+
+.public-template-nocturna .public-vehicle-category-grid article:nth-child(3n + 2) {
+    border-color: rgba(200, 242, 97, 0.38);
+    background: linear-gradient(145deg, #12231a 0%, #21371f 54%, #3d5527 100%);
+}
+
+.public-template-nocturna .public-vehicle-category-grid article:nth-child(3n) {
+    border-color: rgba(211, 151, 255, 0.34);
+    background: linear-gradient(145deg, #191d2e 0%, #2a2d4a 54%, #443963 100%);
+}
+
+.public-template-nocturna .public-vehicle-category-grid p,
+.public-template-nocturna .public-category-note,
+.public-template-nocturna :is(.visual-rate-grid article small, .visual-model-grid article small, .public-blog-grid p, .public-blog-grid small) {
+    color: #ffffff !important;
+}
+
+.public-template-nocturna .public-category-price,
+.public-template-nocturna .public-blog-card-more,
+.public-template-nocturna .public-blog-read-more {
+    color: #8de2eb;
+}
+
+.public-template-nocturna .public-period-selector button {
+    border-color: rgba(141, 226, 235, 0.34);
+    background: #10262b;
+    color: #ffffff;
+}
+
+.public-template-nocturna .public-period-selector button:is(.is-active, [aria-pressed="true"]) {
+    border-color: #c8f261;
+    background: #c8f261;
+    color: #000000;
+}
+
+.public-template-nocturna .visual-banner {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: linear-gradient(135deg, #123944 0%, #1d3840 48%, #355725 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna .visual-map,
+.public-template-nocturna .visual-location .public-design-map-fallback {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #071416;
+}
+
+.public-template-nocturna .visual-map-pin {
+    background: #8de2eb;
+    box-shadow: 0 14px 28px rgba(141, 226, 235, 0.18);
+}
+
+.public-template-nocturna .visual-map-pin::after {
+    background: #175f6b;
+}
+
+.public-template-nocturna .public-price-grid :is(input, select, .public-time24),
+.public-template-nocturna .public-cyclic-grid .public-time24,
+.public-template-nocturna .public-contact-form :is(input, textarea, .country-picker-button) {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #071416;
+    color: #ffffff;
+}
+
+.public-template-nocturna .public-contact-form :is(input, textarea)::placeholder,
+.public-template-nocturna .public-price-grid :is(input, select)::placeholder {
+    color: var(--placeholder);
+    opacity: 1;
+}
+
+.public-template-nocturna .public-contact-form .country-picker-menu {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #071416;
+}
+
+.public-template-nocturna .public-contact-form .country-picker-option {
+    color: #ffffff;
+}
+
+.public-template-nocturna .public-contact-form .country-picker-option:hover,
+.public-template-nocturna .public-contact-form .country-picker-option.is-selected {
+    background: #10262b;
+}
+
+.public-template-nocturna .public-calculation-mode,
+.public-template-nocturna .public-cyclic-field,
+.public-template-nocturna .public-calculation-facts article {
+    border-color: rgba(141, 226, 235, 0.24);
+    background: #0b1d24;
+}
+
+.public-template-nocturna .public-calculation-mode label,
+.public-template-nocturna .public-cyclic-day {
+    color: #ffffff;
+}
+
+.public-template-nocturna .public-calculation-mode label:has(input:checked) {
+    background: #8de2eb;
+    color: #000000;
+}
+
+.public-template-nocturna .public-calculation-facts article.public-discount-fact {
+    border-color: #8de2eb;
+    background: linear-gradient(135deg, rgba(141, 226, 235, 0.16), rgba(11, 29, 36, 0.94));
+    box-shadow: inset 4px 0 0 #8de2eb;
+}
+
+.public-template-nocturna .public-calculation-facts article.public-discount-total-fact {
+    border-color: #c8f261;
+    background: linear-gradient(135deg, rgba(200, 242, 97, 0.16), rgba(11, 29, 36, 0.94));
+    box-shadow: inset 4px 0 0 #c8f261;
+}
+
+.public-template-nocturna .visual-comments .public-reference-card::before,
+.public-template-nocturna .nocturna-inline-comments .public-reference-card::before {
+    background: #8de2eb;
+}
+
+.public-template-nocturna .visual-comments .public-reference-control {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #10262b;
+    color: #8de2eb;
+}
+
+.public-template-nocturna .visual-contact {
+    background: linear-gradient(135deg, #071416 0%, #10262b 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna .visual-footer {
+    background: #041015;
+    color: #ffffff;
+}
+
+.public-template-nocturna .nocturna-contact-comments {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.64fr) minmax(440px, 1fr);
+    align-items: stretch;
+    gap: clamp(20px, 3vw, 36px);
+    padding: clamp(64px, 8vw, 112px) max(18px, calc((100vw - 1680px) / 2));
+    background: linear-gradient(135deg, #071416 0%, #0d2024 54%, #142831 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna .nocturna-contact-comments > .public-comments-block,
+.public-template-nocturna .nocturna-contact-comments > .public-contact-block {
+    min-width: 0;
+    padding: 0;
+}
+
+.public-template-nocturna .nocturna-inline-comments {
+    align-content: start;
+    gap: 18px;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-head h2 {
+    font-size: clamp(28px, 3.3vw, 44px);
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-head p {
+    font-size: 16px;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    gap: 12px;
+    align-items: center;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-control {
+    display: inline-flex;
+    border-color: rgba(141, 226, 235, 0.34);
+    background: rgba(255, 255, 255, 0.08);
+    color: #c8f261;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-viewport {
+    overflow: hidden;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-track {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    overflow: visible;
+    padding: 2px 0 6px;
+    transform: translate3d(0, 0, 0);
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-card {
+    flex: 0 0 calc((100% - 28px) / 3);
+    min-width: 0;
+    min-height: 220px;
+    padding: 20px 22px;
+    border-color: rgba(141, 226, 235, 0.28);
+    background: linear-gradient(145deg, #10262b 0%, #132f38 100%);
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-card p {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-card strong {
+    color: #c8f261;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-location {
+    color: #ffffff;
+}
+
+.public-template-nocturna .nocturna-inline-contact {
+    border: 1px solid rgba(141, 226, 235, 0.26);
+    border-radius: 8px;
+    background: linear-gradient(145deg, #0b1d24 0%, #10262b 100%);
+    box-shadow: 0 24px 68px rgba(0, 0, 0, 0.22);
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-form {
+    padding: clamp(20px, 3vw, 34px);
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-head h2 {
+    font-size: clamp(30px, 4vw, 52px);
+}
+
+@media (max-width: 1120px) {
+    .public-template-nocturna .nocturna-contact-comments {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .public-template-nocturna .nocturna-inline-comments .public-reference-card {
+        flex-basis: calc((100% - 14px) / 2);
+    }
+}
+
+@media (max-width: 760px) {
+    .public-template-nocturna .nocturna-contact-comments {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .public-template-nocturna .nocturna-inline-comments .public-references-carousel {
+        grid-template-columns: 36px minmax(0, 1fr) 36px;
+        gap: 8px;
+    }
+
+    .public-template-nocturna .nocturna-inline-comments .public-reference-control {
+        width: 36px;
+        height: 36px;
+        font-size: 26px;
+    }
+
+    .public-template-nocturna .nocturna-inline-comments .public-reference-card {
+        flex-basis: 100%;
+        min-height: 230px;
+    }
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] {
+    --public-accent: #087a8a;
+    --public-accent-strong: #0a4f5c;
+    --public-bg: #eaf7f8;
+    --public-surface: #ffffff;
+    --public-soft: #d9eef0;
+    --public-ink: #000000;
+    --public-muted: #000000;
+    background: #eaf7f8;
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] :is(.visual-intro, .visual-vehicles, .visual-models, .visual-rates, .visual-location, .visual-blog, .visual-comments) {
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-availability {
+    background: linear-gradient(135deg, #e9fbff 0%, #d9f1f5 54%, #eff8ef 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-calculation {
+    background: linear-gradient(135deg, #f6fbfc 0%, #e6f4f6 52%, #eef8ee 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-blog {
+    background: linear-gradient(135deg, #f4fbfd 0%, #edf5ff 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-location {
+    background: linear-gradient(135deg, #eaf7f8 0%, #ddf1f5 52%, #eef8e7 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-banner {
+    background: linear-gradient(135deg, #0b5260 0%, #087a8a 52%, #4a7d30 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-contact-comments {
+    background: linear-gradient(135deg, #e7f6f8 0%, #f3fbf7 100%);
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] :is(.visual-intro h2, .visual-rates h2, .visual-location h2, .public-section-head h2, .public-contact-head h2) {
+    color: #000000 !important;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] :is(.visual-feature-grid article, .visual-feature-grid a, .visual-rate-grid article, .visual-model-grid article, .public-vehicle-category-grid article, .public-blog-card, .public-reference-card, .nocturna-inline-contact) {
+    border-color: rgba(8, 122, 138, 0.24);
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 18px 44px rgba(17, 71, 82, 0.08);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-feature-grid .public-availability-card-spaces {
+    border-color: #69cbd6;
+    background: linear-gradient(135deg, #effcff 0%, #91dfe8 54%, #087a8a 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-feature-grid .public-availability-card-address {
+    border-color: #c9dd77;
+    background: linear-gradient(135deg, #fbfff0 0%, #ddec93 54%, #7b9f39 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-feature-grid .public-availability-card-contact {
+    border-color: #c5a4e8;
+    background: linear-gradient(135deg, #fbf5ff 0%, #d8bdf1 54%, #7661a8 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] :is(.public-availability-card h3, .public-availability-card p, .public-availability-card-spaces span, .public-availability-card-spaces strong) {
+    color: #000000 !important;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-vehicle-category-grid article:nth-child(3n + 1) {
+    background: linear-gradient(145deg, #ffffff 0%, #dff6fa 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-vehicle-category-grid article:nth-child(3n + 2) {
+    background: linear-gradient(145deg, #ffffff 0%, #eef6d6 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-vehicle-category-grid article:nth-child(3n) {
+    background: linear-gradient(145deg, #ffffff 0%, #eee5fb 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] :is(.visual-calculator, .visual-result, .public-calculation-result-panel, .public-category-note, .visual-map, .visual-location .public-design-map-fallback) {
+    border-color: rgba(8, 122, 138, 0.22);
+    background: #ffffff;
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-inline-comments .public-reference-card {
+    background: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-inline-comments .public-reference-control {
+    border-color: rgba(8, 122, 138, 0.24);
+    background: #ffffff;
+    color: #087a8a;
+    box-shadow: 0 14px 28px rgba(17, 71, 82, 0.12);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-inline-comments .public-reference-card p,
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-inline-comments .public-reference-card strong,
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .nocturna-inline-comments .public-reference-location {
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-contact-form :is(input, textarea, .country-picker-button),
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-price-grid :is(input, select, .public-time24),
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-cyclic-grid .public-time24 {
+    border-color: rgba(8, 122, 138, 0.26);
+    background: #ffffff;
+    color: #000000;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-contact-form :is(input, textarea)::placeholder,
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-price-grid :is(input, select)::placeholder {
+    color: var(--placeholder);
+    opacity: 1;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-contact-submit,
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .public-banner-primary,
+.public-template-nocturna.public-design-visual[data-public-theme="light"] .visual-primary {
+    background: linear-gradient(135deg, #087a8a 0%, #0a4f5c 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] {
+    --public-accent: #8de2eb;
+    --public-accent-strong: #c8f261;
+    --public-bg: #071416;
+    --public-surface: #10262b;
+    --public-soft: #152f35;
+    --public-ink: #ffffff;
+    --public-muted: #ffffff;
+    background: #071416;
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] :is(.visual-intro, .visual-vehicles, .visual-models, .visual-rates, .visual-location, .visual-blog, .visual-comments, .public-contact-block) {
+    background: #0d2024;
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .visual-availability {
+    background: linear-gradient(135deg, #0d2024 0%, #0f2930 54%, #101b27 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .visual-calculation {
+    background: linear-gradient(135deg, #071416 0%, #12242d 58%, #172322 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .visual-blog {
+    background: linear-gradient(135deg, #08171d 0%, #122b31 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .visual-location {
+    background: linear-gradient(135deg, #0c1c23 0%, #0f2d34 55%, #182313 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-contact-comments {
+    background: linear-gradient(135deg, #071416 0%, #0d2024 54%, #142831 100%);
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] :is(.visual-feature-grid article, .visual-feature-grid a, .visual-rate-grid article, .visual-model-grid article, .public-vehicle-category-grid article, .public-blog-card, .public-reference-card, .nocturna-inline-contact, .visual-calculator, .visual-result, .public-calculation-result-panel, .public-category-note) {
+    border-color: rgba(141, 226, 235, 0.28);
+    background: #10262b;
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-card {
+    background: linear-gradient(145deg, #10262b 0%, #132f38 100%);
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-control {
+    border-color: rgba(141, 226, 235, 0.34);
+    background: rgba(255, 255, 255, 0.08);
+    color: #c8f261;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-card p,
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-card strong,
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-location {
+    color: #ffffff;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-reference-card strong {
+    color: #c8f261;
+}

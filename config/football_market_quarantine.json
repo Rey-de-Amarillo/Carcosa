@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "provider": "betcity_research",
+      "source_key": "BOTH_TEAMS_TO_SCORE__YES",
+      "status": "quarantined_label_orientation",
+      "reason": "Its price-implied probability moves inversely to observed both-teams-score frequency. A swapped label is suspected, not independently confirmed.",
+      "action": "Exclude from cover and probability claims by default; preserve original label and raw data. Never silently relabel it as NO.",
+      "evidence": "data/analysis/betcity_crossmarket_search.json:family_label_orientation_audit"
+    },
+    {
+      "provider": "sgodds",
+      "markets": ["ft_asian_handicap", "ht_asian_handicap", "ft_goal_total", "ht_goal_total", "ft_half_goal_handicap_source_label"],
+      "status": "recorded_line_price_pairing_unverified",
+      "reason": "Source help explicitly describes inconsistencies when original handicap or total lines change while a past record is retained.",
+      "action": "Retain conditional mathematical results, but block executable-profit claims until the original line/price/timestamp association is verified.",
+      "source": "https://sgodds.com/help"
+    }
+  ]
+}

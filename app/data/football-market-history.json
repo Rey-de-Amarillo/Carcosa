@@ -1,0 +1,18 @@
+{
+  "path": "football-market-history.json.gz",
+  "sha256": "1219c61f2a2c0db805c4ae9127c40df31ae8631a52981264b11ac3b91eb8a99d",
+  "bytes": 1122502,
+  "counts": {
+    "events": 3257,
+    "contextOffers": 9771,
+    "marketQuotes": {
+      "btts": 12236,
+      "match_result": 19542,
+      "total_goals": 52094,
+      "correct_score": 143308
+    },
+    "excludedMissingContext": 0,
+    "completed": 3143,
+    "pending": 114
+  }
+}

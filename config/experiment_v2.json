@@ -1,0 +1,42 @@
+{
+  "experiment_id": "kraken-v2-20261030",
+  "purpose": "Comparar modelos y liquidaciones sin seleccionar por ROI del período auditado.",
+  "development_end": "2021-12-31",
+  "selection_start": "2022-01-01",
+  "selection_end": "2023-12-31",
+  "retrospective_audit_start": "2024-01-01",
+  "retrospective_audit_end": "2026-10-30",
+  "retrospective_audit_status": "previously_inspected_not_independent_holdout",
+  "prospective_start": "2026-10-31",
+  "selection_metric": "mean_log_loss_on_selection_period_only",
+  "ensemble_candidates": [
+    {"id":"consensus_proportional","devig":"proportional","structural_weight":0.0},
+    {"id":"consensus_power","devig":"power","structural_weight":0.0},
+    {"id":"ensemble_power_10","devig":"power","structural_weight":0.10},
+    {"id":"ensemble_power_25","devig":"power","structural_weight":0.25},
+    {"id":"ensemble_proportional_10","devig":"proportional","structural_weight":0.10},
+    {"id":"ensemble_proportional_25","devig":"proportional","structural_weight":0.25}
+  ],
+  "research_policy": {
+    "min_ev":0.03,
+    "min_odds":1.20,
+    "max_odds":5.0,
+    "min_reference_books":3,
+    "max_book_overround":0.15,
+    "kelly_scale":0.10,
+    "max_event_fraction":0.0025,
+    "max_date_fraction":0.02,
+    "one_selection_per_event":true,
+    "commission":0.0,
+    "stress_odds_haircut":0.01,
+    "note":"Reglas elegidas tras diagnosticar el baseline; su auditoría histórica es exploratoria y no independiente."
+  },
+  "live_policy": {
+    "enabled":false,
+    "prospective_events_required":500,
+    "prospective_dates_required":100,
+    "positive_paired_logloss_skill_required":true,
+    "positive_cost_stressed_roi_ci_required":true,
+    "verified_execution_rules_and_timestamps_required":true
+  }
+}

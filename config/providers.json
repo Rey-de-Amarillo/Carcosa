@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-30",
+  "budget": "free-only",
+  "providers": [
+    {
+      "id": "football_data_csv",
+      "name": "Football-Data.co.uk",
+      "url": "https://www.football-data.co.uk/data.php",
+      "docs_url": "https://www.football-data.co.uk/notes.txt",
+      "status": "connected_periodic_csv",
+      "price": "free",
+      "account_required": false,
+      "sports": [
+        "football"
+      ],
+      "available_markets": [
+        "h2h",
+        "totals_2.5",
+        "asian_handicap_raw",
+        "half_time_results",
+        "corners_results",
+        "cards_results"
+      ],
+      "downloaded_markets": [
+        "h2h",
+        "totals_2.5",
+        "half_time_results",
+        "corners_results",
+        "cards_results"
+      ],
+      "historical_odds": true,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "private-personal-only; provider excludes commercial/data-training products using automated bots/AI; not an open redistribution license",
+      "limitations": [
+        "CSV updates are periodic, not streaming",
+        "No per-price timestamp or guaranteed execution",
+        "Fixture kickoff timezone is not documented in the CSV",
+        "Pinnacle prices warned unreliable by source since 2025-07-23",
+        "No player-level goal order"
+      ],
+      "raw_redistribution": false,
+      "attribution": "Football-Data.co.uk / Joseph Buchdahl",
+      "fixtures_url": "https://www.football-data.co.uk/fixtures.csv"
+    },
+    {
+      "id": "statsbomb_open",
+      "name": "StatsBomb Open Data (Hudl)",
+      "url": "https://github.com/hudl/open-data",
+      "docs_url": "https://github.com/hudl/open-data/tree/master/doc",
+      "status": "connected_research_events",
+      "price": "free",
+      "account_required": false,
+      "sports": [
+        "football"
+      ],
+      "available_markets": [
+        "event_history",
+        "goal_order",
+        "shots_xg",
+        "player_events",
+        "lineups"
+      ],
+      "downloaded_markets": [
+        "goal_order_90_minutes"
+      ],
+      "historical_odds": false,
+      "first_scorer": "observed_outcomes_only",
+      "live_odds": false,
+      "license": "StatsBomb Open Data license and attribution/logo requirements; research use, selected competitions",
+      "limitations": [
+        "Selected competitions, not complete world football",
+        "2022 World Cup event dataset is only 64 matches",
+        "No bookmaker odds",
+        "Own goals have separate settlement rules; no first-scorer model validated"
+      ],
+      "raw_redistribution": false,
+      "attribution": "StatsBomb Open Data; display StatsBomb logo when publishing derived insights",
+      "license_url": "https://github.com/hudl/open-data/blob/master/LICENSE.pdf"
+    },
+    {
+      "id": "fivethirtyeight_nba",
+      "name": "FiveThirtyEight NBA Elo archive",
+      "url": "https://github.com/fivethirtyeight/data/tree/master/nba-elo",
+      "docs_url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/nba-elo/README.md",
+      "status": "connected_historical_archive",
+      "price": "free",
+      "account_required": false,
+      "sports": [
+        "basketball"
+      ],
+      "available_markets": [
+        "game_results"
+      ],
+      "downloaded_markets": [
+        "game_results_since_1990"
+      ],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "CC BY 4.0, original game information credited to Basketball-Reference",
+      "license_url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/LICENSE",
+      "limitations": [
+        "Archive ends in 2015; cannot support current NBA decisions",
+        "No betting odds or player props",
+        "One of the two duplicated game perspectives is retained; US-format dates parsed explicitly"
+      ],
+      "raw_redistribution": true,
+      "attribution": "FiveThirtyEight; game information from Basketball-Reference; normalization and filtering applied"
+    },
+    {
+      "id": "the_odds_api",
+      "name": "The Odds API",
+      "url": "https://the-odds-api.com/",
+      "docs_url": "https://the-odds-api.com/liveapi/guides/v4/",
+      "status": "connected_free_tier",
+      "price": "free tier: 500 credits/month",
+      "account_required": true,
+      "sports": [
+        "multisport"
+      ],
+      "available_markets": [
+        "h2h",
+        "spreads",
+        "totals",
+        "event_markets_provider_dependent",
+        "player_first_goal_scorer",
+        "btts",
+        "correct_score",
+        "corners_cards_provider_dependent"
+      ],
+      "downloaded_markets": [
+        "h2h"
+      ],
+      "historical_odds": "paid_only",
+      "first_scorer": "player_first_goal_scorer_via_per_event_endpoint",
+      "live_odds": true,
+      "license": "Use in analytical apps/models permitted; do not resell/redistribute as standalone raw feed",
+      "license_url": "https://the-odds-api.com/terms-and-conditions.html",
+      "limitations": [
+        "500 credits cannot poll all sports frequently",
+        "All betting markets allowed on free tier, but bookmaker/event coverage varies",
+        "Odds request costs scale with markets and regions",
+        "Historical endpoints unavailable on free plan",
+        "Soccer player props: EPL, Ligue 1, Bundesliga, Serie A, La Liga, MLS; US bookmakers only",
+        "Additional markets require per-event endpoint; upcoming means live games plus next 8 across sports, not full catalog"
+      ],
+      "raw_redistribution": false,
+      "secret_env": "ODDS_API_KEY"
+    },
+    {
+      "id": "api_football",
+      "name": "API-Football / API-Sports",
+      "url": "https://www.api-football.com/pricing",
+      "docs_url": "https://www.api-football.com/documentation-v3",
+      "status": "requires_free_api_key",
+      "price": "free tier: 100 requests/day",
+      "account_required": true,
+      "sports": [
+        "football"
+      ],
+      "available_markets": [
+        "fixtures",
+        "events",
+        "lineups",
+        "injuries",
+        "statistics",
+        "prematch_odds",
+        "inplay_odds"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": "endpoint_retention_and_plan_dependent",
+      "first_scorer": "event_history_and_odds_coverage_to_verify",
+      "live_odds": true,
+      "license": "API-Sports terms; free access is not unrestricted redistribution",
+      "limitations": [
+        "Free seasons limited",
+        "Coverage depends on competition/season/endpoint",
+        "100 calls/day is unsuitable for continuous all-market scanning"
+      ],
+      "raw_redistribution": false,
+      "secret_env": "API_FOOTBALL_KEY"
+    },
+    {
+      "id": "balldontlie",
+      "name": "BALLDONTLIE",
+      "url": "https://www.balldontlie.io/",
+      "docs_url": "https://docs.balldontlie.io/",
+      "status": "requires_free_api_key",
+      "price": "free tier: 5 requests/minute",
+      "account_required": true,
+      "sports": [
+        "basketball",
+        "other_sports_have_separate_plans"
+      ],
+      "available_markets": [
+        "teams_free",
+        "players_free",
+        "games_free"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": "paid_GOAT",
+      "first_scorer": false,
+      "live_odds": "paid_GOAT",
+      "license": "Provider terms",
+      "limitations": [
+        "NBA odds, props, box scores, and play-by-play are not free",
+        "Paid free-trial requires payment method; not activated",
+        "Each sport has separate plan access"
+      ],
+      "raw_redistribution": false,
+      "secret_env": "BALLDONTLIE_API_KEY"
+    },
+    {
+      "id": "tennis_data_app",
+      "name": "TennisData.App",
+      "url": "https://tennisdata.app/downloads/",
+      "status": "human_verification_required_not_downloaded",
+      "price": "free season CSV downloads",
+      "account_required": false,
+      "sports": [
+        "tennis"
+      ],
+      "available_markets": [
+        "ATP_WTA_results_2021_2026",
+        "winner_odds_when_available",
+        "first_set_winner_odds_when_available"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": true,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Download page permits broad use; verify full terms for operational use",
+      "limitations": [
+        "Human bot-verification step encountered; no bypass attempted",
+        "Odds usually closing prices",
+        "Coverage is provider-claimed, not validated locally"
+      ],
+      "raw_redistribution": "not_evaluated"
+    },
+    {
+      "id": "tennismylife",
+      "name": "TennisMyLife",
+      "url": "https://stats.tennismylife.org/tennis-match-database",
+      "status": "catalogued_research_only_not_downloaded",
+      "price": "free CSV",
+      "account_required": false,
+      "sports": [
+        "tennis"
+      ],
+      "available_markets": [
+        "ATP_WTA_results",
+        "serve_stats"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Personal, educational and non-commercial research only; commercial prediction model use requires prior written permission; raw CSV redistribution not authorized",
+      "limitations": [
+        "Not downloaded for the operational bot",
+        "tourney_date is tournament week, not exact match date",
+        "WTA reliability caveat from publisher"
+      ],
+      "raw_redistribution": false
+    },
+    {
+      "id": "jeff_sackmann_matches",
+      "name": "Jeff Sackmann ATP/WTA match repositories",
+      "url": "https://github.com/JeffSackmann",
+      "status": "upstream_removed_404",
+      "price": "previously free",
+      "account_required": false,
+      "sports": [
+        "tennis"
+      ],
+      "available_markets": [],
+      "downloaded_markets": [],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Prior datasets CC BY-NC-SA 4.0; a mirror does not grant commercial rights",
+      "limitations": [
+        "tennis_atp and tennis_wta return HTTP404 as of check date",
+        "Do not treat archived mirrors as an active primary source"
+      ],
+      "raw_redistribution": false
+    },
+    {
+      "id": "tennis_data_co_uk",
+      "name": "Tennis-Data.co.uk",
+      "url": "https://www.tennis-data.co.uk/alldata.php",
+      "status": "access_blocked_403",
+      "price": "free historical files advertised",
+      "account_required": false,
+      "sports": [
+        "tennis"
+      ],
+      "available_markets": [
+        "results",
+        "winner_odds"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": true,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Not reviewed because access denied",
+      "limitations": [
+        "HTTP403 for homepage, CSV, and XLSX; not bypassed"
+      ],
+      "raw_redistribution": false
+    },
+    {
+      "id": "retrosheet",
+      "name": "Retrosheet",
+      "url": "https://www.retrosheet.org/game.htm",
+      "status": "connected_explicit_download_permission",
+      "price": "free historical baseball event files",
+      "account_required": false,
+      "sports": [
+        "baseball"
+      ],
+      "available_markets": [
+        "game_results",
+        "play_by_play"
+      ],
+      "downloaded_markets": [
+        "MLB_regular_season_results_2021_2025"
+      ],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Retrosheet permits reuse including commercial products with mandatory prominent attribution",
+      "limitations": [
+        "Final result includes extra innings; not 9-inning-only settlement",
+        "2026 game logs not yet advertised; latest available annual game-log file is 2025",
+        "No bookmaker odds; no historical ROI can be computed",
+        "Suspended games dated at completion to prevent future leakage; doubleheader IDs preserve game number"
+      ],
+      "raw_redistribution": true,
+      "license_url": "https://www.retrosheet.org/notice.txt"
+    },
+    {
+      "id": "mlb_statsapi",
+      "name": "MLB StatsAPI",
+      "url": "https://statsapi.mlb.com/api/v1/",
+      "status": "bulk_permission_required",
+      "price": "publicly_accessible_not_bulk_licensed",
+      "account_required": false,
+      "sports": [
+        "baseball"
+      ],
+      "available_markets": [
+        "game_results"
+      ],
+      "downloaded_markets": [],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "Individual noncommercial nonbulk use only unless written authorization",
+      "license_url": "https://gdx.mlb.com/components/copyright.txt",
+      "limitations": [
+        "No bulk historical import performed; Retrosheet used instead"
+      ],
+      "raw_redistribution": false
+    },
+    {
+      "id": "nhl_official_api",
+      "name": "NHL official web API",
+      "url": "https://api-web.nhle.com/v1/",
+      "status": "permission_required_and_http403",
+      "price": "not_evaluated",
+      "account_required": false,
+      "sports": [
+        "hockey"
+      ],
+      "available_markets": [],
+      "downloaded_markets": [],
+      "historical_odds": false,
+      "first_scorer": false,
+      "live_odds": false,
+      "license": "No authorization for automated compilation established",
+      "license_url": "https://www.nhl.com/info/terms-of-service",
+      "limitations": [
+        "HTTP403 in this environment",
+        "No bulk historical download performed",
+        "Potential final scores include overtime/shootouts; rules must be checked before moneyline comparison"
+      ],
+      "raw_redistribution": false
+    }
+  ]
+}

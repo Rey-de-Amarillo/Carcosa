@@ -1,0 +1,1357 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-30T20:19:55.767108+00:00",
+  "title": "Fútbol · Partidos y cuotas 1X2 comparadas",
+  "tables": {
+    "events": {
+      "path": "workspace-events.json.gz",
+      "rows": 33106,
+      "columns": [
+        "id",
+        "date",
+        "league",
+        "league_name",
+        "season",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "home_ht_score",
+        "away_ht_score",
+        "home_corners",
+        "away_corners",
+        "home_yellow",
+        "away_yellow",
+        "home_shots",
+        "away_shots",
+        "home_shots_on_target",
+        "away_shots_on_target"
+      ],
+      "encoding": "gzip-json-table",
+      "compressed_bytes": 1011069,
+      "uncompressed_bytes": 4130651,
+      "sha256": "0977a9196159364a3510ddf86c6d447e2e153d1447459c0bda21c95f17aa5eae"
+    },
+    "offers": {
+      "rows": 591471,
+      "columns": [
+        "event",
+        "book",
+        "side",
+        "odds",
+        "probability",
+        "reference_mean",
+        "reference_sd",
+        "references",
+        "ev",
+        "won",
+        "profit",
+        "own_probability",
+        "bookmaker_margin"
+      ],
+      "encoding": "gzip-json-table-parts",
+      "parts": [
+        {
+          "path": "workspace-offers-2018.json.gz",
+          "rows": 72276,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3488973,
+          "uncompressed_bytes": 12957778,
+          "sha256": "1c23798fafee7cc231fc48b7127151a21c942fdb7d80dc59a8f90c1677718ad1",
+          "year": "2018"
+        },
+        {
+          "path": "workspace-offers-2019.json.gz",
+          "rows": 67695,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3232132,
+          "uncompressed_bytes": 11994138,
+          "sha256": "e8296e6ea60092104e95593c089ca82d12c0c65e67a37e34953701604e65957e",
+          "year": "2019"
+        },
+        {
+          "path": "workspace-offers-2020.json.gz",
+          "rows": 58656,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 2778205,
+          "uncompressed_bytes": 10400007,
+          "sha256": "fa6907c723305b266d8ab8716c892b5e5e506d84d54ae9c12b18c73e12368aa3",
+          "year": "2020"
+        },
+        {
+          "path": "workspace-offers-2021.json.gz",
+          "rows": 76599,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3662191,
+          "uncompressed_bytes": 13639069,
+          "sha256": "565bed31fc3267d7b1d125b7ae305985c0ff0f1d8e3c5fc8e3a4a417e1c3da7b",
+          "year": "2021"
+        },
+        {
+          "path": "workspace-offers-2022.json.gz",
+          "rows": 65286,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3133452,
+          "uncompressed_bytes": 11617802,
+          "sha256": "e0c98f700cf8e15a014d395d70404f417ab590b96ec478ec3c19ee18ec56ff9e",
+          "year": "2022"
+        },
+        {
+          "path": "workspace-offers-2023.json.gz",
+          "rows": 71040,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3433250,
+          "uncompressed_bytes": 12630657,
+          "sha256": "0921833fc7f125232118a1069c3e0cf28e5b99438582e656b7dd5d9f67ae1145",
+          "year": "2023"
+        },
+        {
+          "path": "workspace-offers-2024.json.gz",
+          "rows": 61695,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 2995063,
+          "uncompressed_bytes": 10868478,
+          "sha256": "391f2d9ac567bf95563674f6c89d3794d9dd3811f754118e3ea8508531fd7a5b",
+          "year": "2024"
+        },
+        {
+          "path": "workspace-offers-2025.json.gz",
+          "rows": 66504,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 3054835,
+          "uncompressed_bytes": 12027045,
+          "sha256": "ebd47fd94284af1e36943281ea91829f21d5cf12d8fed522ceb61998bd3022bb",
+          "year": "2025"
+        },
+        {
+          "path": "workspace-offers-2026.json.gz",
+          "rows": 51720,
+          "columns": [
+            "event",
+            "book",
+            "side",
+            "odds",
+            "probability",
+            "reference_mean",
+            "reference_sd",
+            "references",
+            "ev",
+            "won",
+            "profit",
+            "own_probability",
+            "bookmaker_margin"
+          ],
+          "encoding": "gzip-json-table",
+          "compressed_bytes": 2359493,
+          "uncompressed_bytes": 9354951,
+          "sha256": "6926b83fc0e17f10b2044c2a177b8affd65c337e2d392f257a1ece3880501490",
+          "year": "2026"
+        }
+      ],
+      "compressed_bytes": 28137594,
+      "uncompressed_bytes": 105489925
+    }
+  },
+  "counts": {
+    "events": 33106,
+    "offers": 591471,
+    "offers_default_odds_range": 503874,
+    "leagues": 11,
+    "books": 15
+  },
+  "date_range": [
+    "2018-01-01",
+    "2026-10-29"
+  ],
+  "leagues": [
+    {
+      "code": "B1",
+      "name": "Belgium First Division A"
+    },
+    {
+      "code": "D1",
+      "name": "Germany Bundesliga"
+    },
+    {
+      "code": "E0",
+      "name": "England Premier League"
+    },
+    {
+      "code": "E1",
+      "name": "England Championship"
+    },
+    {
+      "code": "F1",
+      "name": "France Ligue 1"
+    },
+    {
+      "code": "I1",
+      "name": "Italy Serie A"
+    },
+    {
+      "code": "N1",
+      "name": "Netherlands Eredivisie"
+    },
+    {
+      "code": "P1",
+      "name": "Portugal Primeira Liga"
+    },
+    {
+      "code": "SC0",
+      "name": "Scotland Premiership"
+    },
+    {
+      "code": "SP1",
+      "name": "Spain La Liga"
+    },
+    {
+      "code": "T1",
+      "name": "Turkey Super Lig"
+    }
+  ],
+  "books": [
+    {
+      "code": "1XB",
+      "name": "1xBet",
+      "offers": 11094
+    },
+    {
+      "code": "B365",
+      "name": "Bet365",
+      "offers": 99252
+    },
+    {
+      "code": "BF",
+      "name": "Betfair Sportsbook",
+      "offers": 11370
+    },
+    {
+      "code": "BFD",
+      "name": "Betfred",
+      "offers": 14085
+    },
+    {
+      "code": "BMGM",
+      "name": "BetMGM",
+      "offers": 11220
+    },
+    {
+      "code": "BV",
+      "name": "BetVictor",
+      "offers": 13815
+    },
+    {
+      "code": "BW",
+      "name": "bwin",
+      "offers": 94815
+    },
+    {
+      "code": "CL",
+      "name": "Coral",
+      "offers": 8274
+    },
+    {
+      "code": "IW",
+      "name": "Interwetten",
+      "offers": 67968
+    },
+    {
+      "code": "LB",
+      "name": "Ladbrokes",
+      "offers": 13878
+    },
+    {
+      "code": "PP",
+      "name": "Paddy Power",
+      "offers": 2823
+    },
+    {
+      "code": "PS",
+      "name": "Pinnacle",
+      "offers": 85008
+    },
+    {
+      "code": "SKB",
+      "name": "Sky Bet",
+      "offers": 2787
+    },
+    {
+      "code": "VC",
+      "name": "BetVictor",
+      "offers": 73656
+    },
+    {
+      "code": "WH",
+      "name": "William Hill",
+      "offers": 81426
+    }
+  ],
+  "missing_values": {
+    "representation": null,
+    "events_by_column": {
+      "home_score": 0,
+      "away_score": 0,
+      "home_ht_score": 9,
+      "away_ht_score": 9,
+      "home_corners": 10,
+      "away_corners": 10,
+      "home_yellow": 9,
+      "away_yellow": 9,
+      "home_shots": 10,
+      "away_shots": 10,
+      "home_shots_on_target": 10,
+      "away_shots_on_target": 10
+    }
+  },
+  "sides": [
+    {
+      "value": 0,
+      "label": "1 · Local"
+    },
+    {
+      "value": 1,
+      "label": "X · Empate"
+    },
+    {
+      "value": 2,
+      "label": "2 · Visitante"
+    }
+  ],
+  "fields": [
+    {
+      "key": "date",
+      "label": "Fecha del partido",
+      "type": "date",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "league",
+      "label": "Liga",
+      "type": "category",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "home_team",
+      "label": "Equipo local",
+      "type": "text",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "away_team",
+      "label": "Equipo visitante",
+      "type": "text",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "book",
+      "label": "Casa de apuestas",
+      "type": "category",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "side",
+      "label": "Selección 1 / X / 2",
+      "type": "category",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "odds",
+      "label": "Cuota decimal",
+      "type": "number",
+      "unit": "decimal",
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "probability",
+      "label": "Probabilidad mínima de referencia",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true,
+      "description": "Mínimo de probabilidades power sin margen entre las otras casas; excluye la casa evaluada."
+    },
+    {
+      "key": "reference_mean",
+      "label": "Probabilidad media de referencia",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "reference_sd",
+      "label": "Dispersión entre referencias",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "reference_count",
+      "label": "Cantidad de otras casas",
+      "type": "integer",
+      "unit": "books",
+      "phase": "pre",
+      "available_for_rule": true,
+      "expression": "length(references)"
+    },
+    {
+      "key": "probability_break_even",
+      "label": "Probabilidad de equilibrio",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true,
+      "expression": "1 / odds"
+    },
+    {
+      "key": "ev",
+      "label": "EV estimado",
+      "type": "number",
+      "unit": "ratio",
+      "phase": "pre",
+      "available_for_rule": true,
+      "expression": "probability * odds - 1"
+    },
+    {
+      "key": "edge_probability",
+      "label": "Diferencia sobre el equilibrio",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true,
+      "expression": "probability - 1 / odds"
+    },
+    {
+      "key": "own_probability",
+      "label": "Probabilidad sin margen de esta casa",
+      "type": "number",
+      "unit": "probability",
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "bookmaker_margin",
+      "label": "Margen de esta casa",
+      "type": "number",
+      "unit": "ratio",
+      "phase": "pre",
+      "available_for_rule": true,
+      "expression": "sum(1 / quotes_1x2) - 1"
+    },
+    {
+      "key": "references",
+      "label": "Casas de referencia",
+      "type": "list",
+      "unit": null,
+      "phase": "pre",
+      "available_for_rule": true
+    },
+    {
+      "key": "won",
+      "label": "Apuesta acertada",
+      "type": "boolean",
+      "unit": null,
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "profit",
+      "label": "Beneficio con una unidad",
+      "type": "number",
+      "unit": "units",
+      "phase": "post",
+      "available_for_rule": false,
+      "expression": "won ? odds - 1 : -1"
+    },
+    {
+      "key": "home_score",
+      "label": "Goles local (final)",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_score",
+      "label": "Goles visitante (final)",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "home_ht_score",
+      "label": "Goles local (primer tiempo)",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_ht_score",
+      "label": "Goles visitante (primer tiempo)",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "home_corners",
+      "label": "Córners local",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_corners",
+      "label": "Córners visitante",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "home_yellow",
+      "label": "Amarillas local",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_yellow",
+      "label": "Amarillas visitante",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "home_shots",
+      "label": "Tiros local",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_shots",
+      "label": "Tiros visitante",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "home_shots_on_target",
+      "label": "Tiros al arco local",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    },
+    {
+      "key": "away_shots_on_target",
+      "label": "Tiros al arco visitante",
+      "type": "integer",
+      "unit": "count",
+      "phase": "post",
+      "available_for_rule": false
+    }
+  ],
+  "periods": [
+    {
+      "id": "test",
+      "label": "2022–2026",
+      "from": "2022-01-01",
+      "to": "2026-10-29"
+    },
+    {
+      "id": "validation",
+      "label": "2018–2021",
+      "from": "2018-01-01",
+      "to": "2021-12-31"
+    },
+    {
+      "id": "all",
+      "label": "Todo el historial",
+      "from": "2018-01-01",
+      "to": "2026-10-29"
+    }
+  ],
+  "default_formula": {
+    "id": "ev-conservador-3",
+    "name": "EV conservador ≥ 3%",
+    "status": "candidata",
+    "market": "h2h",
+    "minimum_ev": 0.03,
+    "minimum_reference_books": 3,
+    "minimum_odds": 1.2,
+    "maximum_odds": 5.0,
+    "stake": 1,
+    "expression": "probability * odds - 1 >= 0.03 && reference_count >= 3 && odds >= 1.2 && odds <= 5",
+    "one_selection_per_event": true,
+    "tie_break": [
+      "highest_ev",
+      "book_descending",
+      "side_ascending"
+    ],
+    "verified_results": {
+      "all": {
+        "n": 295,
+        "wins": 154,
+        "profit_units": 35.16,
+        "stake_units": 295,
+        "roi": 0.1191864406779661,
+        "win_rate": 0.5220338983050847,
+        "predicted_ev": 0.06022911355861014,
+        "average_odds": 2.489864406779661,
+        "first_date": "2018-01-02",
+        "last_date": "2026-09-12"
+      },
+      "validation": {
+        "n": 219,
+        "wins": 115,
+        "profit_units": 22.38,
+        "stake_units": 219,
+        "roi": 0.10219178082191781,
+        "win_rate": 0.5251141552511416,
+        "predicted_ev": 0.05911823655417703,
+        "average_odds": 2.412054794520548,
+        "first_date": "2018-01-02",
+        "last_date": "2021-12-27"
+      },
+      "test": {
+        "n": 76,
+        "wins": 39,
+        "profit_units": 12.78,
+        "stake_units": 76,
+        "roi": 0.16815789473684212,
+        "win_rate": 0.5131578947368421,
+        "predicted_ev": 0.06343019334770028,
+        "average_odds": 2.7140789473684213,
+        "first_date": "2022-01-07",
+        "last_date": "2026-09-12"
+      }
+    }
+  },
+  "method": {
+    "market": "1X2 · Resultado final",
+    "snapshot": "pre",
+    "power_devig": true,
+    "target_book_excluded_from_references": true,
+    "minimum_other_real_books": 3,
+    "quote_odds_range": null,
+    "book_overround_range": [
+      -0.02,
+      0.15
+    ],
+    "pinnacle_excluded_from": "2025-07-23",
+    "closing_prices_used": false,
+    "probability_interpretation": "Mínimo entre referencias de mercado sin margen; estimación del modelo de referencia.",
+    "post_match_fields_are_observations": true,
+    "minimum_is_statistical_confidence_bound": false,
+    "policy_introduced_after_prior_test_inspection": true,
+    "price_timestamp_verified": false
+  },
+  "sources": {
+    "quote_history_sha256": "6b76a528fe59125c4fb3005870b003de538d4607c0ddda17fcc41ef43267b431",
+    "matches_sha256": "9348181c1ac274a20cb603303ac6f46a1f1f9bca490026bde5cf50c8238e5701",
+    "provider": "Football-Data.co.uk",
+    "provider_url": "https://www.football-data.co.uk/",
+    "files": [
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/E0.csv",
+        "sha256": "4f3389365ef3f7ac966764ed8ba67cf3b79f5aebed18dd224099c4b2c98bc67b",
+        "retrieved_at": "2026-10-30T13:53:06Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/E1.csv",
+        "sha256": "04d07d578d818bdcd6b95d43e79f10a6a26be01b45be6190b09ebdeaeba0a7ce",
+        "retrieved_at": "2026-10-30T13:53:06Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/P1.csv",
+        "sha256": "c485bfd69cd837e6b62769917d2ba22c410160da6fe0e087c8708dd7b8c6db73",
+        "retrieved_at": "2026-10-30T13:53:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/I1.csv",
+        "sha256": "664a8874d3a33923036120c4162e72f13887e0897b51effe27f89969c79c335d",
+        "retrieved_at": "2026-10-30T13:53:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/SP1.csv",
+        "sha256": "5786719e06d1a5387cb90fac71597c890f496df19e8e1aa868bbc852f7e730fd",
+        "retrieved_at": "2026-10-30T13:53:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/F1.csv",
+        "sha256": "95997fd3c3e13be3101b216fe9b26a9ce6715ac6b76b115e44926c12b90977e6",
+        "retrieved_at": "2026-10-30T13:53:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/D1.csv",
+        "sha256": "033227408247769568111af49de2a50f6951c87e6d43f9e1a01e73d647bced3e",
+        "retrieved_at": "2026-10-30T13:53:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/B1.csv",
+        "sha256": "4fea24437fc7c897e3995fd760f7719209df7c9344c8681d52e42a6bf814d88f",
+        "retrieved_at": "2026-10-30T13:53:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/N1.csv",
+        "sha256": "2cb6dd2f12b3c4493fbeb73ca8c14a3be0c528e1e9d3fb774fd109ff1624613b",
+        "retrieved_at": "2026-10-30T13:53:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/T1.csv",
+        "sha256": "46bd389c3d1f7359e5cf614c409f5aa716cb095ce708f7631f6720cbae1d27a8",
+        "retrieved_at": "2026-10-30T13:53:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1718/SC0.csv",
+        "sha256": "3f4bdeb28e3802efe19961c114f1085fd4341c5b437f4a68f12ac59277304029",
+        "retrieved_at": "2026-10-30T13:53:14Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/B1.csv",
+        "sha256": "19c3b2a685b9a624f172d2794529caec385a957a96ddc6ca399a59bafc0b9cb4",
+        "retrieved_at": "2026-10-30T13:53:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/E1.csv",
+        "sha256": "112eedf787e26e00aac1442ef86e7fee5d4a43f86552ff2dac31ceb95a849487",
+        "retrieved_at": "2026-10-30T13:53:15Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/SC0.csv",
+        "sha256": "12dbf9aed5cbca950209bea7e7beeabb0e8b4412f5e6edd65f65ea0b83a8f903",
+        "retrieved_at": "2026-10-30T13:53:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/T1.csv",
+        "sha256": "515ad5a5602dcc63ddb9062d49d30e1af6974f566676d360741f38e79f912ec2",
+        "retrieved_at": "2026-10-30T13:53:20Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/E0.csv",
+        "sha256": "7c096b3c2ecd54c6993d22eeea73450c2bde11e3457238b226b8f43c62dfc35e",
+        "retrieved_at": "2026-10-30T13:53:14Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/N1.csv",
+        "sha256": "d47418082165dd89849d51dddf3a14e2c302f6de7a9322cf1bd9e678245f6482",
+        "retrieved_at": "2026-10-30T13:53:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/P1.csv",
+        "sha256": "e9caf283aa870e4e866b5716660fb86aa5c598cca2f2750ef3642e429a961db5",
+        "retrieved_at": "2026-10-30T13:53:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/F1.csv",
+        "sha256": "31559a4d8b52eff6f78e13a9b33d7b844e4f41d823dd1cf5c1aaa61c51eaaf9c",
+        "retrieved_at": "2026-10-30T13:53:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/SP1.csv",
+        "sha256": "9b8cece2c85e90e382b30dc4fc5046534f12c6d2b0efa74cd7d1d52e90a0c201",
+        "retrieved_at": "2026-10-30T13:53:14Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/I1.csv",
+        "sha256": "2baea8a1fb31096960b5f5797d31dbb6b454eb41b00845e6b0b79feb82a0e3d0",
+        "retrieved_at": "2026-10-30T13:53:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1819/D1.csv",
+        "sha256": "f03ee41b741aca9c43cbafb800bbc6f01ca9d7ed19c1a9dd4c309389280cfe11",
+        "retrieved_at": "2026-10-30T13:53:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/B1.csv",
+        "sha256": "f64077e0fcd43a2d961ac7462ca3902d9aa67e86a12bb8c2b6e1c11984c9d5b8",
+        "retrieved_at": "2026-10-30T13:53:28Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/E1.csv",
+        "sha256": "f31450c623c0b74b89692584a85924cc652d33ec89757acf4b2dda5e26261d57",
+        "retrieved_at": "2026-10-30T13:53:23Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/N1.csv",
+        "sha256": "84998d67f390ee86d2f2552fed19a0d5ebaba32000ff7c759b3bd00dfdd9f988",
+        "retrieved_at": "2026-10-30T13:53:25Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/SC0.csv",
+        "sha256": "9fa1ffda5b5b292580dae625323864ead985e27b83427600cfd5f686b12a6491",
+        "retrieved_at": "2026-10-30T13:53:28Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/F1.csv",
+        "sha256": "bda566f6aea24bc2f08cceac8f7d6c81d7f9c64cfda9fdae7eb9be2b84dddd2a",
+        "retrieved_at": "2026-10-30T13:53:25Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/E0.csv",
+        "sha256": "100037618b94f94057400bb02bf6bac4ef74ddaa58cde4b38370839c39caee61",
+        "retrieved_at": "2026-10-30T13:53:22Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/P1.csv",
+        "sha256": "b65f3fa55dd1362af093ad5f823f6b0ec1925e796048688bcbdebc19fab8b240",
+        "retrieved_at": "2026-10-30T13:53:26Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/D1.csv",
+        "sha256": "0a032b1adc75f7fa018dcfeff7fcdcc0a89014e3fe69f44534f538b6f931aef5",
+        "retrieved_at": "2026-10-30T13:53:25Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/SP1.csv",
+        "sha256": "a05d5d60eee0b1414c56d6d6817f860cdc620e206234069a1886c98a8cb318da",
+        "retrieved_at": "2026-10-30T13:53:23Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/T1.csv",
+        "sha256": "2ae46dbc0c80a9a10c2ea6737c7bcbcf5849c394ba3912615c39466e5db7bf7a",
+        "retrieved_at": "2026-10-30T13:53:28Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/1920/I1.csv",
+        "sha256": "f33233e0c428ebe4f7cb854c4a504e0b59c4e009ee8b679269486e26afdc575b",
+        "retrieved_at": "2026-10-30T13:53:23Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/SC0.csv",
+        "sha256": "0456d91665fccef8a7b4cce781b9a56a0df451d43dc1f67f0d623ac90aa26817",
+        "retrieved_at": "2026-10-30T13:53:36Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/B1.csv",
+        "sha256": "6e74a3f376c67b18bc40175aaf4d87b553ed8d10335ec48e6c0d805fd0117687",
+        "retrieved_at": "2026-10-30T13:53:34Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/F1.csv",
+        "sha256": "124560ab39a1c256eb6ee5ad2dd1eed250c9780d0cbb34525d9abee41fbf7f70",
+        "retrieved_at": "2026-10-30T13:53:34Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/T1.csv",
+        "sha256": "f50a1ca815964b11f818a3ca35035f57969e5b3b04e267ad508e8b9282920cfd",
+        "retrieved_at": "2026-10-30T13:53:37Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/E1.csv",
+        "sha256": "cf93295e310c60e5b97ae7466d772f8ec6a908ad401e38fceb7e8617369d5073",
+        "retrieved_at": "2026-10-30T13:53:31Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/E0.csv",
+        "sha256": "5afe63f69401457b8354eaacee24f9a3e520b3c3af6329564a9783e20d789c62",
+        "retrieved_at": "2026-10-30T13:53:29Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/SP1.csv",
+        "sha256": "b4137db923101f464e8403c4973acbfaf7d71724ce93b4336fad580e894d9591",
+        "retrieved_at": "2026-10-30T13:53:31Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/N1.csv",
+        "sha256": "65d532e1ea878954043454422ba2c770d05909691b219f39fcc6e9c4c4037657",
+        "retrieved_at": "2026-10-30T13:53:34Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/P1.csv",
+        "sha256": "c6bb505a2a2a3f5a71f5d37cbe9f717fb683d706b66170b6b3bef7947a5252cb",
+        "retrieved_at": "2026-10-30T13:53:34Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/D1.csv",
+        "sha256": "48ec5d53d2452b6ebdbc07bd78a836d6a4686f99fc020439ee3292e685315e61",
+        "retrieved_at": "2026-10-30T13:53:31Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2021/I1.csv",
+        "sha256": "c09196fa18877547442807d375317299947abdd6d51a5e0df044cc6026e13f36",
+        "retrieved_at": "2026-10-30T13:53:31Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/B1.csv",
+        "sha256": "1fbc0221c0c017c34ff480268b153959576b0c707dffbeaf3141819a7d8d4363",
+        "retrieved_at": "2026-10-30T13:53:43Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/SC0.csv",
+        "sha256": "5814849157392d05df1bd8220a468649434d1e816e9385d65eca2dede98c5dd1",
+        "retrieved_at": "2026-10-30T13:53:44Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/P1.csv",
+        "sha256": "c4477c4f40da93fbba978fa52b76dc962df3a998a464f9c5ae5462d1b36e3a63",
+        "retrieved_at": "2026-10-30T13:53:42Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/E1.csv",
+        "sha256": "a181451be4801b9f838daf5f6aaf21e9f09d36042be9e6c15388e71001e772ea",
+        "retrieved_at": "2026-10-30T13:53:38Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/F1.csv",
+        "sha256": "9e9eaefb8704264f8d55a718a119d940de4af7d7b4217ac4097b957406e16213",
+        "retrieved_at": "2026-10-30T13:53:40Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/T1.csv",
+        "sha256": "d945315d283f2c3b48e8ff67d9ac460ccc2c817ad719e0448000db995b5ab9ce",
+        "retrieved_at": "2026-10-30T13:53:43Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/D1.csv",
+        "sha256": "034d0e1296e944dddf25e3c91b85ef5bd1ad25661b89d73878f5c73bfea4b9fc",
+        "retrieved_at": "2026-10-30T13:53:40Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/SP1.csv",
+        "sha256": "2d9e619700712823d15716c07715133f8c3b1a09046930dcfc785a38633dee2e",
+        "retrieved_at": "2026-10-30T13:53:39Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/E0.csv",
+        "sha256": "335afcbabeb2939fa10ab39ba3e8215072d0b577cb8d0705c1e44c56e934e703",
+        "retrieved_at": "2026-10-30T13:53:37Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/N1.csv",
+        "sha256": "1798f02c9e2d55d399503bce4adf82d9cb31969caab01de8a4ac0632947b692a",
+        "retrieved_at": "2026-10-30T13:53:42Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2122/I1.csv",
+        "sha256": "6a9555d5a90e652a883fd2862a52545c06e264016cd770347c067a6d7c993170",
+        "retrieved_at": "2026-10-30T13:53:40Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/B1.csv",
+        "sha256": "46737ea78b45a1fa6827b733a884c78f2610f37961781336ea7aa6dbfd64dcb4",
+        "retrieved_at": "2026-10-30T13:53:50Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/E1.csv",
+        "sha256": "cd38ab0586ea8cb4d573c363ff70749117f116da5b2741e5b0ea37da05860b1b",
+        "retrieved_at": "2026-10-30T13:53:46Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/SC0.csv",
+        "sha256": "d716ef774542bb04701e1ac03eedf677cfa02422a0974b030824b3002c011730",
+        "retrieved_at": "2026-10-30T13:53:51Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/P1.csv",
+        "sha256": "acb35c152f1198de9d02cdea622bc815e1438bae00d1822e0fe48a787405a84a",
+        "retrieved_at": "2026-10-30T13:53:50Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/D1.csv",
+        "sha256": "b716517b25033ce8e0243e967aa961876425a4c41e97c8aa8fa59f2aca061341",
+        "retrieved_at": "2026-10-30T13:53:48Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/F1.csv",
+        "sha256": "18ea07d922e8b6360b81189637efd5aaf44779765db856bff208d5b1acf69b2f",
+        "retrieved_at": "2026-10-30T13:53:48Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/T1.csv",
+        "sha256": "129aacfe9576679cd287a63c401823b7df4ecd8bddb7eeb1ed0fcd22c867e0e3",
+        "retrieved_at": "2026-10-30T13:53:51Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/E0.csv",
+        "sha256": "8442792d3b614c94ea3cf381bd2736805889cc1713169035368fff19c3d02380",
+        "retrieved_at": "2026-10-30T13:53:45Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/N1.csv",
+        "sha256": "a52a916c302ab414705fdcbba2077c301f9f0baefd3d519ea5434a2a5f5c4e8f",
+        "retrieved_at": "2026-10-30T13:53:49Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/SP1.csv",
+        "sha256": "53348112526b5165539df240be350083989bb258f30c0ff7cacbc0165ca7e4b3",
+        "retrieved_at": "2026-10-30T13:53:46Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2223/I1.csv",
+        "sha256": "9960837f37a97ae700f876c87b85a8b7a2f5a5d05a53077830c21b9db8880c45",
+        "retrieved_at": "2026-10-30T13:53:47Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/B1.csv",
+        "sha256": "379d10bd92cecba6349f043f0661e3548e16d8053b234a7cace7493acfb72144",
+        "retrieved_at": "2026-10-30T13:53:58Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/E1.csv",
+        "sha256": "5737f6cc95c95092b28317f41d3123e2fb09345434efc1c84bbdf15830849ab3",
+        "retrieved_at": "2026-10-30T13:53:53Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/SC0.csv",
+        "sha256": "ed2dcf1bb0bdb12e911f0b8435038a85448be27d4fa368202c85be5e8036c341",
+        "retrieved_at": "2026-10-30T13:53:59Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/E0.csv",
+        "sha256": "b2e057b0ed959f198b0f63d2391c01239f3608e6de5db68edab3f88e04d07ff3",
+        "retrieved_at": "2026-10-30T13:53:53Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/N1.csv",
+        "sha256": "bbef260d01917668069697c60e5179571600ddca6f3cc353b81d46143697dad4",
+        "retrieved_at": "2026-10-30T13:53:56Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/P1.csv",
+        "sha256": "681e132bee3948b432436e907a935ea8fc4a8ccace86dad67d61be0159035758",
+        "retrieved_at": "2026-10-30T13:53:57Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/F1.csv",
+        "sha256": "ca0a4bf51d5b1ccfd0e1558ea41de6bb829df6c96c759888a87248d296d5adb7",
+        "retrieved_at": "2026-10-30T13:53:56Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/SP1.csv",
+        "sha256": "5323f596c7ed318e4bce95557a369d809d98501fa499ea5f41350cd45cf3c7d9",
+        "retrieved_at": "2026-10-30T13:53:54Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/T1.csv",
+        "sha256": "17097f7d31bad40f830dc6f0f85090e9f76876e6812ec14997bc80423a05924b",
+        "retrieved_at": "2026-10-30T13:53:59Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/D1.csv",
+        "sha256": "1de8bc12a133dbbf71bc6ffda62082642f087f61b1b7c15ae9f2d320876fb07e",
+        "retrieved_at": "2026-10-30T13:53:55Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2324/I1.csv",
+        "sha256": "343a89db026fe4204ebeabd663cdfee8d02a45457828fc1cb63fa630ca170723",
+        "retrieved_at": "2026-10-30T13:53:54Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/B1.csv",
+        "sha256": "fcc3ec3a7bdd57ec42df76bb03aa1858ee18be88886a379f42b4c7b2e7f5d0eb",
+        "retrieved_at": "2026-10-30T13:54:05Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/SC0.csv",
+        "sha256": "a7e7c7512a04784c8c8d9a82a3bb24a3c67c9a6afa533a661d8fbbbbec293118",
+        "retrieved_at": "2026-10-30T13:54:07Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/E1.csv",
+        "sha256": "f34c340446c916374be66bdc2fb25b87ee7f2662712ca009653d03ac705535f9",
+        "retrieved_at": "2026-10-30T13:54:01Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/P1.csv",
+        "sha256": "e3cceff81e471c59e72c1f60f81b2e62df21d1a58af167062d4915484da00255",
+        "retrieved_at": "2026-10-30T13:54:04Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/T1.csv",
+        "sha256": "fd91680cc815f356c94fdd733078431ca771707305994ec49c5f1270cf9c9f5c",
+        "retrieved_at": "2026-10-30T13:54:06Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/N1.csv",
+        "sha256": "7f97f0a7fd1f9b2cff6ac09588cdc14fd07f19950cb75e821fa58ab41e541d0a",
+        "retrieved_at": "2026-10-30T13:54:04Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/SP1.csv",
+        "sha256": "c086e96d6a53f6e6c0fce4e35db0d1728c773b4362323da0161a34769e315a36",
+        "retrieved_at": "2026-10-30T13:54:01Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/E0.csv",
+        "sha256": "d0c8ce4a96d886cf60cf101f570f4a3893844226f91c7bd769eb568c49edbfa4",
+        "retrieved_at": "2026-10-30T13:54:00Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/F1.csv",
+        "sha256": "fe6ae6a0c30d05f0ac88e0fc4a31452c7203e2b444703dfa941e22f38f20ab63",
+        "retrieved_at": "2026-10-30T13:54:04Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/I1.csv",
+        "sha256": "79d87a5b18771e066ac7419b7876bfd9771a68ca117a9712375d6bc9685abee3",
+        "retrieved_at": "2026-10-30T13:54:02Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2425/D1.csv",
+        "sha256": "a295c58033cfe6393cbbc28f7db85671839b960c5f1153fd3678e20ad2adb92e",
+        "retrieved_at": "2026-10-30T13:54:03Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/B1.csv",
+        "sha256": "7ba1d75b2f23ab6bf36952fa61b62e80905e2d38fa059ad389106772aebaf481",
+        "retrieved_at": "2026-10-30T13:54:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/SC0.csv",
+        "sha256": "be3c45e08f09a327e3fd5289dd0b362b200f430ed5845cb18df1aca7e3ced2ee",
+        "retrieved_at": "2026-10-30T13:54:15Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/N1.csv",
+        "sha256": "dfb092a866e0df4b4c8fde7778d47f41a4307f5c5ac5a6f55d2276e45c80e604",
+        "retrieved_at": "2026-10-30T13:54:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/E1.csv",
+        "sha256": "98954c319950f19158624b17a154ef1c56eb7b8d169ef317f28f06d11d0b9a74",
+        "retrieved_at": "2026-10-30T13:54:08Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/P1.csv",
+        "sha256": "f1353dc7404bfa0d27daa3ca6c164bb450ec20558ee02fffb7160fae182213dc",
+        "retrieved_at": "2026-10-30T13:54:12Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/T1.csv",
+        "sha256": "d35e97d42b53ca870b13683da3998aa2758eeb43280fbe71d5d935bae47cdd23",
+        "retrieved_at": "2026-10-30T13:54:14Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/E0.csv",
+        "sha256": "3e3a8352f9ada6789c508d6ca184424421fed56a30400904a4a327c583407e62",
+        "retrieved_at": "2026-10-30T13:54:07Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/SP1.csv",
+        "sha256": "4ca2e285f3ee0702f6bc55fcaa4f5a15cb3aef6220735a1d15398131e21d63f5",
+        "retrieved_at": "2026-10-30T13:54:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/F1.csv",
+        "sha256": "898b7ddcd373cfe955ae353b1a98cf7f1c8757ca10b69d53039f4e098e88f192",
+        "retrieved_at": "2026-10-30T13:54:11Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/D1.csv",
+        "sha256": "618301a4b39918225a8ccc57f0f839d675e1abd92fa3a3ccd9a67acd7c79dd7f",
+        "retrieved_at": "2026-10-30T13:54:10Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2526/I1.csv",
+        "sha256": "709ae279617d16af226312bcceac941e71241745ddaf950bdac2b83afad4fcbb",
+        "retrieved_at": "2026-10-30T13:54:09Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/SC0.csv",
+        "sha256": "8aa34f72c6b0bc3725a66a2185beddaa8204f85c42c780a3ca910878c3297e14",
+        "retrieved_at": "2026-10-30T13:54:21Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/N1.csv",
+        "sha256": "0a0df1a00c9779d635b22a2419cc63502939307b0f12ec8f9483d5b5679acf64",
+        "retrieved_at": "2026-10-30T13:54:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/B1.csv",
+        "sha256": "c663c5f34c981b8bf6a982446028916d7ca7b6cac07f39bcc0bf1163c451de50",
+        "retrieved_at": "2026-10-30T13:54:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/P1.csv",
+        "sha256": "77ddf50cca9f3944af36982eb7e8d251cc611e4c1553d034438790b105b088df",
+        "retrieved_at": "2026-10-30T13:54:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/T1.csv",
+        "sha256": "c307b0cc913901a1821d8f8e6fa0f628e50113561a5a3d0ec6bbdb6834a1cdae",
+        "retrieved_at": "2026-10-30T13:54:19Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/E1.csv",
+        "sha256": "0a69f4397c23f53a68cecacfb1f195b1513a5742d44665fa30aa6dea31256155",
+        "retrieved_at": "2026-10-30T13:54:15Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/SP1.csv",
+        "sha256": "f5643d70ef824713fba42de3687c072e26934c6bbbbc903652b75a4767e2d8f8",
+        "retrieved_at": "2026-10-30T13:54:16Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/E0.csv",
+        "sha256": "4cd9d41c75bdaafce0657cb97ce76438f8016605957af80896b60a0f21955ab2",
+        "retrieved_at": "2026-10-30T13:54:14Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/F1.csv",
+        "sha256": "46efdba17c47176f58cc65bd40d178944b5f985eb753c61f997fed31de4c7642",
+        "retrieved_at": "2026-10-30T13:54:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/I1.csv",
+        "sha256": "32ca618587c90db25f16ea647cb55060f519c03830a1e8ec4a6c4204e27d5135",
+        "retrieved_at": "2026-10-30T13:54:17Z"
+      },
+      {
+        "url": "https://www.football-data.co.uk/mmz4281/2627/D1.csv",
+        "sha256": "313040382632ccf3b564eaba6e2ad680850ca91e78e2d799c0708dec973b1506",
+        "retrieved_at": "2026-10-30T13:54:17Z"
+      }
+    ],
+    "field_definitions_url": "https://www.football-data.co.uk/notes.txt"
+  },
+  "audit": {
+    "exact_ledger_match": true,
+    "selections_checked": 295,
+    "reference": "research_robust_reference_ev.trades.jsonl · all_books_minimum",
+    "exporter": "scripts/export_football_workspace.py"
+  }
+}

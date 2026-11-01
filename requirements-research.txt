@@ -1,0 +1,3 @@
+# Used by the portfolio LP searches; pin the versions recorded in their audits.
+numpy==2.5.4
+scipy==1.18.1

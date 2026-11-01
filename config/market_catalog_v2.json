@@ -1,0 +1,1451 @@
+{
+  "version": 2,
+  "checked_at": "2026-10-30",
+  "purpose": "Mapa de familias de apuestas y de la evidencia necesaria; no promete disponibilidad universal por casa.",
+  "execution_enabled": false,
+  "coverage_policy": [
+    "La existencia de un mercado en un proveedor no implica histórico gratuito ni modelo validado.",
+    "La cuadrícula de goles sólo se usa para la estadística y período que modela.",
+    "Los precios observados sin historial comparable no generan ROI retrospectivo.",
+    "El catálogo agrupa variantes; cada línea, período, participante y regla define un contrato distinto."
+  ],
+  "sources": [
+    {
+      "name": "The Odds API: mercados y cobertura",
+      "url": "https://the-odds-api.com/sports-odds-data/betting-markets.html"
+    },
+    {
+      "name": "Pinnacle: reglas oficiales",
+      "url": "https://www.pinnacle.com/en/future/betting-rules"
+    },
+    {
+      "name": "Betfair: reglas de hándicap asiático",
+      "url": "https://support.betfair.com/app/answers/detail/a_id/6418"
+    }
+  ],
+  "markets": [
+    {
+      "key": "result_1x2",
+      "name": "Resultado 1X2",
+      "family": "Resultado",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "h2h",
+        "h2h_3_way"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Resultados descargados",
+      "historical_price_status": "Cuotas de casa identificada disponibles",
+      "requirements": [
+        "Probabilidades de los tres resultados",
+        "Mismo período y snapshot"
+      ],
+      "contract_fields": [
+        "90 minutos y descuento",
+        "Excluir prórroga y penales"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "winner_binary",
+      "name": "Ganador sin empate",
+      "family": "Resultado",
+      "sports": [
+        "basketball",
+        "baseball",
+        "hockey",
+        "tennis",
+        "mma"
+      ],
+      "provider_keys": [
+        "h2h"
+      ],
+      "model_status": "sport_specific_model_required",
+      "history_status": "NBA y MLB descargados; otros pendientes",
+      "historical_price_status": "Sin cuotas históricas NBA/MLB en esta base",
+      "requirements": [
+        "Historial del deporte y participantes",
+        "Resultado final según reglas"
+      ],
+      "contract_fields": [
+        "Prórroga / shootout / extra innings",
+        "Abandono o empate"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "double_chance",
+      "name": "Doble oportunidad",
+      "family": "Resultado",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "double_chance"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Resultados descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución 1X2",
+        "Precio del contrato combinado"
+      ],
+      "contract_fields": [
+        "1X, X2 o 12",
+        "No tratar como tres resultados excluyentes"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "draw_no_bet",
+      "name": "Empate no apuesta",
+      "family": "Resultado",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "draw_no_bet"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Resultados descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Probabilidad de victoria, empate y derrota",
+        "Precio DNB específico"
+      ],
+      "contract_fields": [
+        "Reembolso por empate",
+        "Tiempo reglamentario"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "european_handicap",
+      "name": "Hándicap europeo de tres resultados",
+      "family": "Hándicap",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Resultados descargados",
+      "historical_price_status": "No normalizado",
+      "requirements": [
+        "Distribución de diferencias",
+        "Línea entera y tres precios"
+      ],
+      "contract_fields": [
+        "Hándicap aplicado al local",
+        "Empate ajustado es un resultado, no reembolso"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "asian_handicap",
+      "name": "Hándicap asiático y líneas alternativas",
+      "family": "Hándicap",
+      "sports": [
+        "football",
+        "basketball",
+        "baseball",
+        "hockey"
+      ],
+      "provider_keys": [
+        "spreads",
+        "alternate_spreads"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores finales descargados para tres deportes",
+      "historical_price_status": "Fútbol: columnas raw por normalizar y verificar",
+      "requirements": [
+        "Distribución de diferencia del deporte",
+        "Línea y cuota de la misma casa y snapshot"
+      ],
+      "contract_fields": [
+        "Línea del equipo seleccionado",
+        "Cuartos dividen el importe",
+        "Prórroga / reembolso"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "totals",
+      "name": "Total de goles o puntos",
+      "family": "Totales",
+      "sports": [
+        "football",
+        "basketball",
+        "baseball",
+        "hockey"
+      ],
+      "provider_keys": [
+        "totals",
+        "alternate_totals"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores finales descargados para tres deportes",
+      "historical_price_status": "Fútbol 2,5: cuotas disponibles; otras líneas no normalizadas",
+      "requirements": [
+        "Distribución del total del deporte",
+        "Precios más/menos de la misma línea"
+      ],
+      "contract_fields": [
+        "Líneas enteras reembolsables",
+        "Prórroga y períodos"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "asian_total",
+      "name": "Total asiático de cuarto de línea",
+      "family": "Totales",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "totals",
+        "alternate_totals"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico completo de líneas de cuarto",
+      "requirements": [
+        "Distribución del total",
+        "Cada componente de media línea"
+      ],
+      "contract_fields": [
+        "Dos mitades del importe",
+        "Victoria/pérdida parcial y reembolso"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "team_total",
+      "name": "Total de un equipo",
+      "family": "Totales",
+      "sports": [
+        "football",
+        "basketball",
+        "baseball",
+        "hockey"
+      ],
+      "provider_keys": [
+        "team_totals",
+        "alternate_team_totals"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores finales descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Marginal del equipo en el modelo del deporte",
+        "Línea y cuota específicas"
+      ],
+      "contract_fields": [
+        "Equipo exacto",
+        "Tiempo y prórroga",
+        "Cuartos y reembolso"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "btts",
+      "name": "Ambos equipos marcan",
+      "family": "Goles",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "btts"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución conjunta de goles",
+        "Precios sí/no"
+      ],
+      "contract_fields": [
+        "Tiempo reglamentario",
+        "Definición de goles válidos"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "correct_score",
+      "name": "Marcador exacto",
+      "family": "Goles",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "correct_score"
+      ],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Cuadrícula conjunta y masa de cola",
+        "Cuota de cada marcador"
+      ],
+      "contract_fields": [
+        "Tiempo reglamentario",
+        "Otros marcadores y agrupaciones"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "odd_even",
+      "name": "Total par o impar",
+      "family": "Totales",
+      "sports": [
+        "football",
+        "basketball",
+        "baseball",
+        "hockey"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores finales descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución del total del deporte"
+      ],
+      "contract_fields": [
+        "Cero es par",
+        "Período exacto"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "winning_margin",
+      "name": "Margen exacto de victoria",
+      "family": "Resultado",
+      "sports": [
+        "football",
+        "basketball",
+        "baseball",
+        "hockey"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores finales descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución de diferencias",
+        "Definición exacta del intervalo"
+      ],
+      "contract_fields": [
+        "Ganador seleccionado",
+        "Margen exacto o rango",
+        "Prórroga"
+      ],
+      "settlement_engine": true,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "same_game_result_btts",
+      "name": "Resultado y ambos marcan",
+      "family": "Combinados",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico del precio combinado",
+      "requirements": [
+        "Intersección sobre la misma cuadrícula",
+        "Cuota real del combinado"
+      ],
+      "contract_fields": [
+        "Dependencia entre selecciones",
+        "No multiplicar probabilidades marginales"
+      ],
+      "settlement_engine": "joint_score_events",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "same_game_result_total",
+      "name": "Resultado y total",
+      "family": "Combinados",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico del precio combinado",
+      "requirements": [
+        "Intersección sobre la misma cuadrícula",
+        "Cuota real del combinado"
+      ],
+      "contract_fields": [
+        "Dependencia",
+        "Tratamiento de reembolsos y cuartos"
+      ],
+      "settlement_engine": "joint_score_events",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "win_to_nil",
+      "name": "Gana sin recibir goles",
+      "family": "Goles",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "score_distribution_available_research",
+      "history_status": "Marcadores descargados",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Victoria e incapacidad rival de anotar en el mismo evento"
+      ],
+      "contract_fields": [
+        "Equipo elegido",
+        "Tiempo reglamentario"
+      ],
+      "settlement_engine": "joint_score_events",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "first_half",
+      "name": "Mercados del primer tiempo",
+      "family": "Períodos",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "h2h_h1",
+        "h2h_3_way_h1",
+        "totals_h1",
+        "btts_h1"
+      ],
+      "model_status": "requires_period_specific_model",
+      "history_status": "Marcadores al descanso descargados cuando existen",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Modelo entrenado con el primer tiempo",
+        "Hora de liquidación"
+      ],
+      "contract_fields": [
+        "Descuento del primer tiempo",
+        "No dividir tasas finales por dos automáticamente"
+      ],
+      "settlement_engine": "selected_period_grid",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "second_half",
+      "name": "Mercados del segundo tiempo",
+      "family": "Períodos",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "h2h_h2",
+        "h2h_3_way_h2",
+        "totals_h2",
+        "btts_h2"
+      ],
+      "model_status": "requires_period_specific_model",
+      "history_status": "Derivable de resultado final menos descanso cuando existen ambos",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Modelo propio del segundo tiempo",
+        "Estado al descanso para apuestas en vivo"
+      ],
+      "contract_fields": [
+        "Marcador sólo del período",
+        "No incluir prórroga"
+      ],
+      "settlement_engine": "selected_period_grid",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "halftime_fulltime",
+      "name": "Descanso / resultado final",
+      "family": "Períodos",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "halftime_fulltime"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Descanso y final disponibles parcialmente",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución temporal conjunta de ambos períodos"
+      ],
+      "contract_fields": [
+        "Nueve resultados conjuntos",
+        "No multiplicar mitades como independientes"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "first_goal_team",
+      "name": "Equipo del primer gol",
+      "family": "Secuencia",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "exploratory_competing_hazards",
+      "history_status": "64 secuencias de eventos del Mundial 2022",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Secuencia y minutos de goles",
+        "Tasas de gol dependientes del tiempo"
+      ],
+      "contract_fields": [
+        "Sin goles",
+        "Goles en propia puerta",
+        "Período exacto"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "player_first_goal",
+      "name": "Primer goleador individual",
+      "family": "Jugadores",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "player_first_goal_scorer"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Eventos limitados; sin cobertura completa de participación",
+      "historical_price_status": "Una captura real disponible; sin histórico de backtest",
+      "requirements": [
+        "Titulares y minutos esperados",
+        "Tasa individual de gol",
+        "Lista de participantes y opción sin goleador"
+      ],
+      "contract_fields": [
+        "Titularidad / participación según casa",
+        "Propia puerta",
+        "Sin goleador",
+        "Anulaciones"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "player_anytime_goal",
+      "name": "Jugador marca en cualquier momento",
+      "family": "Jugadores",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "player_goal_scorer_anytime"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Eventos limitados; historial individual pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Minutos esperados",
+        "Rol y participación ofensiva",
+        "Lesiones y alineaciones"
+      ],
+      "contract_fields": [
+        "Participación mínima",
+        "Propia puerta",
+        "Prórroga"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "player_last_goal",
+      "name": "Último goleador",
+      "family": "Jugadores",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "player_last_goal_scorer"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial individual completo pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Secuencia completa",
+        "Sustituciones y minutos de exposición"
+      ],
+      "contract_fields": [
+        "Sin goleador",
+        "Propia puerta",
+        "Tiempo de liquidación"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "player_shots_assists",
+      "name": "Remates, remates al arco y asistencias",
+      "family": "Jugadores",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "player_shots",
+        "player_shots_on_target",
+        "player_assists"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Etiquetas de eventos parciales",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Minutos y rol",
+        "Definición del proveedor estadístico"
+      ],
+      "contract_fields": [
+        "Participación",
+        "Qué cuenta como remate o asistencia",
+        "Correcciones oficiales"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "player_cards",
+      "name": "Tarjetas de un jugador",
+      "family": "Jugadores",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "player_to_receive_card",
+        "player_to_receive_red_card"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Eventos parciales; cobertura individual pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Titulares y minutos",
+        "Árbitro y posición",
+        "Historial disciplinario"
+      ],
+      "contract_fields": [
+        "Segunda amarilla",
+        "Suplentes y cuerpo técnico",
+        "Participación"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "corners_total",
+      "name": "Total y total por equipo de córners",
+      "family": "Córners",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "alternate_totals_corners",
+        "alternate_team_totals_corners"
+      ],
+      "model_status": "requires_separate_count_model",
+      "history_status": "Conteos de córners descargados cuando existen",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Modelo de conteos específico",
+        "Dispersión y dependencia entre equipos"
+      ],
+      "contract_fields": [
+        "Concedidos o ejecutados",
+        "Córners repetidos",
+        "Tiempo reglamentario"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "corners_result_handicap",
+      "name": "Resultado y hándicap de córners",
+      "family": "Córners",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "corners_1x2",
+        "alternate_spreads_corners"
+      ],
+      "model_status": "requires_separate_count_model",
+      "history_status": "Conteos descargados parcialmente",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Distribución conjunta de córners",
+        "Línea completa y cuota"
+      ],
+      "contract_fields": [
+        "1X2 frente a hándicap con reembolso",
+        "Período exacto"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "cards_total",
+      "name": "Tarjetas y puntos por amonestación",
+      "family": "Tarjetas",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [
+        "alternate_totals_cards",
+        "alternate_spreads_cards"
+      ],
+      "model_status": "requires_separate_count_model",
+      "history_status": "Amarillas descargadas; no equivalen a puntos por tarjetas",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Árbitro, amarillas y rojas",
+        "Modelo de conteo y definición de puntuación"
+      ],
+      "contract_fields": [
+        "Amarilla / roja / doble amarilla",
+        "Máximo por jugador",
+        "Tarjetas posteriores al final"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "next_goal_race",
+      "name": "Próximo gol y carrera a N goles",
+      "family": "En vivo",
+      "sports": [
+        "football",
+        "hockey"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "64 secuencias parciales; no feed vivo completo",
+      "historical_price_status": "Sin histórico de estados y cuotas sincronizadas",
+      "requirements": [
+        "Estado y reloj en vivo",
+        "Expulsiones y sustituciones",
+        "Hazards condicionados"
+      ],
+      "contract_fields": [
+        "Marcador de referencia",
+        "Tiempo restante",
+        "Sin próximo gol"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "penalties_events",
+      "name": "Penales, fueras de juego y eventos especiales",
+      "family": "Eventos",
+      "sports": [
+        "football"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "Eventos de competiciones seleccionadas",
+      "historical_price_status": "Sin histórico de precios equivalente",
+      "requirements": [
+        "Etiquetas precisas por evento",
+        "Cobertura estable del proveedor"
+      ],
+      "contract_fields": [
+        "VAR",
+        "Penal concedido / ejecutado / convertido",
+        "Tanda excluida o incluida"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "period_quarters",
+      "name": "Cuartos, mitades y períodos",
+      "family": "Períodos",
+      "sports": [
+        "basketball",
+        "hockey",
+        "american_football"
+      ],
+      "provider_keys": [
+        "h2h_q1",
+        "spreads_q1",
+        "totals_q1",
+        "h2h_p1",
+        "totals_p1"
+      ],
+      "model_status": "requires_period_specific_model",
+      "history_status": "Históricos locales sólo de resultado final",
+      "historical_price_status": "Sin histórico de precios por período",
+      "requirements": [
+        "Marcadores de cada período",
+        "Modelos de ritmo, posesiones o tiempo de hielo"
+      ],
+      "contract_fields": [
+        "Prórroga",
+        "Límites del período",
+        "Empate y reembolso"
+      ],
+      "settlement_engine": "selected_period_grid",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "basketball_player_stats",
+      "name": "Puntos, rebotes, asistencias y otras estadísticas",
+      "family": "Jugadores",
+      "sports": [
+        "basketball"
+      ],
+      "provider_keys": [
+        "player_points",
+        "player_rebounds",
+        "player_assists",
+        "player_threes",
+        "player_blocks",
+        "player_steals"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial de jugadores no incorporado",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Minutos y uso",
+        "Plantel, descanso y emparejamiento",
+        "Distribución de conteos"
+      ],
+      "contract_fields": [
+        "Participación y titularidad",
+        "Prórroga",
+        "Proveedor estadístico"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "basketball_first_basket",
+      "name": "Primera canasta y primera canasta del equipo",
+      "family": "Jugadores",
+      "sports": [
+        "basketball"
+      ],
+      "provider_keys": [
+        "player_first_basket",
+        "player_first_team_basket",
+        "player_method_of_first_basket"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Sin play-by-play incorporado",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Quinteto inicial",
+        "Primera posesión y selección de tiro"
+      ],
+      "contract_fields": [
+        "Tiros libres",
+        "Método de canasta",
+        "Participación"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "basketball_milestones",
+      "name": "Doble-doble, triple-doble y combinaciones",
+      "family": "Jugadores",
+      "sports": [
+        "basketball"
+      ],
+      "provider_keys": [
+        "player_double_double",
+        "player_triple_double",
+        "player_points_rebounds_assists"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Sin historial de jugadores incorporado",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Distribución conjunta de estadísticas",
+        "Minutos y prórroga"
+      ],
+      "contract_fields": [
+        "Definición estadística",
+        "Dependencia entre categorías"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "baseball_innings",
+      "name": "Ganador, hándicap y total por innings",
+      "family": "Períodos",
+      "sports": [
+        "baseball"
+      ],
+      "provider_keys": [
+        "h2h_1st_5_innings",
+        "spreads_1st_5_innings",
+        "totals_1st_5_innings"
+      ],
+      "model_status": "requires_period_specific_model",
+      "history_status": "Resultados finales; modelo por innings pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Line scores por inning",
+        "Pitchers abridores y bullpen"
+      ],
+      "contract_fields": [
+        "Cantidad mínima de innings",
+        "Empate",
+        "Pitchers anunciados"
+      ],
+      "settlement_engine": "selected_period_grid",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "baseball_batter",
+      "name": "Hits, bases, carreras y home runs del bateador",
+      "family": "Jugadores",
+      "sports": [
+        "baseball"
+      ],
+      "provider_keys": [
+        "batter_hits",
+        "batter_total_bases",
+        "batter_home_runs",
+        "batter_rbis"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Resultados de juegos; plate appearances pendientes",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Turnos al bate",
+        "Pitcher y parque",
+        "Orden de bateo"
+      ],
+      "contract_fields": [
+        "Titularidad",
+        "Juego suspendido",
+        "Criterio del anotador"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "baseball_pitcher",
+      "name": "Ponches, outs y carreras del pitcher",
+      "family": "Jugadores",
+      "sports": [
+        "baseball"
+      ],
+      "provider_keys": [
+        "pitcher_strikeouts",
+        "pitcher_outs",
+        "pitcher_earned_runs"
+      ],
+      "model_status": "not_trained",
+      "history_status": "No hay historial de pitchers normalizado",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Pitch count esperado",
+        "Abridor, rival y bullpen"
+      ],
+      "contract_fields": [
+        "Debe abrir o participar",
+        "Outs frente a innings",
+        "Cambios de abridor"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "hockey_regulation",
+      "name": "Hockey: resultado en tiempo reglamentario",
+      "family": "Resultado",
+      "sports": [
+        "hockey"
+      ],
+      "provider_keys": [
+        "h2h_3_way"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial autorizado pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Marcador de 60 minutos",
+        "Distribución de tres resultados"
+      ],
+      "contract_fields": [
+        "Excluye prórroga y shootout",
+        "No mezclar con ganador final"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "hockey_players",
+      "name": "Goles, tiros, asistencias y atajadas",
+      "family": "Jugadores",
+      "sports": [
+        "hockey"
+      ],
+      "provider_keys": [
+        "player_goal_scorer_first",
+        "player_goals",
+        "player_shots_on_goal",
+        "player_total_saves"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial de jugadores pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Tiempo de hielo y líneas",
+        "Power play",
+        "Arquero confirmado"
+      ],
+      "contract_fields": [
+        "Shootout y prórroga",
+        "Participación",
+        "Proveedor estadístico"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "tennis_sets_games",
+      "name": "Ganador, sets, games, hándicaps y totales",
+      "family": "Tenis",
+      "sports": [
+        "tennis"
+      ],
+      "provider_keys": [
+        "h2h",
+        "h2h_s1",
+        "spreads_s1",
+        "totals_s1",
+        "alternate_set_totals"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Fuente y derechos pendientes",
+      "historical_price_status": "Sin histórico descargado equivalente",
+      "requirements": [
+        "Superficie, saque y devolución",
+        "Secuencia de sets y games",
+        "Forma temporal"
+      ],
+      "contract_fields": [
+        "Abandono y walkover",
+        "Tie-break",
+        "Match tie-break frente a set"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "tennis_player_props",
+      "name": "Aces, dobles faltas y breaks",
+      "family": "Tenis",
+      "sports": [
+        "tennis"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "Sin puntos de tenis normalizados",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Puntos de saque y devolución",
+        "Superficie y formato"
+      ],
+      "contract_fields": [
+        "Abandono",
+        "Proveedor estadístico",
+        "Formato de tie-break"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "nfl_yards_counts",
+      "name": "Yardas, pases, recepciones y conteos",
+      "family": "Jugadores",
+      "sports": [
+        "american_football"
+      ],
+      "provider_keys": [
+        "player_pass_yds",
+        "player_rush_yds",
+        "player_reception_yds",
+        "player_receptions"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Sin play-by-play y snaps incorporados",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Snaps y rutas",
+        "Rival y situación de juego",
+        "Lesiones"
+      ],
+      "contract_fields": [
+        "Prórroga",
+        "Participación",
+        "Proveedor estadístico"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "nfl_touchdowns",
+      "name": "Touchdown primero, último y en cualquier momento",
+      "family": "Jugadores",
+      "sports": [
+        "american_football"
+      ],
+      "provider_keys": [
+        "player_1st_td",
+        "player_last_td",
+        "player_anytime_td"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Sin historial de participación incorporado",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Uso en zona roja",
+        "Snaps y secuencia de jugadas"
+      ],
+      "contract_fields": [
+        "Qué constituye anotador",
+        "Pase de TD frente a recepción",
+        "Touchdowns defensivos"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "rugby_afl_players",
+      "name": "Tries, goles, posesiones y estadísticas",
+      "family": "Jugadores",
+      "sports": [
+        "rugby",
+        "australian_football"
+      ],
+      "provider_keys": [
+        "player_try_scorer_first",
+        "player_try_scorer_anytime",
+        "player_disposals",
+        "player_goals_scored_over"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial específico pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Minutos y posiciones",
+        "Ritmo y reglas del deporte"
+      ],
+      "contract_fields": [
+        "Prórroga",
+        "Participación",
+        "Proveedor estadístico"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "cricket",
+      "name": "Ganador, innings, carreras y wickets",
+      "family": "Críquet",
+      "sports": [
+        "cricket"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "Historial específico pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Formato y estado del inning",
+        "Bateadores, bowlers y condiciones"
+      ],
+      "contract_fields": [
+        "Draw / tie / no result",
+        "DLS",
+        "Super over y overs reducidos"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "mma_boxing",
+      "name": "Ganador, método, asalto y distancia",
+      "family": "Combate",
+      "sports": [
+        "mma",
+        "boxing"
+      ],
+      "provider_keys": [
+        "h2h",
+        "totals"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial específico pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Emparejamiento y categoría",
+        "Duración y finalización"
+      ],
+      "contract_fields": [
+        "Empate / no contest",
+        "Decisión técnica",
+        "Cambio de asaltos"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "golf",
+      "name": "Ganador, posición y enfrentamientos",
+      "family": "Golf",
+      "sports": [
+        "golf"
+      ],
+      "provider_keys": [
+        "h2h",
+        "outrights"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Historial específico pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Rondas, campo y dispersión",
+        "Distribución conjunta del torneo"
+      ],
+      "contract_fields": [
+        "Dead heat",
+        "Corte",
+        "Retiro y desempate"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "outrights_qualification",
+      "name": "Campeón, clasificación y futuros",
+      "family": "Futuros",
+      "sports": [
+        "all_supported_sports"
+      ],
+      "provider_keys": [
+        "outrights",
+        "to_qualify"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Simulador de torneo pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Calendario y formato",
+        "Simulación dependiente de rondas"
+      ],
+      "contract_fields": [
+        "Prórroga y penales",
+        "Dead heat",
+        "Participación y aplazamiento"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "racing",
+      "name": "Ganador, colocado y each-way",
+      "family": "Carreras",
+      "sports": [
+        "horse_racing",
+        "greyhounds"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "Historial y permisos pendientes",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Participantes, pista y forma",
+        "Distribución de orden de llegada"
+      ],
+      "contract_fields": [
+        "Retirados y deducciones",
+        "Dead heat",
+        "Términos de cada-way"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "esports",
+      "name": "Partido, mapas, rondas y estadísticas",
+      "family": "Esports",
+      "sports": [
+        "esports"
+      ],
+      "provider_keys": [],
+      "model_status": "not_trained",
+      "history_status": "Historial específico pendiente",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Juego, parche y plantel",
+        "Formato de mapas y rondas"
+      ],
+      "contract_fields": [
+        "Walkover",
+        "Sustituciones",
+        "Mapa o partido completo"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "parlays",
+      "name": "Combinadas, sistemas y bet builders",
+      "family": "Combinados",
+      "sports": [
+        "all_supported_sports"
+      ],
+      "provider_keys": [],
+      "model_status": "joint_distribution_required",
+      "history_status": "Dependencia aún no modelada entre eventos",
+      "historical_price_status": "Sin histórico de cotizaciones conjuntas",
+      "requirements": [
+        "Distribución conjunta o simulador explícito",
+        "Precio real del producto"
+      ],
+      "contract_fields": [
+        "Void legs",
+        "Liquidación parcial",
+        "Dependencia",
+        "Precio del bet builder"
+      ],
+      "settlement_engine": "joint_score_events_only_binary_same_match",
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "exchange",
+      "name": "Back, lay y arbitraje de exchange",
+      "family": "Exchange",
+      "sports": [
+        "all_supported_sports"
+      ],
+      "provider_keys": [
+        "h2h_lay",
+        "outrights_lay"
+      ],
+      "model_status": "not_trained",
+      "history_status": "Sin libro de órdenes ni límites históricos",
+      "historical_price_status": "Sin histórico de ejecución equivalente",
+      "requirements": [
+        "Comisión y liquidez",
+        "Responsabilidad y emparejamiento"
+      ],
+      "contract_fields": [
+        "Back frente a lay",
+        "Apuestas parcialmente casadas",
+        "Reglas idénticas"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    },
+    {
+      "key": "cashout",
+      "name": "Cash out y cierre de posiciones",
+      "family": "Gestión",
+      "sports": [
+        "all_supported_sports"
+      ],
+      "provider_keys": [],
+      "model_status": "not_a_probability_market",
+      "history_status": "Sin ofertas históricas de cierre",
+      "historical_price_status": "Sin histórico equivalente",
+      "requirements": [
+        "Oferta de cierre real",
+        "Pasivos y precios actualizados"
+      ],
+      "contract_fields": [
+        "Costo implícito",
+        "Parcialidad",
+        "Mercado suspendido"
+      ],
+      "settlement_engine": false,
+      "actionable": false,
+      "execution_enabled": false
+    }
+  ],
+  "families": 21,
+  "mathematical_settlement_families": 12,
+  "markets_count": 53,
+  "family_count": 21,
+  "mathematical_settlement_types": 12
+}

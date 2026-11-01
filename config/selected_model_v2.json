@@ -1,0 +1,1 @@
+{"id": "consensus_power", "devig": "power", "structural_weight": 0.0, "version": "0.2.0", "selected_on": {"from": "2022-01-01", "to": "2023-12-31"}, "criterion": "log_loss", "live_enabled": false}

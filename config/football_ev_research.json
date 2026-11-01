@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "objective": "Positive expected net return under repeated bets, accepting individual losses; also inspect expected log capital growth.",
+  "unit_ev_formula": "p * decimal_odds - 1",
+  "models": [
+    {"id": "conditional_goals", "script": "scripts/research_goal_ev.py", "result": "data/analysis/research_goal_ev.json", "report": "VALOR_ESPERADO_GOLES.md"},
+    {"id": "conditional_1x2", "script": "scripts/research_result_ev.py", "result": "data/analysis/research_result_ev.json", "report": "VALOR_ESPERADO_RESULTADOS.md"},
+    {"id": "conditional_first_half", "script": "scripts/research_first_half_ev.py", "result": "data/analysis/research_first_half_ev.json", "report": "VALOR_ESPERADO_PRIMER_TIEMPO.md"},
+    {"id": "market_reference", "script": "scripts/research_market_reference_ev.py", "result": "data/analysis/research_market_reference_ev.json", "report": "VALOR_ESPERADO_CUOTAS.md"},
+    {"id": "robust_market_reference", "script": "scripts/research_robust_reference_ev.py", "result": "data/analysis/research_robust_reference_ev.json", "report": "VALOR_ESPERADO_REFERENCIAS_ROBUSTAS.md"}
+  ],
+  "candidate_policy": {
+    "id": "minimum_three_reference_books_ev03_v1",
+    "status": "exploratory_expected_value_candidate",
+    "market": "1X2",
+    "target": "any actual named bookmaker with the quoted offer",
+    "reference_probability": "For the selected side, take the minimum de-vigged probability from at least three OTHER actual bookmakers; exclude the target bookmaker.",
+    "probability_interpretation": "Conservative envelope across reference models, not a certified statistical lower bound on the real probability.",
+    "de_vig_method": "power",
+    "minimum_other_bookmakers": 3,
+    "minimum_model_ev": 0.03,
+    "odds_range": [1.2, 5.0],
+    "book_overround_range": [-0.02, 0.15],
+    "exclude_pinnacle_from": "2025-07-23",
+    "positions_per_event": 1,
+    "selection": "highest conservative estimated EV, deterministic tie-break; no selection by the eventual match result",
+    "stake_in_research": "flat one unit",
+    "robustness_policies_all_reported": ["mean", "minimum", "mean_minus_one_sd"],
+    "introduced_after_prior_mean_reference_test_was_observed": true,
+    "new_unseen_prospective_results": 0,
+    "automatic_betting_enabled": false
+  },
+  "long_run_math": {
+    "expected_profit_n_constant_bets": "n * stake * (p * odds - 1), when the same probability/price assumptions hold",
+    "expected_log_growth": "p*log(1+f*(odds-1))+(1-p)*log(1-f)",
+    "kelly_fraction": "max(0,(p*odds-1)/(odds-1))",
+    "diagnostic_fraction_of_bankroll": 0.001,
+    "conditional_on_probabilities": true
+  },
+  "summary_script": "scripts/build_expected_value_report.py",
+  "summary_report": "VALOR_ESPERADO_FUTBOL.md"
+}

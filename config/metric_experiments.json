@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "purpose": "Registro de pruebas retrospectivas, una métrica por vez; conservar también los resultados negativos.",
+  "shared_protocol": {
+    "stake_units_per_match": 1,
+    "chronology": "Primeros dos tercios por orden temporal para ajustar; toda la fecha de corte pasa al período posterior.",
+    "calibration": "logistic(log(negative_odds/positive_odds)+alpha); alpha ajustado sólo con datos anteriores",
+    "selection": "estimated_probability * decimal_odds - 1 > 0",
+    "uncertainty": "Bootstrap de fechas, 10000 repeticiones, semilla 20261030",
+    "team_or_league_optimization": false,
+    "prospective_validation": false
+  },
+  "experiments": [
+    {
+      "id": "first_half_over05_v1",
+      "label": "Al menos un gol en el primer tiempo",
+      "market": "ht_goal_total",
+      "selection": "over",
+      "line": 0.5,
+      "script": "scripts/analyze_first_half_over05.py",
+      "result": "data/analysis/first_half_over05_backtest.json",
+      "report": "NUMEROS_PRIMER_TIEMPO.md"
+    },
+    {
+      "id": "btts_yes_v1",
+      "label": "Ambos equipos marcan: Sí",
+      "market": "ft_btts",
+      "selection": "yes",
+      "line": null,
+      "script": "scripts/analyze_btts_yes.py",
+      "result": "data/analysis/btts_yes_backtest.json",
+      "report": "NUMEROS_AMBOS_MARCAN.md"
+    },
+    {
+      "id": "under25_v1",
+      "label": "Menos de 2,5 goles en el partido",
+      "market": "ft_goal_total",
+      "selection": "under",
+      "line": 2.5,
+      "script": "scripts/analyze_under25.py",
+      "result": "data/analysis/under25_backtest.json",
+      "report": "NUMEROS_MENOS_25_GOLES.md",
+      "additional_checks": [
+        {
+          "source": "Club Football Match Data / Football-Data, cuotas Bet365",
+          "script": "scripts/validate_under25_large_archive.py",
+          "result": "data/analysis/under25_large_archive_check.json",
+          "report": "NUMEROS_MENOS_25_BASE_GRANDE.md",
+          "scope": "Corroboración retrospectiva del mismo Under 2,5; no sumar partidos como fuentes independientes."
+        }
+      ]
+    }
+  ]
+}

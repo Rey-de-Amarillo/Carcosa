@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "policy": "Cada combinación deporte, periodo, línea, participante y regla de liquidación se valida por separado.",
+  "execution_enabled": false,
+  "markets": [
+    {"key":"h2h","name":"Ganador / 1X2","sports":["all_provider_supported"],"model_status":"historical_baselines_football_basketball_baseball","data_required":["previous_results","complete_outcome_prices","settlement_rules"],"live_status":"observation_only"},
+    {"key":"totals","name":"Más / menos puntos o goles","sports":["all_provider_supported"],"model_status":"football_2.5_evaluated_separately","data_required":["previous_scores","same_line_over_under_prices","push_rules"],"live_status":"observation_only"},
+    {"key":"btts","name":"Ambos equipos marcan","sports":["football"],"model_status":"poisson_exploratory","data_required":["previous_scores","yes_no_prices"],"live_status":"validation_required"},
+    {"key":"correct_score","name":"Marcador exacto","sports":["football"],"model_status":"poisson_distribution_exploratory","data_required":["previous_scores","full_score_distribution","tail_and_settlement_rules"],"live_status":"validation_required"},
+    {"key":"first_goal_team","name":"Equipo del primer gol","sports":["football"],"model_status":"competing_poisson_exploratory","data_required":["goal_sequence","no_goal_outcome","own_goal_rules"],"history":"64 World Cup 2022 event sequences; no operational validation","live_status":"validation_required"},
+    {"key":"player_first_goal_scorer","name":"Primer goleador","sports":["football"],"model_status":"not_trained","api_access":"event_specific_us_bookmakers_selected_leagues","data_required":["goal_sequence","starting_lineups","minutes_distribution","player_goal_hazard","no_scorer_and_own_goal_rules"],"live_status":"prices_observed_without_probability"},
+    {"key":"player_goal_scorer_anytime","name":"Jugador marca en cualquier momento","sports":["football"],"model_status":"not_trained","data_required":["player_events","expected_minutes","team_goal_rates","participation_and_void_rules"],"live_status":"not_validated"},
+    {"key":"spreads","name":"Hándicap","sports":["all_provider_supported"],"model_status":"not_validated","data_required":["score_difference_distribution","exact_line","quarter_line_and_push_rules"],"live_status":"prices_observed_without_probability"},
+    {"key":"h2h_h1","name":"Resultado del primer tiempo","sports":["all_provider_supported"],"model_status":"not_trained","history":"Football half-time scores downloaded where available","data_required":["period_scores","period_specific_prices"],"live_status":"not_validated"},
+    {"key":"alternate_totals_corners","name":"Total de córners","sports":["football"],"model_status":"not_trained","history":"Match-level corners downloaded where available","data_required":["previous_corner_counts","overdispersion_model","line_specific_prices"],"live_status":"not_validated"},
+    {"key":"alternate_totals_cards","name":"Total de tarjetas","sports":["football"],"model_status":"not_trained","history":"Yellow-card counts downloaded where available","data_required":["referee","cards_and_red_cards","booking_points_rules","line_specific_prices"],"live_status":"not_validated"},
+    {"key":"player_points","name":"Puntos del jugador","sports":["basketball","hockey"],"model_status":"not_trained","data_required":["player_minutes","usage","lineups","sport_specific_scoring"],"live_status":"not_validated"},
+    {"key":"player_first_basket","name":"Primera canasta","sports":["basketball"],"model_status":"not_trained","data_required":["play_by_play","starters","first_possession","scoring_method_rules"],"live_status":"not_validated"},
+    {"key":"h2h_s1","name":"Ganador del primer set","sports":["tennis"],"model_status":"not_trained","data_required":["set_scores","surface","serve_strength","retirement_rules"],"live_status":"history_source_pending"},
+    {"key":"batter_home_runs","name":"Home runs del bateador","sports":["baseball"],"model_status":"not_trained","data_required":["plate_appearances","pitcher","park","lineup"],"live_status":"not_validated"},
+    {"key":"player_goal_scorer_first","name":"Primer goleador de hockey","sports":["hockey"],"model_status":"not_trained","data_required":["play_by_play","time_on_ice","lines","power_play_usage"],"live_status":"licensed_history_pending"},
+    {"key":"player_1st_td","name":"Primer touchdown","sports":["american_football"],"model_status":"not_trained","data_required":["play_by_play","snaps","red_zone_usage","lineups"],"live_status":"licensed_history_pending"}
+  ]
+}

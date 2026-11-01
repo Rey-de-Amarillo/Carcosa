@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808">
+  <title>Fútbol · WorKraken</title>
+  <link rel="icon" href="vendor/workraken/assets/branding/workraken_mark.png">
+  <link rel="stylesheet" href="vendor/workraken/static/styles.css">
+  <link rel="stylesheet" href="vendor/workraken/static/neptuno-merged.css">
+  <link rel="stylesheet" href="vendor/workraken/static/neptuno-vertical.css">
+  <link rel="stylesheet" href="vendor/workraken/static/account-profile.css">
+  <link rel="stylesheet" href="vendor/workraken/static/shell.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-module="estacionamiento">
+<div class="app-shell is-dark-mode is-sidebar-collapsed" data-app-shell>
+  <aside class="sidebar" data-sidebar>
+    <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-label="Expandir módulos" aria-expanded="false"></button>
+    <a class="brand" href="#datos" aria-label="Fútbol"><img class="brand-logo brand-mark" src="vendor/workraken/assets/branding/workraken_mark.png" alt=""><span class="brand-copy"><img class="brand-wordmark brand-wordmark-light" src="vendor/workraken/assets/branding/workraken_wordmark_light.png" alt="WorKraken"><img class="brand-wordmark brand-wordmark-dark" src="vendor/workraken/assets/branding/workraken_wordmark_dark.png" alt="" aria-hidden="true"></span></a>
+    <nav class="nav-list" aria-label="Módulos"><a class="nav-link is-active" href="#datos" title="Fútbol"><span class="nav-icon nav-icon-primary" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="16" cy="16" r="12"/><path d="m16 10 6 4-2 7h-8l-2-7 6-4Zm0-6v6m11 2-5 2m1 12-3-5M9 26l3-5m-8-9 6 2"/></svg></span><span class="nav-label">Fútbol</span></a></nav>
+    <div class="sidebar-session"><button class="sidebar-theme-toggle" type="button" data-theme-toggle aria-pressed="true" aria-label="Activar modo claro" title="Modo claro"><span class="nav-icon sidebar-theme-toggle-icon" data-theme-icon aria-hidden="true"><svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" focusable="false"><path d="M20.3 15.3A8.8 8.8 0 0 1 8.7 3.7a8.8 8.8 0 1 0 11.6 11.6Z"/></svg><svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4.25"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg></span><span class="sidebar-theme-toggle-label">Modo claro</span></button></div>
+  </aside>
+  <main class="content">
+    <header class="topbar has-parking-logo has-company-identity topbar-parking-three-zone">
+      <h1 class="topbar-module-title">Fútbol</h1>
+      <div class="topbar-main"><div class="football-identity"><img class="topbar-company-logo" src="vendor/workraken/assets/branding/workraken_mark.png" alt=""><span class="topbar-company-title"><span class="topbar-company-brand-value"><span class="topbar-identity-image-light"><img class="topbar-company-brand-name" src="vendor/workraken/assets/branding/workraken_wordmark_light.png" alt="WorKraken"></span><span class="topbar-identity-image-dark"><img class="topbar-company-brand-name" src="vendor/workraken/assets/branding/workraken_wordmark_dark.png" alt="WorKraken"></span></span></span></div></div>
+      <div class="topbar-side"><div class="topbar-company-identity"><img class="topbar-company-logo" src="vendor/workraken/assets/branding/workraken_mark.png" alt=""><span class="topbar-company-title"><span class="topbar-company-brand-value"><span class="topbar-identity-image-light"><img class="topbar-company-brand-name" src="vendor/workraken/assets/branding/workraken_wordmark_light.png" alt="WorKraken"></span><span class="topbar-identity-image-dark"><img class="topbar-company-brand-name" src="vendor/workraken/assets/branding/workraken_wordmark_dark.png" alt="WorKraken"></span></span></span></div></div>
+    </header>
+    <div class="module-control-row"><nav class="module-tabs has-icon-tabs" aria-label="Fútbol"><a href="#datos" data-view="datos">Datos</a><a href="#formulas" data-view="formulas">Fórmulas</a></nav></div>
+    <p id="load-error" role="alert" hidden></p>
+    <div id="datos-view" class="football-panels">
+      <details class="panel table-panel collapsible-panel" id="events-panel">
+        <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Partidos</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
+        <div class="parking-directory-body">
+          <form class="entry-form record-filter-form wk-field-grid" id="events-filters" data-public-registration-date-picker><label>Desde<input id="events-from" type="date" value="2018-01-01" data-app-date-picker></label><label>Hasta<input id="events-to" type="date" value="2026-10-29" data-app-date-picker></label><label>Liga<select id="events-league"><option value="">Todas las ligas</option></select></label><label>Resultado<select id="events-result"><option value="">Todos</option><option value="0">Ganó el local</option><option value="1">Empate</option><option value="2">Ganó el visitante</option></select></label></form>
+          <div id="events-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div>
+          <div class="table-wrap"><table id="events-table"><thead><tr><th>Fecha</th><th>Local</th><th>Visitante</th><th>Liga</th><th>Final</th><th>Primer tiempo</th><th>Córners</th><th>Tiros</th><th>Al arco</th><th>Amarillas</th></tr></thead><tbody></tbody></table></div>
+          <div class="football-panel-actions"><span id="events-count" role="status"></span><button type="button" class="button button-neutral" id="events-export" disabled>Exportar CSV</button></div>
+        </div>
+      </details>
+      <details class="panel table-panel collapsible-panel" id="offers-panel">
+        <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Cuotas 1X2</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
+        <div class="parking-directory-body">
+          <form class="record-filter-form wk-field-grid" id="offers-filters"><label>Período<select id="offers-period"><option value="test">2022–2026</option><option value="validation">2018–2021</option><option value="all">2018–2026</option></select></label><label>Liga<select id="offers-league"><option value="">Todas las ligas</option></select></label><label>Casa<select id="offers-book"><option value="">Todas las casas</option></select></label><label>Selección<select id="offers-side"><option value="">Todas</option><option value="0">1 · Local</option><option value="1">X · Empate</option><option value="2">2 · Visitante</option></select></label></form>
+          <div id="offers-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div>
+          <div class="table-wrap"><table id="offers-table"><thead><tr><th>Fecha</th><th>Partido</th><th>Selección</th><th>Casa</th><th>Cuota</th><th>Prob. mínima</th><th>EV estimado</th><th>Resultado</th><th>Beneficio (1 u)</th></tr></thead><tbody></tbody></table></div>
+          <div class="football-panel-actions"><span id="offers-count" role="status"></span><button type="button" class="button button-neutral" id="offers-export" disabled>Exportar CSV</button></div>
+        </div>
+      </details>
+
+      <details class="panel table-panel collapsible-panel" id="goals-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Marcadores y goles</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body">
+        <form class="entry-form record-filter-form wk-field-grid" id="goals-filters"><label>Mercado<select id="goals-market"><option value="correct_score">Marcador exacto</option><option value="total_goals">Goles del partido</option><option value="btts">Ambos marcan</option><option value="match_result">Resultado 1X2</option></select></label><label>Período<select id="goals-period"><option value="full">Partido completo</option><option value="first_half">Primer tiempo</option></select></label><label>Liga<select id="goals-league"><option value="">Todas las ligas</option></select></label><label>Cuota mínima<input id="goals-min-odds" type="number" min="1" step="0.1" value="1"></label></form>
+        <div id="goals-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="goals-table"><thead><tr><th>Fecha</th><th>Partido</th><th>Mercado</th><th>Selección</th><th>Cuota</th><th>Casa</th><th>Final</th></tr></thead><tbody></tbody></table></div><div class="football-panel-actions"><span id="goals-count" role="status"></span><button class="button button-neutral" id="goals-export" disabled>Exportar CSV</button></div>
+      </div></details>
+      <details class="panel table-panel collapsible-panel" id="players-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Equipos y jugadores</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body">
+        <form class="record-filter-form wk-field-grid" id="players-filters"><label>Liga<select id="players-league"><option value="">Todas las ligas con plantel</option></select></label><label>Equipo<select id="players-team"><option value="">Todos los equipos</option></select></label><label>Posición<select id="players-position"><option value="">Todas</option></select></label><label>Estado<select id="players-status"><option value="">Todos</option><option value="a">Disponible</option><option value="i">Lesionado</option><option value="d">En duda</option><option value="s">Suspendido</option><option value="other">Otro / no indicado</option></select></label></form>
+        <div id="players-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="players-table"><thead><tr><th>Jugador</th><th>Equipo</th><th>Liga</th><th>Posición</th><th>Estado</th><th>Plantel al</th></tr></thead><tbody></tbody></table></div><span id="players-count" role="status"></span>
+      </div></details>
+    </div>
+    <div id="formulas-view" class="football-panels" hidden>
+      <details class="panel table-panel collapsible-panel" id="create-panel">
+        <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading" id="create-title">Crear fórmula</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
+        <div class="parking-directory-body" id="formula-builder"></div>
+      </details>
+      <details class="panel table-panel collapsible-panel" id="formulas-panel">
+        <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Fórmulas guardadas</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
+        <div class="parking-directory-body"><div id="formulas-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div><div class="table-wrap"><table id="formulas-table"><thead><tr><th>Nombre</th><th>Cuándo avisar</th><th>Qué apostar</th><th>Importe</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div>
+      </details>
+      <details class="panel table-panel collapsible-panel" id="trades-panel">
+        <summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Jugadas coincidentes</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary>
+        <div class="parking-directory-body">
+          <form class="record-filter-form wk-field-grid" id="trades-filters"><label>Alerta / fórmula<select id="trades-formula"></select></label><label>Período<select id="trades-period"><option value="test">2022–2026</option><option value="validation">2018–2021</option><option value="all">2018–2026</option></select></label><label>Liga<select id="trades-league"><option value="">Todas las ligas</option></select></label><label>Casa<select id="trades-book"><option value="">Todas las casas</option></select></label></form>
+          <div id="trades-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div>
+          <div id="trade-metrics" class="kpi-grid kpi-grid-wide parking-occupancy-kpis" aria-live="polite"></div>
+          <div class="table-wrap"><table id="trades-table"><thead><tr><th>Fecha</th><th>Partido</th><th>Apuesta</th><th>Casa</th><th>Cuota apuesta</th><th>Probabilidad</th><th>EV estimado</th><th>Ganancia esperada</th><th>Resultado</th><th>Beneficio</th></tr></thead><tbody></tbody></table></div>
+          <div class="football-panel-actions"><span id="trades-count" role="status"></span><button type="button" class="button button-neutral" id="trades-export" disabled>Exportar CSV</button></div>
+          <details class="panel table-panel collapsible-panel football-nested" id="results-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Resultado por año</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="table-wrap"><table id="years-table"><thead><tr><th>Año</th><th>Jugadas</th><th>Aciertos</th><th>EV estimado</th><th>ROI histórico</th><th>Beneficio</th></tr></thead><tbody></tbody></table></div></details>
+        </div>
+      </details>
+      <details class="panel table-panel collapsible-panel" id="dictionary-panel"><summary class="panel-header collapsible-summary"><span class="collapsible-title"><span class="collapsible-heading">Datos y cálculos</span></span><span class="collapsible-indicator" aria-hidden="true"></span></summary><div class="parking-directory-body"><div class="table-wrap"><table id="dictionary-table"><thead><tr><th>Nombre del dato</th><th>Cálculo / significado</th><th>Uso</th></tr></thead><tbody></tbody></table></div></div></details>
+    </div>
+  </main>
+</div>
+<dialog id="trade-dialog" class="football-dialog"><div class="football-dialog-heading"><h2>Detalle de la jugada</h2><button class="button button-neutral" id="close-dialog" aria-label="Cerrar detalle">Cerrar</button></div><div id="trade-details"></div></dialog>
+<div id="message" role="status" hidden></div>
+<script type="module" src="app.js"></script>
+</body></html>

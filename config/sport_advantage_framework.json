@@ -1,0 +1,617 @@
+{
+  "schema_version": 1,
+  "as_of_date": "2026-10-30",
+  "language": "es-AR",
+  "research_only": true,
+  "conclusion": "No hay evidencia suficiente para ordenar deportes por rentabilidad. La ventaja depende de contrato, precio, probabilidades y costos.",
+  "observed_price_metrics_policy": "Sólo cotizaciones actuales completas y comparables; null significa faltante, no cero. Los márgenes actuales se calculan en la auditoría de snapshots, no se inventan por deporte.",
+  "frozen_local_evidence": {
+    "source": "docs/VALIDATION_V2.md",
+    "football_matches": 65810,
+    "nba_matches": 31822,
+    "mlb_matches": 12148,
+    "nba_history_ends": 2015,
+    "mlb_history_years": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "nba_historical_odds": false,
+    "mlb_historical_odds": false,
+    "football_best_price_audit": {
+      "n": 137,
+      "roi_pct": 16.81109,
+      "roi_ci95_pct": [
+        -8.16826,
+        43.37527
+      ],
+      "prospective": false,
+      "previously_inspected_period": true,
+      "quote_execution_verified": false,
+      "independent_edge_demonstrated": false
+    },
+    "cross_sport_roi_comparable": false
+  },
+  "definitions": {
+    "binary_no_push_ev": "p * decimal_odds - 1",
+    "standard_overround": "sum(1 / decimal_odds) - 1",
+    "overround_valid_only_when": [
+      "mutually_exclusive",
+      "exhaustive",
+      "same_contract",
+      "no_push_or_partial_payoff",
+      "same_book_and_capture"
+    ],
+    "proportional_loss": "1 - 1 / sum(1 / decimal_odds), sólo bajo hipótesis proporcional",
+    "exchange_isolated_back_effective_odds": "1 + (decimal_odds - 1) * (1 - commission)",
+    "exchange_portfolio_commission": "Por ganancia neta de mercado, no por leg de forma independiente",
+    "independent_parlay_ev": "product(p_i * odds_i) - 1, sólo independencia y multiplicación real del precio",
+    "same_event_combination": "Usar probabilidad conjunta, no multiplicar probabilidades marginales",
+    "two_vs_three_outcomes": "No hay menor margen garantizado. Comparar cuotas 1.90/1.90 con 2.85/2.85/2.85: mismo overround y pérdida proporcional.",
+    "non_partition_examples": [
+      "anytime_goal_scorers",
+      "overlapping_double_chance",
+      "incomplete_correct_score",
+      "incomplete_first_scorer"
+    ]
+  },
+  "comparison_protocol": {
+    "forecast_metrics": [
+      "log_loss",
+      "brier",
+      "calibration_vs_baseline_on_same_events"
+    ],
+    "financial_metrics": [
+      "net_roi",
+      "date_or_event_cluster_interval",
+      "turnover",
+      "drawdown",
+      "price_sensitivity",
+      "available_capacity"
+    ],
+    "forbidden_inferences": [
+      "rank_sports_from_accuracy",
+      "rank_sports_without_comparable_odds",
+      "treat_de_vig_as_true_probability",
+      "treat_zero_positions_as_zero_roi",
+      "treat_observed_quote_as_accepted",
+      "treat_in_sample_bias_as_future_profit",
+      "compare_raw_scores_across_different_outcome_spaces",
+      "count_correlated_props_as_independent_games"
+    ],
+    "prospective_requirements": [
+      "freeze_model_and_policy_before_new_period",
+      "target_book_excluded_from_reference",
+      "record_abstentions",
+      "track_rule_and_quote_version",
+      "net_of_costs",
+      "disclose_multiple_testing",
+      "preserve_immutable_predictions"
+    ]
+  },
+  "free_provider": {
+    "provider": "The Odds API",
+    "domain": "the-odds-api.com",
+    "plan": "Starter FREE",
+    "credits_per_month": 500,
+    "all_markets_subject_to_coverage": true,
+    "historical_odds_included": false,
+    "main_odds_credit_cost": "regiones * mercados solicitados",
+    "event_odds_credit_cost": "regiones * mercados únicos devueltos",
+    "local_budget_cap_monthly": 450,
+    "claim_all_sports_all_markets_live": false,
+    "source_ids": [
+      "odds_plan",
+      "odds_docs"
+    ]
+  },
+  "markets": [
+    {
+      "id": "soccer_1x2",
+      "sport": "soccer",
+      "label": "1X2 de fútbol",
+      "mathematical_structure": "Tres estados excluyentes al mismo período",
+      "edge_hypothesis": "Precio multicasa incoherente frente a consenso sin casa objetivo",
+      "verification_required": [
+        "quotes_simultaneous",
+        "three_reference_books_excluding_target",
+        "same_settlement_rules",
+        "price_acceptance"
+      ],
+      "rule_and_model_risks": [
+        "Apuesta de 90 minutos distinta de clasificación",
+        "Exactitud de cuota histórica individual desconocida"
+      ],
+      "evidence_status": "retrospective_uncertain",
+      "local_evidence": "Cuotas históricas; 137 posiciones auditadas, sin ventaja prospectiva acreditada",
+      "source_ids": [
+        "power",
+        "structure"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_asian",
+      "sport": "soccer",
+      "label": "Asiático, DNB y doble oportunidad",
+      "mathematical_structure": "Pagos parciales/devolución y contratos con solapamiento",
+      "edge_hypothesis": "Exposición equivalente a menor costo por réplica",
+      "verification_required": [
+        "payoff_vector_all_states",
+        "same_period",
+        "quarter_push_rules",
+        "matched_lines"
+      ],
+      "rule_and_model_risks": [
+        "No usar overround estándar en dobles oportunidades",
+        "No sustituir vacío de referencias"
+      ],
+      "evidence_status": "insufficient_historical_quote_coverage",
+      "local_evidence": "Cero posiciones asiáticas elegibles; ROI null",
+      "source_ids": [
+        "structure",
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_goals",
+      "sport": "soccer",
+      "label": "Totales, team totals y BTTS",
+      "mathematical_structure": "Dos lados por línea; dependencias entre familias",
+      "edge_hypothesis": "Incoherencias entre líneas y precios del mismo estado",
+      "verification_required": [
+        "matched_lines",
+        "joint_score_distribution",
+        "three_reference_books_excluding_target",
+        "historical_quotes"
+      ],
+      "rule_and_model_risks": [
+        "Push en líneas enteras",
+        "BTTS y total de goles dependientes"
+      ],
+      "evidence_status": "insufficient_historical_quote_coverage",
+      "local_evidence": "OU2.5 sin posiciones elegibles; otros objetivos con precisión, sin ROI",
+      "source_ids": [
+        "power",
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_score_time",
+      "sport": "soccer",
+      "label": "Marcador, margen, descanso/final e intervalos",
+      "mathematical_structure": "Estados conjuntos y resultados de cola",
+      "edge_hypothesis": "Incoherencias entre marcadores, tiempos e intervalos",
+      "verification_required": [
+        "joint_halftime_fulltime",
+        "exhaustive_other_score",
+        "event_sequences",
+        "historical_quotes"
+      ],
+      "rule_and_model_risks": [
+        "Marcadores enumerados pueden no ser exhaustivos",
+        "HT no identifica orden de goles"
+      ],
+      "evidence_status": "no_validated_financial_model",
+      "local_evidence": "Resultados y evaluación HT; sin odds comparables",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_corners_cards",
+      "sport": "soccer",
+      "label": "Córners, tarjetas y booking points",
+      "mathematical_structure": "Conteos sobredispersos y definiciones por proveedor",
+      "edge_hypothesis": "Precio incoherente entre líneas con definición idéntica",
+      "verification_required": [
+        "provider_stat_definition",
+        "period",
+        "card_points_rules",
+        "historical_quotes"
+      ],
+      "rule_and_model_risks": [
+        "Amarillas no equivalen a rojas ni puntos",
+        "Córner concedido o ejecutado"
+      ],
+      "evidence_status": "prediction_only",
+      "local_evidence": "Conteos históricos para algunos mercados; ROI no definido",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_player",
+      "sport": "soccer",
+      "label": "Goleadores y props de jugadores",
+      "mathematical_structure": "Minutos/rol; algunos sucesos solapados y otros excluyentes",
+      "edge_hypothesis": "Precio frente a probabilidad individual condicionada a participación",
+      "verification_required": [
+        "lineups_known_at_capture",
+        "minutes_distribution",
+        "player_history",
+        "nonparticipant_rule",
+        "own_goal_rule",
+        "complete_selections"
+      ],
+      "rule_and_model_risks": [
+        "Anytime scorers no forman partición",
+        "Primer goleador requiere ningún goleador según reglas"
+      ],
+      "evidence_status": "no_validated_financial_model",
+      "local_evidence": "64 partidos de eventos de Mundial y algunas cuotas actuales; insuficiente",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_futures",
+      "sport": "soccer",
+      "label": "Futuros y torneos",
+      "mathematical_structure": "Escenarios de temporada de larga duración",
+      "edge_hypothesis": "Consistencia entre campeón, clasificación y resultados de escenario",
+      "verification_required": [
+        "season_simulation",
+        "tie_break_rules",
+        "dead_heat",
+        "roster_changes",
+        "complete_field",
+        "capital_lock_duration"
+      ],
+      "rule_and_model_risks": [
+        "Resultados no independientes en calendario",
+        "Selecciones otros o dead heat"
+      ],
+      "evidence_status": "no_validated_financial_model",
+      "local_evidence": "Sin histórico financiero equivalente",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_live",
+      "sport": "soccer",
+      "label": "Live, próximo gol, cash out y exchange",
+      "mathematical_structure": "Estado dinámico y latencia",
+      "edge_hypothesis": "Cobertura/precio de salida favorable tras costos",
+      "verification_required": [
+        "state_timestamp",
+        "quote_timestamp",
+        "suspension_status",
+        "depth",
+        "exchange_net_commission",
+        "all_legs_accepted"
+      ],
+      "rule_and_model_risks": [
+        "Delayed API puede demorar de 1 a 180 segundos",
+        "Screenshot o snapshot no confirma ejecución"
+      ],
+      "evidence_status": "not_executable_from_daily_snapshots",
+      "local_evidence": "Sin ticks ni profundidad; sin cobertura live acreditada",
+      "source_ids": [
+        "commission",
+        "delayed"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "soccer_multiples",
+      "sport": "soccer",
+      "label": "Combinadas, sistemas y Bet Builder",
+      "mathematical_structure": "Probabilidad conjunta y estructura de tickets",
+      "edge_hypothesis": "Precio final incoherente con distribución conjunta",
+      "verification_required": [
+        "joint_probability",
+        "final_ticket_quote",
+        "void_push_rules",
+        "max_payout",
+        "leg_eligibility"
+      ],
+      "rule_and_model_risks": [
+        "Multiplicar probabilidades sólo con independencia",
+        "Correlación sola no crea beneficio"
+      ],
+      "evidence_status": "no_validated_financial_model",
+      "local_evidence": "Sin serie histórica de precios finales de tickets",
+      "source_ids": [
+        "parlay_restrictions",
+        "bet_builder"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "tennis",
+      "sport": "tennis",
+      "label": "Tenis: ganador, games, sets",
+      "mathematical_structure": "Dos resultados ganador; estructura punto/juego/set",
+      "edge_hypothesis": "Mejor precio frente a referencia validada por superficie y rival",
+      "verification_required": [
+        "exact_match_date",
+        "surface",
+        "serve_return_history",
+        "retirement_rule",
+        "tiebreak_rule",
+        "historical_quotes",
+        "license"
+      ],
+      "rule_and_model_risks": [
+        "Retiro puede liquidar ganador y anular otros mercados",
+        "Más aciertos no implica mejor ROI"
+      ],
+      "evidence_status": "missing_usable_local_history",
+      "local_evidence": "Sin historia financiera local consistente y autorizada",
+      "source_ids": [
+        "tennis_retirement",
+        "power"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "basketball",
+      "sport": "basketball",
+      "label": "NBA: ganador, spread, total y props",
+      "mathematical_structure": "Muchos eventos de anotación y estado por posesión",
+      "edge_hypothesis": "Precio frente a modelo de equipo/minutos bien calibrado",
+      "verification_required": [
+        "current_history",
+        "historical_quotes",
+        "injury_asof",
+        "minutes_distribution",
+        "overtime_rule",
+        "stat_revision_rule"
+      ],
+      "rule_and_model_risks": [
+        "Game y segunda mitad pueden incluir OT",
+        "Cambios de rol/descanso afectan props"
+      ],
+      "evidence_status": "outcomes_only_stale",
+      "local_evidence": "31.822 partidos de archivo terminado en 2015, sin odds",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "baseball",
+      "sport": "baseball",
+      "label": "MLB: ganador, run line, total y props",
+      "mathematical_structure": "Estructura por entrada/bateador",
+      "edge_hypothesis": "Precio frente a abridor/bullpen/lineup conocidos a la captura",
+      "verification_required": [
+        "historical_quotes",
+        "starting_pitcher",
+        "lineup_asof",
+        "ballpark_weather",
+        "doubleheader_id",
+        "innings_rule"
+      ],
+      "rule_and_model_risks": [
+        "Action y listed pitchers pueden liquidar diferente",
+        "Identidad de juego doble y entradas extra"
+      ],
+      "evidence_status": "outcomes_only",
+      "local_evidence": "12.148 juegos de 2021–2025, sin odds",
+      "source_ids": [
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "hockey",
+      "sport": "icehockey",
+      "label": "NHL: ganador, 60 minutos y puck line",
+      "mathematical_structure": "Separación regulación/OT/shootout",
+      "edge_hypothesis": "Consistencia entre contratos con universo idéntico",
+      "verification_required": [
+        "licensed_history",
+        "historical_quotes",
+        "starting_goalie",
+        "regulation_ot_shootout",
+        "empty_net_model"
+      ],
+      "rule_and_model_risks": [
+        "2-way y 3-way no son el mismo contrato",
+        "Pocos goles no implica cuotas menos eficientes"
+      ],
+      "evidence_status": "missing_history",
+      "local_evidence": "Sin historia local suficiente ni permiso bulk verificado",
+      "source_ids": [
+        "hockey"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "football_american",
+      "sport": "americanfootball",
+      "label": "NFL: ganador, spread, total y props",
+      "mathematical_structure": "Estado por jugada/posesión y puntos discretos",
+      "edge_hypothesis": "Precio frente a modelo situacional independiente",
+      "verification_required": [
+        "licensed_play_history",
+        "historical_quotes",
+        "injury_asof",
+        "key_number_model",
+        "tie_overtime_rule",
+        "weather"
+      ],
+      "rule_and_model_risks": [
+        "Menos partidos por equipo reduce muestra efectiva",
+        "Sesgo de público puede estar absorbido por precio"
+      ],
+      "evidence_status": "missing_history",
+      "local_evidence": "Sin base local de cuotas/jugadas para evaluación",
+      "source_ids": [
+        "nfl",
+        "pinnacle_rules"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    },
+    {
+      "id": "other_sports",
+      "sport": "multisport",
+      "label": "Cricket, rugby, voleibol, MMA y otros",
+      "mathematical_structure": "Modelo específico por formato",
+      "edge_hypothesis": "Sólo hipótesis por contrato y datos disponibles",
+      "verification_required": [
+        "sport_specific_model",
+        "licensed_history",
+        "historical_quotes",
+        "format_rules",
+        "prospective_protocol"
+      ],
+      "rule_and_model_risks": [
+        "Catálogo y una cotización no son un predictor",
+        "No transferir ROI de fútbol entre deportes"
+      ],
+      "evidence_status": "catalogue_only",
+      "local_evidence": "Sin validación financiera local",
+      "source_ids": [
+        "odds_docs"
+      ],
+      "observed_overround": null,
+      "observed_cost_band": null,
+      "observed_quote_sample_count": null,
+      "prospective_roi": null,
+      "profitable_sport_claim": false
+    }
+  ],
+  "sources": [
+    {
+      "id": "power",
+      "title": "Clarke, Kovalchik e Ingram (2017)",
+      "type": "primary_research",
+      "url": "https://www.sciencepg.com/article/10.11648/j.ajss.20170506.12"
+    },
+    {
+      "id": "structure",
+      "title": "Hegarty y Whelan (revisión 2025; publicación 2026)",
+      "type": "primary_research",
+      "url": "https://www.karlwhelan.com/Papers/Monopoly.pdf"
+    },
+    {
+      "id": "nfl",
+      "title": "Levitt (2003/2004), NFL",
+      "type": "primary_research",
+      "url": "https://www.nber.org/papers/w9422"
+    },
+    {
+      "id": "pinnacle_rules",
+      "title": "Pinnacle: reglas de liquidación",
+      "type": "operator_rules",
+      "url": "https://www.pinnacle.com/en/future/betting-rules"
+    },
+    {
+      "id": "tennis_retirement",
+      "title": "Pinnacle: retiros en tenis",
+      "type": "operator_rules",
+      "url": "https://support.pinnacle.com/hc/en-us/articles/46732813299601-How-does-Pinnacle-grade-tennis-matches-in-the-event-of-retirement-or-disqualification"
+    },
+    {
+      "id": "hockey",
+      "title": "Betfair: reglas de hockey",
+      "type": "operator_rules",
+      "url": "https://support.betfair.com/app/answers/detail/ice-hockey-rules/"
+    },
+    {
+      "id": "commission",
+      "title": "Betfair: comisión por ganancia neta del mercado",
+      "type": "operator_rules",
+      "url": "https://support.betfair.com/app/answers/detail/a_id/413/"
+    },
+    {
+      "id": "delayed",
+      "title": "Betfair: claves Delayed/Live",
+      "type": "official_provider_documentation",
+      "url": "https://support.developer.betfair.com/hc/en-us/articles/360009638032-When-should-I-use-the-Delayed-or-Live-Application-Key"
+    },
+    {
+      "id": "parlay_restrictions",
+      "title": "Pinnacle: restricciones de combinadas",
+      "type": "operator_rules",
+      "url": "https://support.pinnacle.com/hc/en-us/articles/45299381622673-What-bet-types-are-not-available-for-Multiple-bets"
+    },
+    {
+      "id": "bet_builder",
+      "title": "Betfair: Bet Builder",
+      "type": "operator_rules",
+      "url": "https://support.betfair.com/app/answers/detail/a_id/6653/"
+    },
+    {
+      "id": "odds_plan",
+      "title": "The Odds API: plan oficial",
+      "type": "official_provider_documentation",
+      "url": "https://the-odds-api.com/"
+    },
+    {
+      "id": "odds_docs",
+      "title": "The Odds API: documentación v4",
+      "type": "official_provider_documentation",
+      "url": "https://the-odds-api.com/liveapi/guides/v4/"
+    }
+  ],
+  "report_path": "docs/SPORTS_COMPARISON.md"
+}

@@ -1,0 +1,147 @@
+/* Neptuno: comentarios verticales y contacto a la derecha. */
+.public-template-nocturna .nocturna-contact-comments {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.72fr) minmax(420px, 1fr);
+    align-items: start;
+    gap: clamp(22px, 3vw, 42px);
+    padding: 18px;
+    border: 1px solid rgba(8, 122, 138, 0.16) !important;
+    background: #ffffff !important;
+    box-shadow: 0 18px 46px rgba(17, 71, 82, 0.08) !important;
+}
+
+.public-template-nocturna .nocturna-contact-comments > .nocturna-inline-comments {
+    grid-column: 1;
+}
+
+.public-template-nocturna .nocturna-contact-comments > .nocturna-inline-contact {
+    grid-column: 2;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel {
+    display: block;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel > .public-reference-control {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 46px;
+    margin-top: 8px;
+    border: 1px solid rgba(8, 122, 138, 0.28);
+    border-radius: 8px;
+    background: #087a8a;
+    color: #ffffff;
+    font-size: 0;
+    box-shadow: 0 14px 28px rgba(17, 71, 82, 0.14);
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel > .public-reference-control:first-of-type {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel > .public-reference-control:last-of-type::before {
+    font-size: 28px;
+    line-height: 1;
+    content: "\2193";
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel > .public-reference-control:first-of-type::before {
+    font-size: 28px;
+    line-height: 1;
+    content: "\2191";
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-carousel > .public-reference-control[hidden] {
+    display: none !important;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-viewport {
+    overflow: visible;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-track {
+    display: grid;
+    gap: 14px;
+    padding: 0;
+    transform: none !important;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-card {
+    flex: none;
+    width: 100%;
+    min-height: 0;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-references-track:not([data-neptune-vertical-managed]) > .public-reference-card:nth-child(n + 4) {
+    display: none !important;
+}
+
+.public-template-nocturna .nocturna-inline-comments .public-reference-card[hidden] {
+    display: none !important;
+}
+
+.public-template-nocturna .nocturna-inline-contact {
+    display: block;
+    min-width: 0;
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-form {
+    height: auto;
+    align-content: start;
+    gap: 18px;
+    padding: clamp(18px, 2.4vw, 28px);
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-head h2 {
+    max-width: none;
+    font-size: clamp(30px, 3vw, 44px);
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    gap: 14px;
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-phone-field {
+    grid-column: 1 / -1;
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-message textarea {
+    min-height: 190px;
+}
+
+.public-template-nocturna .nocturna-inline-contact .public-contact-submit {
+    justify-self: start;
+}
+
+.public-template-nocturna.public-design-visual[data-public-theme="dark"] .nocturna-inline-comments .public-references-carousel > .public-reference-control {
+    border-color: rgba(141, 226, 235, 0.34);
+    background: #0b6f7a;
+    color: #ffffff;
+}
+
+@media (max-width: 1120px) {
+    .public-template-nocturna .nocturna-contact-comments {
+        grid-template-columns: 1fr;
+    }
+
+    .public-template-nocturna .nocturna-contact-comments > .nocturna-inline-comments,
+    .public-template-nocturna .nocturna-contact-comments > .nocturna-inline-contact {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 720px) {
+    .public-template-nocturna .nocturna-inline-contact .public-contact-fields {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,65 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { compileFormula, matchAndRank, summarize, DEFAULT_EXPRESSION, FormulaError } from '../app/formula-engine.js';
+
+const row = (overrides = {}) => ({ id: 'a', date: '2022-01-01', book: 'B365', market: 'h2h', side: 0, odds: 2.1, probability: 0.5, referenceMean: 0.52, referenceSd: 0.02, references: ['PS', 'WH', 'BW'], ev: 0.05, won: true, ...overrides });
+assert.equal(compileFormula().test(row()), true);
+assert.equal(compileFormula().test(row({ ev: 0.029 })), false);
+assert.equal(compileFormula('probability * odds - 1 >= 3% Y refs >= 3').test(row()), true);
+assert.equal(compileFormula('probabilidad_min * cuota - 1 >= 0.03 AND referencias >= 3').test(row({ references: 3 })), true);
+assert.equal(compileFormula('ev < 0 O cuota > 2 Y referencias >= 3').test(row()), true);
+assert.equal(compileFormula('(ev < 0 O cuota > 2) Y referencias > 3').test(row()), false);
+assert.equal(compileFormula('NO ev < 0').test(row()), true);
+assert.equal(compileFormula('min(cuota, 2) = 2 Y abs(-dispersion) <= max(0.01, 0.02)').test(row()), true);
+assert.equal(compileFormula('prob_equilibrio <= 0.5').test(row()), true);
+const enriched = row({ ownProbability: 0.47, bookmakerMargin: 0.065 });
+assert.equal(compileFormula('probabilidad_min > probabilidad_casa Y margen_casa < 7%').test(enriched), true);
+assert.equal(compileFormula('probabilidad_casa > 50% O margen_casa > 10%').test(enriched), false);
+assert.equal(compileFormula('ventaja_probabilidad >= 2% Y ventaja_probabilidad = probabilidad_min - 1 / cuota').test(enriched), true);
+assert.equal(compileFormula('edge_probability > 0.02 Y own_probability < 0.5 Y bookmaker_margin >= 0.06').test(enriched), true);
+assert.equal(compileFormula('ownProbability < 0.5 Y bookmakerMargin < 0.1').test(enriched), true);
+assert.equal(compileFormula('margen_casa != 0').test(row()), false);
+assert.equal(compileFormula('probabilidad_casa < 0.5').test(row({ own_probability: 0.47 })), true);
+assert.equal(compileFormula('margen_casa < 0.1').test(row({ bookmaker_margin: 0.065 })), true);
+assert.equal(compileFormula('NO probabilidad_casa > 0.5').test(row()), false);
+assert.equal(compileFormula('1 / (cuota - cuota) != 0').test(row()), false);
+assert.equal(compileFormula('probabilidad_media != 0').test(row({ referenceMean: null })), false);
+assert.equal(compileFormula('NO probabilidad_media > 0').test(row({ referenceMean: null })), false);
+for (const expression of ['', 'cuota', 'ev >=', 'foo > 0', 'acierto = 1', 'beneficio > 0', 'won = 1', 'goles_local > 0', 'cuota.constructor > 1', 'ev > 0; alert(1)', '1 < cuota < 5', 'Math.max(1,2)>0', 'min(1)>0', 'cuota + (ev > 0) > 1']) {
+  assert.throws(() => compileFormula(expression), FormulaError, expression);
+}
+assert.throws(() => compileFormula('('.repeat(70) + 'ev > 0' + ')'.repeat(70)), FormulaError);
+const original = [row({ id: 'c', date: '2023-01-02', won: false }), row({ book: 'AA', ev: 0.1 }), row({ book: 'ZZ', ev: 0.1, side: 2 }), row({ book: 'ZZ', ev: 0.1, side: 0 }), row({ id: 'b', date: '2022-01-02', ev: 0.01 })];
+const selected = matchAndRank(original, DEFAULT_EXPRESSION);
+assert.equal(selected.length, 2);
+assert.equal(selected[0].book, 'ZZ');
+assert.equal(selected[0].side, 0);
+assert.equal(selected[0].date, '2022-01-01');
+assert.equal(matchAndRank(original, DEFAULT_EXPRESSION, { onePerMatch: false }).length, 4);
+assert.equal(original[0].id, 'c', 'Selection must not mutate source data');
+const metrics = summarize(selected, 10);
+assert.equal(metrics.n, 2);
+assert.equal(metrics.wins, 1);
+assert.equal(metrics.stake, 20);
+assert.ok(Math.abs(metrics.profit - 1) < 1e-12);
+assert.ok(Math.abs(metrics.roi - 0.05) < 1e-12);
+assert.ok(Math.abs(metrics.meanEV - 0.075) < 1e-12);
+assert.equal(metrics.drawdown, 10);
+assert.deepEqual(metrics.years.map(x => x.year), ['2022', '2023']);
+assert.equal(summarize([]).roi, null);
+assert.deepEqual(summarize([]).equity, []);
+assert.throws(() => summarize(selected, 0));
+
+// Audit the real ledger: the frozen rule must preserve counts and settled ROI.
+const ledgerPath = new URL('../data/analysis/research_robust_reference_ev.trades.jsonl', import.meta.url);
+const text = await readFile(ledgerPath, 'utf8');
+const ledger = text.trim().split('\n').map(line => JSON.parse(line));
+const normalize = trade => ({ ...trade, home: trade.home_team, away: trade.away_team, referenceMean: trade.reference_mean, referenceSd: trade.reference_sd });
+const validation = ledger.filter(r => r.scenario === 'validation_all_books_minimum').map(normalize);
+const test = ledger.filter(r => r.scenario === 'test_all_books_minimum').map(normalize);
+assert.equal(matchAndRank(validation).length, 219);
+assert.equal(matchAndRank(test).length, 76);
+assert.ok(Math.abs(summarize(test).profit - 12.78) < 1e-9);
+assert.ok(Math.abs(summarize(test).roi - 12.78 / 76) < 1e-12);
+assert.ok(Math.abs(summarize([...validation, ...test]).profit - 35.16) < 1e-9);
+console.log('Formula engine: parser, chronology, ranking, metrics and real ledger passed.');
