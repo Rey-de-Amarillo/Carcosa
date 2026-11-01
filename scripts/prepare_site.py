@@ -13,7 +13,8 @@ target = root / 'site/dist'
 manifest = json.loads((source / 'data/workspace.json').read_text())
 assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'formula-builder.js', 'workspace-data.js', 'entity-presentation.js',
-          'football-alert-builder.js', 'football-market-catalog.js', 'football-situations.js', 'football-strategy-engine.js', 'strategy-store.js',
+          'football-alert-builder.js', 'football-formula-editor.js', 'football-unified-formula.js',
+          'football-market-catalog.js', 'football-situations.js', 'football-strategy-engine.js', 'strategy-store.js',
           'data/entities.json', 'data/entity-badges.json', 'data/football-market-history.json',
           'data/football-market-history.json.gz',
           'data/workspace.json', 'data/' + manifest['tables']['events']['path']]
@@ -40,15 +41,19 @@ for relative in assets:
 Espacio privado de datos y fórmulas: 1X2, probabilidades de otras casas sin
 margen, EV estimado y rendimiento de las jugadas históricas coincidentes.
 
-El creador empieza por una apuesta: mercado, selección y período. Los filtros
-de cuota y de partido se agregan cuando hacen falta; comparar una cuota nunca
-la convierte por su cuenta en otra apuesta. Los desplegables usan mercados
+El creador reúne equipos, jugadores, cuotas y mercados en una sola fórmula,
+con condiciones y grupos unidos por Y/O. Las fórmulas guardadas conservan
+íntegramente sus condiciones y agrupaciones. Los desplegables usan mercados
 reales de fútbol y conservan los controles originales de Workraken.
 Incluye resultado, doble oportunidad, empate no válido, hándicaps, goles,
 descanso/final, córners, tarjetas y mercados de jugadores.
 Los jugadores se vinculan a equipos mediante identidades verificadas y capturas
-de planteles; un plantel actual no acredita la participación en un partido viejo.
-La probabilidad histórica de cada señal usa exclusivamente fechas anteriores.
+de planteles. Jugador y mercado filtran la selección cotizada: elegir un jugador
+no incluye apuestas genéricas de su equipo, y elegir gana el local no incluye
+otras selecciones del mismo partido. Las cuotas y probabilidades se conservan
+cuando existen referencias independientes para la apuesta elegida.
+Las alertas anteriores conservan su evaluación original, que utiliza
+exclusivamente fechas anteriores.
 Las combinadas requieren precio conjunto y no multiplican probabilidades marginales.
 Cuotas ingresadas se distinguen del archivo. Los datos ausentes permanecen nulos.
 

@@ -1,4 +1,5 @@
 /** Derived, indexed football tables. Prices and probabilities retain source precision. */
+import {UNIFIED_FORMULA_KIND} from './football-unified-formula.js';
 export const periodMatches=(row,period)=>period==='all'||(period==='test'?row.date>='2022-01-01':row.date<'2022-01-01');
 export async function readData(path,gzip=false){
   const response=await fetch(`data/${path}`);if(!response.ok)throw new Error(`No se pudo cargar ${path} (${response.status}).`);
@@ -33,6 +34,7 @@ export class FootballData {
   }
   usesGoalArchive(rule){
     const a=rule.action,quotedMarkets=new Set(['correct_score','total_goals','btts']);
+    if(!a)return false;
     // These new contracts can be settled from this archive's match/half scores.
     // They have no archived quote of their own: use this smaller universe only
     // when an explicitly observed goals price requires it.
@@ -45,10 +47,25 @@ export class FootballData {
     return quotedMarkets.has(a.market)||(a.market==='match_result'&&a.period!=='full')||legacyCombination||observationNeedsArchive&&actionSupported;
   }
   async strategyUniverse(rule){
+    if(rule.kind===UNIFIED_FORMULA_KIND)return this.unifiedStrategyUniverse();
     if(this.usesGoalArchive(rule)){
       const payload=await this.ensureMarketHistory();return {...payload,name:'Archivo de marcadores y goles · Singapore Pools'};
     }
     await this.ensureOffers('all');return {events:this.events,offers:this.offers,name:'Archivo de cuotas comparadas · 1X2'};
   }
-
+  async unifiedStrategyUniverse(){
+    if(this.unifiedUniverse)return this.unifiedUniverse;
+    if(!this.unifiedLoading)this.unifiedLoading=Promise.all([this.ensureOffers('all'),this.ensureMarketHistory()]).then(([,archive])=>{
+      // Source identifiers describe different archives, not verified shared matches.
+      // Keep both event identities and all actual quote contracts intact.
+      const events=[...this.events],offers=[...this.offers],ids=new Set(events.map(e=>String(e.id)));
+      for(const source of archive.events){
+        const base=`market-history:${source.id}`;let id=base,suffix=1;while(ids.has(id))id=`${base}:${suffix++}`;ids.add(id);
+        const event={...source,id,sourceEventId:source.id},index=events.length;events.push(event);
+        for(const quote of source.marketQuotes||[])offers.push({probability:null,ev:null,references:[],...quote,id,event:index,eventId:id,date:event.date,league:event.league,home:event.home??event.home_team,away:event.away??event.away_team});
+      }
+      return this.unifiedUniverse={events,offers,name:'Archivos de cuotas comparadas y mercados de goles'};
+    }).finally(()=>this.unifiedLoading=null);
+    return this.unifiedLoading;
+  }
 }

@@ -1,3 +1,4 @@
+import {mountUnifiedFormulaEditor} from './football-formula-editor.js';
 import {newSituationsDraft,newSituationSelection,situationsDraftFromAlert,compileSituationsAlert} from './football-situations.js';
 import {FOOTBALL_MARKET_CATALOG,marketDefinition,marketSelectionChoices,marketLineChoices,defaultMarketSelection,footballMarketLabel} from './football-market-catalog.js';
 /** Football alert authoring: entity context, price trigger, bet and valuation. */
@@ -219,7 +220,7 @@ export function calculateManualPreview(raw={}) {
 }
 
 /** Direct market/selection rows; saved conditions retain their original meaning. */
-export function mountFootballAlertBuilder(container,{entities={},onSave=()=>{},onCancel=()=>{}}={}) {
+export function mountLegacyFootballAlertBuilder(container,{entities={},onSave=()=>{},onCancel=()=>{}}={}) {
   if(!container?.ownerDocument)throw new Error('El creador necesita un contenedor.');
   let catalog=entities,state=newSituationsDraft(),editing=false,saving=false,sequence=0;
   const q=selector=>container.querySelector(selector);
@@ -395,4 +396,22 @@ export function mountFootballAlertBuilder(container,{entities={},onSave=()=>{},o
   function reset(){state=newSituationsDraft();editing=false;render();}
   function setEntities(next){if(container.childElementCount)state=readDraft();catalog=next||{};cleanPlayers(state);render();}
   render();return {edit,reset,getDefinition,setEntities};
+}
+
+/** Existing alerts keep their exact editor and meaning; new rules use one tree. */
+export function mountFootballAlertBuilder(container,options={}){
+  let catalog=options.entities||{},current,legacy=false;
+  function activate(useLegacy){
+    legacy=useLegacy;
+    const surface=container.ownerDocument.createElement('div');surface.className='football-builder-host';
+    container.replaceChildren(surface);
+    current=(legacy?mountLegacyFootballAlertBuilder:mountUnifiedFormulaEditor)(surface,{...options,entities:catalog,onCancel:()=>{if(legacy)activate(false);options.onCancel?.();}});
+  }
+  activate(false);
+  return {
+    edit(rule){const useLegacy=rule.kind==='football-alert';if(useLegacy!==legacy)activate(useLegacy);current.edit(rule);},
+    reset(){if(legacy)activate(false);else current.reset();},
+    getDefinition(){return current.getDefinition();},
+    setEntities(next){catalog=next||{};current.setEntities(catalog);},
+  };
 }

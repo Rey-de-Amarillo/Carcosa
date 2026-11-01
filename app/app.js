@@ -4,6 +4,7 @@ import {loadStrategies,saveStrategies} from './strategy-store.js';
 import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strategy-engine.js';
 import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
+import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
 import {initExpandableFilterSearch,filterSearchMatches} from './vendor/workraken/search.js';
 import {initDatePicker} from './vendor/workraken/date-picker.js';
 import {initCommonSimpleSelects} from './vendor/workraken/single-select.js';
@@ -56,7 +57,7 @@ function eventRow(e){return `<tr><td>${date(e.date)}</td><td>${teamHTML(e.home,e
 const stakeOf=f=>f.kind==='football-alert'?f.action.stake:f.stake;
 function describeAction(action,context={}){return footballSelectionLabel(action,data.entities||{},context);}
 function conditionLabel(condition){const signal=ALERT_SIGNALS.find(s=>s.id===condition.field),percent=signal?.unit==='percentage',value=v=>percent?pct(v):num(v),name=condition.selection?footballSelectionLabel(condition.selection,data.entities):signal?.name||condition.field;return `${name} ${condition.ui?.operator==='around'?value(condition.ui.value)+' ± '+value(condition.ui.margin):condition.operator==='between'?value(condition.min)+'–'+value(condition.max):condition.operator+' '+value(condition.value)}`;}
-function formulaRow(f){const domain=f.kind==='football-alert',trigger=domain?f.conditions.map(conditionLabel).join(' · '):'EV mínimo · referencias entre casas',bet=domain?describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';return `<tr><td>${esc(f.name)}</td><td>${esc(trigger)}</td><td>${esc(bet)}</td><td>${num(stakeOf(f))} u</td><td><div class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></td></tr>`;}
+function formulaRow(f){const unified=f.kind===UNIFIED_FORMULA_KIND,domain=f.kind==='football-alert',trigger=unified?formatUnifiedFormula(f,data.entities||{}):domain?f.conditions.map(conditionLabel).join(' · '):'EV mínimo · referencias entre casas',bet=unified?'—':domain?describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';return `<tr><td>${esc(f.name)}</td><td>${esc(trigger)}</td><td>${esc(bet)}</td><td>${num(stakeOf(f))} u</td><td><div class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></td></tr>`;}
 function refreshFormulaList(){tables.formulas.setRows(formulas);const value=$('trades-formula').value||active;$('trades-formula').innerHTML=formulas.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');$('trades-formula').value=formulas.some(f=>f.id===value)?value:formulas[0].id;}
 function refreshEvents(){
   if(!ready)return;const from=$('events-from').value,to=$('events-to').value,league=$('events-league').value,result=$('events-result').value;
@@ -71,6 +72,7 @@ function metric(label,value,kind){return `<article class="kpi-card" ${kind?`data
 function setStrategyBooks(f){
   const old=$('trades-book').value,sg=f.kind==='football-alert'&&data.usesGoalArchive(f);
   const options=sg?[['SGP','Singapore Pools']]:[...new Set(data.manifest.books.map(b=>b.name))].map(name=>[data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
+  if(f.kind===UNIFIED_FORMULA_KIND&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
   $('trades-book').innerHTML='<option value="">Todas las casas</option>'+options.map(([key,name])=>`<option value="${esc(key)}">${esc(name)}</option>`).join('');
   $('trades-book').value=options.some(([key])=>key===old)?old:'';
 }
@@ -83,14 +85,17 @@ function renderAlertRow(r){
 }
 async function refreshTrades(){
   if(!ready)return;const token=++tradeToken,f=formulas.find(f=>f.id===$('trades-formula').value);if(!f)return;
+  const unified=f.kind===UNIFIED_FORMULA_KIND;$('trades-coverage-field').hidden=!unified;$('trades-coverage').value=unified?'Buscando…':'';
   setStrategyBooks(f);initCommonSimpleSelects(document);const view=scope('trades');tables.trades.loading('Buscando coincidencias…');$('trades-export').disabled=true;$('trade-metrics').hidden=true;$('results-panel').hidden=true;
   try{
     let rows,summary;
-    if(f.kind==='football-alert'){
+    if(f.kind==='football-alert'||f.kind===UNIFIED_FORMULA_KIND){
       const universe=await data.strategyUniverse(f);if(token!==tradeToken)return;
-      const offers=universe.offers.filter(r=>(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
-      const result=evaluateFootballStrategy({events:universe.events,offers},f,{entities:data.entities,universe:universe.name});
+      const offers=universe.offers.filter(r=>(f.kind!==UNIFIED_FORMULA_KIND||periodMatches(r,view.period))&&(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
+      const evaluate=f.kind===UNIFIED_FORMULA_KIND?evaluateUnifiedFormula:evaluateFootballStrategy;
+      const result=evaluate({events:universe.events,offers},f,{entities:data.entities,universe:universe.name});
       rows=result.alerts.filter(r=>periodMatches(r,view.period));summary=summarizeFootballAlerts(rows);
+      if(unified){const coverage=result.coverage;$('trades-coverage').value=`${num(coverage.candidateCount??coverage.quoteGroups,0)} cuotas evaluadas · ${num(coverage.unknownCandidates,0)} sin datos`;}
     }else{
       await data.ensureOffers(view.period);if(token!==tradeToken)return;
       selected=matchAndRank(data.offers.filter(r=>offerMatches(r,view)),f.expression,{onePerMatch:f.onePerMatch});
@@ -103,7 +108,7 @@ async function refreshTrades(){
     $('trade-metrics').innerHTML=metric('Alertas',num(summary.n,0))+metric(`EV estimado · ${num(valued,0)}`,pct(summary.meanEV,true))+metric('Ganancia esperada',summary.expectedProfit==null?'—':`${signed(summary.expectedProfit)} u`)+metric(summary.isScenario?'ROI simulado':'ROI histórico',pct(summary.roi,true));
     $('trades-count').textContent=`${num(summary.n,0)} alertas · ${num(valued,0)} con EV · ${summary.profit==null?'—':signed(summary.profit)+' u'} ${summary.isScenario?'simuladas':'realizadas'}`;
     $('years-table').tBodies[0].innerHTML=summary.years.map(y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(y.meanEV)}">${pct(y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`).join('');
-  }catch(e){if(token===tradeToken)tables.trades.loading(e.message);}
+  }catch(e){if(token===tradeToken){tables.trades.loading(e.message);if(unified)$('trades-coverage').value=e.message;}}
 }
 function showAlert(key){
   const r=alertByKey.get(key);if(!r)return;
@@ -163,7 +168,7 @@ async function initialize(){
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
-    await data.initialize();entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);initializeEntityTables();
+    await data.initialize();entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList();initializeEntityTables();
     for(const id of ['events','offers','trades'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
     const bookOptions=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>`<option value="${esc(data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('');
     for(const id of ['offers','trades'])$(`${id}-book`).innerHTML='<option value="">Todas las casas</option>'+bookOptions;
@@ -179,7 +184,7 @@ for(const [id,refresh]of [['events',refreshEvents],['offers',refreshOffers],['tr
 document.addEventListener('click',event=>{
   const use=event.target.closest('[data-use]'),edit=event.target.closest('[data-edit]'),duplicate=event.target.closest('[data-duplicate]'),row=event.target.closest('[data-trade]');
   if(use){$('trades-formula').value=use.dataset.use;$('trades-panel').open=true;refreshTrades();$('trades-panel').scrollIntoView({behavior:'smooth',block:'start'});}
-  if(edit||duplicate){const f=formulas.find(f=>f.id===(edit?.dataset.edit||duplicate.dataset.duplicate));if(f?.kind==='football-alert'){builder.edit(duplicate?{...f,id:null,name:f.name+' · copia'}:f);$('create-title').textContent='Crear fórmula';$('create-panel').open=true;$('create-panel').scrollIntoView({behavior:'smooth',block:'start'});}}
+  if(edit||duplicate){const f=formulas.find(f=>f.id===(edit?.dataset.edit||duplicate.dataset.duplicate));if(f?.kind==='football-alert'||f?.kind===UNIFIED_FORMULA_KIND){builder.edit(duplicate?{...f,id:null,name:f.name+' · copia'}:f);$('create-title').textContent='Crear fórmula';$('create-panel').open=true;$('create-panel').scrollIntoView({behavior:'smooth',block:'start'});}}
   const alert=event.target.closest('[data-alert]');if(alert)showAlert(alert.dataset.alert);if(row)showTrade(row.dataset.trade);
 });
 document.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)&&event.target.matches('[data-alert]')){event.preventDefault();showAlert(event.target.dataset.alert);}if(['Enter',' '].includes(event.key)&&event.target.matches('[data-trade]')){event.preventDefault();showTrade(event.target.dataset.trade);}});

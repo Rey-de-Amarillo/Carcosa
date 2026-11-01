@@ -48,7 +48,7 @@
 
 
 /* Creator cells use the unchanged Workraken field grid and control dimensions. */
-#formula-builder{display:grid;gap:13px;min-width:0}
+#formula-builder,.football-builder-host{display:grid;gap:13px;min-width:0}
 #formula-builder .football-builder-fields{margin:0}
 #formula-builder .football-builder-fields>label>.button{box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:42px;min-height:42px;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #formula-builder [data-alert-error]{color:var(--error,#e88383)}

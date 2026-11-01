@@ -6,11 +6,13 @@ Laboratorio privado de probabilidades deportivas: descarga resultados reales, co
 
 ## Interfaz actual de fútbol
 
-El creador incluye 28 mercados, selecciones por mercado, filtros de cuota y combinadas. Los campos usan la grilla original de Workraken, con el mismo tamaño y sin texto suelto.
+El creador combina equipo, jugador, cuotas y 28 mercados en una sola fórmula con uniones Y/O y grupos anidados. Los campos usan la grilla original de Workraken, con el mismo tamaño y sin texto suelto. Las fórmulas se pueden guardar, editar y duplicar.
+
+La fórmula filtra cotizaciones reales del histórico: mercado, selección, jugador y cuota corresponden a la misma apuesta. El resultado sirve para liquidarla; no se usa para decidir si cumple la fórmula. Los datos ausentes quedan sin evaluar.
 
 La interfaz abre con `python3 server.py` en http://127.0.0.1:8765. Los datos derivados necesarios están incluidos; las claves y los archivos locales de investigación quedan fuera del repositorio.
 
-Comprobaciones del creador: `node tests/test_formula_field_layout.mjs`, `node tests/test_bet365_authoring.mjs` y `node tests/test_alert_workflow.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
+Comprobaciones del creador: `node tests/test_unified_formula_core.mjs`, `node tests/test_unified_formula_editor.mjs`, `node tests/test_unified_formula_integration.mjs` y `node tests/test_formula_field_layout.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
 
 **Versión 0.2, revisión del 30/10/2026:** hay un nuevo modelo de goles ajustado por adversario y marcadores bajos, consenso multicasa sin margen, liquidación exacta de hándicaps y modelos separados de primer tiempo, córners y amarillas. El catálogo distingue **53 tipos de apuesta**, sus datos y sus límites; hay **16 evaluaciones numéricas** por mercado. Catalogar un mercado no implica tener un pronóstico entrenado o una estrategia rentable para él.
 

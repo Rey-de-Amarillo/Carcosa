@@ -1,13 +1,15 @@
 /** Creator text must live in ordinary fields, apart from their own titles. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {mountFootballAlertBuilder,newFootballAlert,normalizeFootballAlert,playersForTeam} from '../app/football-alert-builder.js';
+import {mountLegacyFootballAlertBuilder,newFootballAlert,normalizeFootballAlert,playersForTeam} from '../app/football-alert-builder.js';
 import {FOOTBALL_MARKET_CATALOG,defaultMarketSelection} from '../app/football-market-catalog.js';
 import {newSituationsDraft,compileSituationsAlert} from '../app/football-situations.js';
+import {mountUnifiedFormulaEditor} from '../app/football-formula-editor.js';
+import {normalizeUnifiedFormula} from '../app/football-unified-formula.js';
 
 const entities=JSON.parse(readFileSync(new URL('../app/data/entities.json',import.meta.url)));
-const container={ownerDocument:{},innerHTML:'',querySelectorAll:()=>[],addEventListener(){}};
-const editor=mountFootballAlertBuilder(container,{entities});
+const container={ownerDocument:{},innerHTML:'',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}};
+const editor=mountLegacyFootballAlertBuilder(container,{entities});
 const voidTags=new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
 const controls=new Set(['input','select','button']);
 
@@ -34,8 +36,8 @@ function parse(html){
 }
 function flatten(node){return [node,...node.children?.flatMap(flatten)||[]];}
 let checked=0;
-function verifyFields(name){
-  const nodes=flatten(parse(container.innerHTML)),elements=nodes.filter(node=>!node.tag.startsWith('#'));
+function verifyFields(name,html=container.innerHTML){
+  const nodes=flatten(parse(html)),elements=nodes.filter(node=>!node.tag.startsWith('#'));
   for(const node of elements){
     assert.ok(!['p','h1','h2','h3','h4','h5','h6','summary','details','section','span'].includes(node.tag),`${name}: stray ${node.tag} outside ordinary field structure`);
     if(controls.has(node.tag)){
@@ -65,7 +67,7 @@ function verifyFields(name){
   assert.ok(error.parent.attrs['data-alert-error-field']!==undefined,`${name}: error field can be shown/hidden as a unit`);
   checked++;
 }
-verifyFields('new formula');
+verifyFields('legacy new formula');
 const base=normalizeFootballAlert({...newFootballAlert(),id:'legacy',name:'Legacy price ranges'},entities);
 editor.edit(base);verifyFields('legacy around price');
 editor.edit({...base,id:'calculations',conditions:[{field:'ev',operator:'>=',value:.03},{field:'home_implied',operator:'>=',value:.6}]});verifyFields('legacy calculation conditions');
@@ -79,7 +81,33 @@ for(const definition of FOOTBALL_MARKET_CATALOG){
   editor.edit(compileSituationsAlert(draft,entities));verifyFields(definition.id);
 }
 editor.edit(normalizeFootballAlert({...base,id:'player-half',context,action:{...base.action,...defaultMarketSelection('player_goals'),period:'first_half',playerId:player.id,teamId:home.id}},entities));verifyFields('legacy first-half player');
-editor.reset();verifyFields('reset');
+editor.reset();verifyFields('legacy reset');
+// The new editor shares the exact same control and field contract, including
+// nested Y/O expressions, readonly expression values and all Bet365 markets.
+const unifiedContainer={ownerDocument:{},innerHTML:'',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}};
+const unified=mountUnifiedFormulaEditor(unifiedContainer,{entities});
+const editUnified=rule=>unified.edit(normalizeUnifiedFormula(rule,entities));
+const verifyUnified=name=>verifyFields(name,unifiedContainer.innerHTML);
+verifyUnified('unified blank formula');
+const metadata=(id,field,value)=>({type:'condition',id,field,operator:'=',value});
+const unifiedRule={kind:'football-formula',version:1,id:'unified-layout',name:'Una fórmula',stake:1,expression:{type:'group',id:'root',operator:'Y',children:[
+  metadata('club','team',home.id),metadata('player','player',player.id),
+  {type:'group',id:'alternatives',operator:'O',children:[{type:'condition',id:'price',field:'odds',operator:'between',min:1.8,max:2.2},{type:'condition',id:'stat',field:'market',operator:'=',playerRef:'player',selection:{...defaultMarketSelection('player_goals'),playerId:player.id}}]},
+]}};
+editUnified(unifiedRule);verifyUnified('nested team Y player Y (price O player goals)');
+for(const definition of FOOTBALL_MARKET_CATALOG){
+  const selection=defaultMarketSelection(definition.id),isPlayer=definition.id.startsWith('player_')||definition.kind==='player_scorer';
+  if(isPlayer)selection.playerId=player.id;
+  editUnified({...unifiedRule,expression:{type:'group',id:'root',operator:'O',children:[
+    metadata('club','team',home.id),...(isPlayer?[metadata('player','player',player.id)]:[]),
+    {type:'condition',id:'market',field:'market',operator:'=',selection,...(isPlayer?{playerRef:'player'}:{})},
+  ]}});verifyUnified(`unified ${definition.id}`);
+}
+for(const field of ['home_team','away_team','league']){
+  editUnified({...unifiedRule,expression:{type:'group',id:'root',operator:'Y',children:[metadata('metadata',field,field==='league'?'E0':home.id)]}});verifyUnified(`unified ${field}`);
+}
+editUnified({...unifiedRule,expression:{type:'group',id:'root',operator:'Y',children:[metadata('player1','player',player.id),metadata('player2','player',playersForTeam(entities,home.id,'E0')[1].id),{type:'condition',id:'stat',field:'market',operator:'=',playerRef:'player2',selection:{...defaultMarketSelection('player_shots'),playerId:playersForTeam(entities,home.id,'E0')[1].id}}]}});verifyUnified('unified multiple player references');
+unified.reset();verifyUnified('unified reset');
 const css=readFileSync(new URL('../app/styles.css',import.meta.url),'utf8');
 assert.ok(!/\.football-builder-fields[^}]*\bauto-fit\b/.test(css),'creator fields cannot stretch with an auto-fit grid');
 assert.ok(!/\.football-builder-rule-heading[^}]*min-height\s*:\s*30px/.test(css),'no miniature creator controls');
