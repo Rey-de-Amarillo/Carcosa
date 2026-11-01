@@ -5,6 +5,7 @@ import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strat
 import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
 import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
+import {seedFormulaLibrary} from './football-formula-library.js';
 import {initExpandableFilterSearch,filterSearchMatches} from './vendor/workraken/search.js';
 import {initDatePicker} from './vendor/workraken/date-picker.js';
 import {initCommonSimpleSelects} from './vendor/workraken/single-select.js';
@@ -168,7 +169,7 @@ async function initialize(){
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
-    await data.initialize();entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList();initializeEntityTables();
+    await data.initialize();formulas=seedFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList();initializeEntityTables();
     for(const id of ['events','offers','trades'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
     const bookOptions=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>`<option value="${esc(data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('');
     for(const id of ['offers','trades'])$(`${id}-book`).innerHTML='<option value="">Todas las casas</option>'+bookOptions;
