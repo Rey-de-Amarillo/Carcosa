@@ -15,6 +15,7 @@ assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'formula-builder.js', 'workspace-data.js', 'entity-presentation.js',
           'football-alert-builder.js', 'football-formula-editor.js', 'football-unified-formula.js',
           'football-formula-library.js',
+          'football-price-engine.js', 'football-price-editor.js', 'football-price-library.js',
           'formula-metrics.js', 'formula-metrics-worker.js', 'formula-metrics-view.js',
           'football-market-catalog.js', 'football-situations.js', 'football-strategy-engine.js', 'strategy-store.js',
           'data/entities.json', 'data/entity-badges.json', 'data/football-market-history.json',
@@ -43,32 +44,20 @@ for relative in assets:
 Espacio privado de datos y fórmulas: 1X2, probabilidades de otras casas sin
 margen, EV estimado y rendimiento de las jugadas históricas coincidentes.
 
-El creador reúne equipos, jugadores, cuotas y mercados en una sola fórmula,
-con condiciones y grupos unidos por Y/O. Los desplegables madre Equipos,
-Jugadores, Goles, Cuotas y las demás familias contienen sus campos, usando
-los paneles originales de Workraken. Las fórmulas guardadas conservan
-íntegramente sus condiciones y agrupaciones. Los desplegables usan mercados
-reales de fútbol y conservan los controles originales de Workraken.
-Incluye 120 fórmulas guardadas iniciales; se agregan sin reemplazar las propias
-y se pueden editar o duplicar. La grilla incluye búsqueda y paginación,
-orden por rendimiento y filtros de EV, ROI y número de apuestas.
-Incluye resultado, doble oportunidad, empate no válido, hándicaps, goles,
-descanso/final, córners, tarjetas y mercados de jugadores.
-Los jugadores se vinculan a equipos mediante identidades verificadas y capturas
-de planteles. Jugador y mercado filtran la selección cotizada: elegir un jugador
-no incluye apuestas genéricas de su equipo, y elegir gana el local no incluye
-otras selecciones del mismo partido. Las cuotas y probabilidades se conservan
-cuando existen referencias independientes para la apuesta elegida.
-Las alertas anteriores conservan su evaluación original, que utiliza
-exclusivamente fechas anteriores.
-Las combinadas requieren precio conjunto y no multiplican probabilidades marginales.
-Cuotas ingresadas se distinguen del archivo. Los datos ausentes permanecen nulos.
+El creador matemático reúne cuotas, importes, pagos, valor esperado y cobertura
+en una sola fórmula con condiciones y grupos unidos por Y/O. Los desplegables
+madre contienen campos del tamaño original de Workraken. Incluye 120 fórmulas
+iniciales basadas en relaciones de precio; las fórmulas propias se conservan.
+La grilla incluye búsqueda, paginación y filtros por EV, ROI y muestra.
 
-La regla 1X2 conservada usa EV >= 3%, al menos tres referencias, cuota entre 1.2 y 5,
-y una selección de mayor EV por partido. El precio de la casa evaluada no se
-incluye en sus referencias. La interfaz permite editar expresiones con nombres,
-guardar fórmulas en el navegador, filtrar períodos/ligas/casas, revisar cada
-selección y exportar CSV. EV estimado y ROI histórico son métricas separadas.
+EV = probabilidad de referencia × cuota + probabilidad de devolución − 1 − costo.
+La casa evaluada se excluye de las referencias. La cobertura reparte el importe
+y evalúa el pago total en cada resultado posible, incluida doble oportunidad
+con pagos superpuestos. Los registros deben tener contratos compatibles y
+captura verificable; sin ella no se presenta un arbitraje histórico. La
+calculadora manual y las variantes de costo/cuota se identifican como escenarios.
+Los datos ausentes permanecen nulos. EV estimado y ROI histórico son métricas
+separadas. Las fórmulas anteriores mantienen su evaluación y pueden editarse.
 
 Datos derivados de Football-Data.co.uk, para uso personal privado. La carpeta
 dist no incluye claves, archivos originales ni conexiones autenticadas.

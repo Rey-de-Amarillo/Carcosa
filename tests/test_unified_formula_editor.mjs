@@ -233,10 +233,11 @@ assert.deepEqual(wrapperSaves[0],normalized);assert.deepEqual(wrapperSaves[2],no
 assert.deepEqual(wrapperSaves[1],wrapperSaves[3],'legacy alert remains unchanged across editor switches');
 await fire('click',wrapperContainer.querySelector('[data-cancel-alert]'));
 assert.equal(wrapperCancelled,1,'legacy cancel invokes the configured callback once');
-assert.equal(wrapperContainer.querySelectorAll('[data-formula-category]').length,categoryIds.length,'canceling a legacy edit returns to the mother dropdowns');
+const priceMotherTitles=()=>wrapperContainer.querySelectorAll('[data-formula-panel]').filter(panel=>['prices','payments','value','coverage'].includes(panel.dataset.formulaPanel)).map(panel=>panel.querySelector('.collapsible-heading').textContent);
+assert.deepEqual(priceMotherTitles(),['Cuotas','Pagos','Valor esperado','Cobertura'],'canceling a legacy edit returns to the four mathematical mothers');
 assert.throws(()=>wrapper.getDefinition(),/condici[oó]n|f[oó]rmula|nombre/i,'legacy cancel clears the old definition');
 wrapper.edit(legacy);
-wrapper.reset();assert.equal(wrapperContainer.querySelectorAll('[data-formula-category]').length,categoryIds.length,'reset from legacy opens the unified mother dropdowns');
+wrapper.reset();assert.deepEqual(priceMotherTitles(),['Cuotas','Pagos','Valor esperado','Cobertura'],'reset from legacy opens the four mathematical mothers');
 
 // Failed asynchronous saves remain retryable and report through the same field.
 const failureContainer=new Element('div',{},document);documentRoot.append(failureContainer);let calls=0;

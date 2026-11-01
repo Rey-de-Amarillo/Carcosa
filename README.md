@@ -6,15 +6,19 @@ Laboratorio privado de probabilidades deportivas: descarga resultados reales, co
 
 ## Interfaz actual de fútbol
 
-El creador combina equipo, jugador, cuotas y 28 mercados en una sola fórmula con uniones Y/O y grupos anidados. Dentro de Crear fórmula, los desplegables madre Equipos, Jugadores, Goles, Cuotas y las demás familias contienen sus campos. Usan los paneles y la grilla originales de Workraken, con campos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar.
+El creador matemático combina cuotas, importes, pagos, EV y cobertura en una sola fórmula con uniones Y/O y grupos anidados. Sus condiciones no dependen de la identidad de equipos o jugadores. Los desplegables madre contienen los campos y usan los paneles originales de Workraken, todos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar; las fórmulas propias anteriores se conservan.
 
 Incluye 120 fórmulas guardadas iniciales, editables y duplicables, que se agregan sin reemplazar las propias. La grilla permite buscar, paginar, ordenar y filtrar por EV, ROI y rendimiento de las cotizaciones coincidentes.
 
-La fórmula filtra cotizaciones reales del histórico: mercado, selección, jugador y cuota corresponden a la misma apuesta. El resultado sirve para liquidarla; no se usa para decidir si cumple la fórmula. Los datos ausentes quedan sin evaluar.
+La evaluación por valor usa `EV = probabilidad de referencia × cuota + probabilidad de devolución − 1 − costo`, con referencias que excluyen la casa evaluada. Los pagos esperados y beneficios se calculan sobre el importe de la fórmula. La suma de probabilidades implícitas de una sola casa no se convierte en una probabilidad independiente.
+
+La cobertura reparte el presupuesto y calcula el pago total en cada resultado posible. Admite particiones de dos o tres resultados y doble oportunidad con pagos superpuestos. Para resultados excluyentes, `S = Σ(1/cuota)`, `importe_i = presupuesto/(cuota_i × S)` y `pago = presupuesto/S`; sólo hay retorno mínimo positivo si ese pago supera el importe y los costos. Las cotizaciones deben compartir evento, mercado, período, línea, reglas compatibles y captura verificable. Sin captura no se presenta arbitraje histórico: queda sin evaluar. Los cálculos manuales y los cambios de costo/cuota se identifican como escenarios.
+
+La fórmula filtra cotizaciones reales del histórico; el resultado sólo se usa para liquidarlas. EV estimado y ROI histórico son métricas separadas. Los datos ausentes quedan sin evaluar.
 
 La interfaz abre con `python3 server.py` en http://127.0.0.1:8765. Los datos derivados necesarios están incluidos; las claves y los archivos locales de investigación quedan fuera del repositorio.
 
-Comprobaciones del creador: `node tests/test_unified_formula_core.mjs`, `node tests/test_unified_formula_editor.mjs`, `node tests/test_unified_formula_integration.mjs` y `node tests/test_formula_field_layout.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
+Comprobaciones del creador: `node tests/test_football_price_engine.mjs`, `node tests/test_price_formula_integration.mjs`, `node tests/test_unified_formula_core.mjs` y `node tests/test_formula_field_layout.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
 
 **Versión 0.2, revisión del 30/10/2026:** hay un nuevo modelo de goles ajustado por adversario y marcadores bajos, consenso multicasa sin margen, liquidación exacta de hándicaps y modelos separados de primer tiempo, córners y amarillas. El catálogo distingue **53 tipos de apuesta**, sus datos y sus límites; hay **16 evaluaciones numéricas** por mercado. Catalogar un mercado no implica tener un pronóstico entrenado o una estrategia rentable para él.
 

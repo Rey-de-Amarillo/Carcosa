@@ -5,7 +5,8 @@ import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strat
 import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
 import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
-import {seedFormulaLibrary} from './football-formula-library.js';
+import {seedPriceFormulaLibrary} from './football-price-library.js';
+import {PRICE_FORMULA_KIND,formatPriceFormula,evaluatePriceFormula} from './football-price-engine.js';
 import {filterAndSortFormulas} from './formula-metrics-view.js';
 import {initExpandableFilterSearch,filterSearchMatches} from './vendor/workraken/search.js';
 import {initDatePicker} from './vendor/workraken/date-picker.js';
@@ -28,7 +29,7 @@ function searchHTML(id,label,placeholder){return `<div class="expandable-filter-
 class Table {
   constructor(id,label,columns,render,searchText,placeholder){
     Object.assign(this,{id,label,columns,renderRow:render,searchText,rows:[],filtered:[],page:1,pageSize:10,query:'',pageCount:0});
-    $(`${id}-toolbar`).innerHTML=`<div class="record-pagination-controls"><label class="record-page-size-control"><span>Mostrar</span><select class="record-page-size-select" aria-label="Cantidad de ${label} por página" aria-controls="${id}-table">${[10,20,50,100,200].map(n=>`<option value="${n}">${n}</option>`).join('')}</select></label><span class="record-pagination" role="group" aria-label="Paginación de ${label}"><button class="mini-button record-page-button" type="button" data-prev hidden aria-label="Página anterior" title="Página anterior" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button><label class="record-page-picker"><span>Página</span><select class="record-page-select" aria-label="Página de ${label}" aria-controls="${id}-table"><option value="1">1</option></select><span>de <span data-page-total>1</span></span></label><button class="mini-button record-page-button" type="button" data-next aria-label="Página siguiente" title="Página siguiente" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button><span class="record-page-announcement" data-page-status role="status" aria-live="polite" aria-atomic="true"></span></span></div>${searchHTML(id,label,placeholder||(id==='formulas'?'Nombre, equipo o mercado':'Equipo o partido'))}`;
+    $(`${id}-toolbar`).innerHTML=`<div class="record-pagination-controls"><label class="record-page-size-control"><span>Mostrar</span><select class="record-page-size-select" aria-label="Cantidad de ${label} por página" aria-controls="${id}-table">${[10,20,50,100,200].map(n=>`<option value="${n}">${n}</option>`).join('')}</select></label><span class="record-pagination" role="group" aria-label="Paginación de ${label}"><button class="mini-button record-page-button" type="button" data-prev hidden aria-label="Página anterior" title="Página anterior" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button><label class="record-page-picker"><span>Página</span><select class="record-page-select" aria-label="Página de ${label}" aria-controls="${id}-table"><option value="1">1</option></select><span>de <span data-page-total>1</span></span></label><button class="mini-button record-page-button" type="button" data-next aria-label="Página siguiente" title="Página siguiente" aria-controls="${id}-table"><svg class="record-page-button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button><span class="record-page-announcement" data-page-status role="status" aria-live="polite" aria-atomic="true"></span></span></div>${searchHTML(id,label,placeholder||(id==='formulas'?'Nombre, pago o condición':'Equipo o partido'))}`;
     this.root=$(`${id}-toolbar`);this.isGrid=id==='formulas';this.body=this.isGrid?$(`${id}-table`).querySelector('[data-grid-body]'):$(`${id}-table`).tBodies[0];
     this.size=this.root.querySelector('.record-page-size-select');this.picker=this.root.querySelector('.record-page-select');
     this.size.onchange=()=>{this.pageSize=Number(this.size.value);this.page=1;this.render();};
@@ -61,12 +62,12 @@ function eventRow(e){return `<tr><td>${date(e.date)}</td><td>${teamHTML(e.home,e
 const stakeOf=f=>f.kind==='football-alert'?f.action.stake:f.stake;
 function describeAction(action,context={}){return footballSelectionLabel(action,data.entities||{},context);}
 function conditionLabel(condition){const signal=ALERT_SIGNALS.find(s=>s.id===condition.field),percent=signal?.unit==='percentage',value=v=>percent?pct(v):num(v),name=condition.selection?footballSelectionLabel(condition.selection,data.entities):signal?.name||condition.field;return `${name} ${condition.ui?.operator==='around'?value(condition.ui.value)+' ± '+value(condition.ui.margin):condition.operator==='between'?value(condition.min)+'–'+value(condition.max):condition.operator+' '+value(condition.value)}`;}
-function formulaDescription(f){return f.kind===UNIFIED_FORMULA_KIND?formatUnifiedFormula(f,data.entities||{}):f.kind==='football-alert'?f.conditions.map(conditionLabel).join(' · ')+' → '+describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';}
+function formulaDescription(f){return f.kind===PRICE_FORMULA_KIND?formatPriceFormula(f):f.kind===UNIFIED_FORMULA_KIND?formatUnifiedFormula(f,data.entities||{}):f.kind==='football-alert'?f.conditions.map(conditionLabel).join(' · ')+' → '+describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';}
 function formulaRow(f){
-  const unified=f.kind===UNIFIED_FORMULA_KIND,domain=f.kind==='football-alert',raw=formulaMetrics.get(f.id),m=raw?.state==='ready'?raw:null;
+  const unified=f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND,domain=f.kind==='football-alert',raw=formulaMetrics.get(f.id),m=raw?.state==='ready'?raw:null;
   const state=raw?.state==='error'?'Error':raw?.state==='loading'?'Calculando…':'Pendiente',cell=(text,kind='',extra='')=>`<div role="cell" data-number class="${kind}">${text}${extra}</div>`;
   const hint=text=>`<span class="football-sub">${esc(text)}</span>`;
-  return `<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" data-formula-row="${esc(f.id)}"><div role="cell"><strong>${esc(f.name)}</strong>${hint(formulaDescription(f))}</div>${cell(m?pct(m.meanEV,true):'—',cls(m?.meanEV),hint(m?`${num(m.expectedPriced,0)} con EV`:state))}${cell(m?pct(m.roi,true):'—',cls(m?.roi),m?hint(`${m.scenario?'Simulado · ':''}${num(m.settledPriced,0)} liquidadas`):'')}${cell(m&&m.profit!=null?signed(m.profit):'—',cls(m?.profit))}${cell(m?num(m.n,0):'—')}${cell(m?pct(m.winRate):'—')}${cell(m?num(m.meanOdds):'—')}${cell(m?num(m.unknownCandidates,0):'—','',raw?.state==='error'?hint(raw.message):'')}<div role="cell" class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></div>`;
+  return `<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" data-formula-row="${esc(f.id)}"><div role="cell"><strong>${esc(f.name)}</strong>${hint(formulaDescription(f))}</div>${cell(m?pct(m.meanEV,true):'—',cls(m?.meanEV),hint(m?`${num(m.expectedPriced,0)} con EV`:state))}${cell(m?pct(m.meanMinReturn,true):'—',cls(m?.meanMinReturn))}${cell(m?pct(m.roi,true):'—',cls(m?.roi),m?hint(`${m.scenario?'Simulado · ':''}${num(m.settledPriced,0)} liquidadas`):'')}${cell(m&&m.profit!=null?signed(m.profit):'—',cls(m?.profit))}${cell(m?num(m.n,0):'—')}${cell(m?pct(m.winRate):'—')}${cell(m?num(m.meanOdds):'—')}${cell(m?num(m.unknownCandidates,0):'—','',raw?.state==='error'?hint(raw.message):'')}<div role="cell" class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></div>`;
 }
 function refreshFormulaGrid(resetPage=false){
   if(!tables.formulas)return;
@@ -112,7 +113,7 @@ function setStrategyBooks(f,preferredBook){
   const available=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>[data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'),name]);
   available.push(['SGP','Singapore Pools']);
   const options=sg?[['SGP','Singapore Pools']]:available.filter(([key])=>key!=='SGP');
-  if(f.kind===UNIFIED_FORMULA_KIND&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
+  if((f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND)&&!options.some(([key])=>key.split('|').includes('SGP')))options.push(['SGP','Singapore Pools']);
   const retained=available.find(([key])=>key===old);if(retained&&!options.some(([key])=>key===old))options.push(retained);
   $('trades-book').innerHTML='<option value="">Todas las casas</option>'+options.map(([key,name])=>`<option value="${esc(key)}">${esc(name)}</option>`).join('');
   $('trades-book').value=options.some(([key])=>key===old)?old:'';
@@ -122,21 +123,21 @@ function renderAlertRow(r){
   const missingHistory=pastResultMissing||r.statuses?.some(s=>/player_history|player_membership|period_corners|participation|combination_void/.test(s));
   const outcome=r.won===true?'Ganada':r.won===false?'Perdida':r.won==='push'?'Devuelta':missingHistory?'Sin dato':'Pendiente';
   const sample=r.probabilitySource==='manual'?'<span class="football-sub">Ingresada</span>':r.probabilityN!=null?`<span class="football-sub">${num(r.probabilityN,0)} ${r.probabilitySource==='reference'?'referencias':'previos'}</span>`:'';
-  return `<tr role="button" tabindex="0" data-alert="${esc(r.id)}|${esc(r.book)}" aria-label="Ver alerta ${esc(r.home)} contra ${esc(r.away)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}<span class="football-sub">${leagueHTML(r.league)}</span></td><td>${esc(r.actionLabel)}${r.contextOdds?`<span class="football-sub">1: ${num(r.contextOdds.home)} · X: ${num(r.contextOdds.draw)} · 2: ${num(r.contextOdds.away)}</span>`:''}</td><td>${esc(data.books.get(r.book)||r.book)}${r.isScenario?'<span class="football-sub">Cuota ingresada</span>':''}</td><td data-number>${num(r.odds)}</td><td data-number>${pct(r.probability)}${sample}</td><td data-number class="${cls(r.ev)}">${pct(r.ev,true)}</td><td data-number class="${cls(r.expectedProfit)}">${r.expectedProfit==null?'—':signed(r.expectedProfit)+' u'}</td><td>${outcome}</td><td data-number class="${cls(r.profit)}">${r.profit==null?'—':signed(r.profit)+' u'}</td></tr>`;
+  return `<tr role="button" tabindex="0" data-alert="${esc(r.id)}|${esc(r.book)}" aria-label="Ver alerta ${esc(r.home)} contra ${esc(r.away)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}<span class="football-sub">${leagueHTML(r.league)}</span></td><td>${esc(r.actionLabel)}${r.contextOdds?`<span class="football-sub">1: ${num(r.contextOdds.home)} · X: ${num(r.contextOdds.draw)} · 2: ${num(r.contextOdds.away)}</span>`:''}</td><td>${esc(data.books.get(r.book)||r.book)}${r.isScenario?`<span class="football-sub">${r.legs?'Reparto simulado':'Escenario matemático'}</span>`:''}</td><td data-number>${num(r.odds)}</td><td data-number>${pct(r.probability)}${sample}</td><td data-number class="${cls(r.ev)}">${pct(r.ev,true)}</td><td data-number class="${cls(r.expectedProfit)}">${r.expectedProfit==null?'—':signed(r.expectedProfit)+' u'}</td><td>${outcome}</td><td data-number class="${cls(r.profit)}">${r.profit==null?'—':signed(r.profit)+' u'}</td></tr>`;
 }
 async function refreshTrades(){
   if(!ready)return;const token=++tradeToken,f=formulas.find(f=>f.id===$('trades-formula').value);if(!f)return;
-  const unified=f.kind===UNIFIED_FORMULA_KIND;$('trades-coverage-field').hidden=!unified;$('trades-coverage').value=unified?'Buscando…':'';
+  const unified=f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND;$('trades-coverage-field').hidden=!unified;$('trades-coverage').value=unified?'Buscando…':'';
   setStrategyBooks(f);initCommonSimpleSelects(document);const view=scope('trades');tables.trades.loading('Buscando coincidencias…');$('trades-export').disabled=true;$('trade-metrics').hidden=true;$('results-panel').hidden=true;
   try{
     let rows,summary;
-    if(f.kind==='football-alert'||f.kind===UNIFIED_FORMULA_KIND){
+    if(f.kind==='football-alert'||f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND){
       const universe=await data.strategyUniverse(f);if(token!==tradeToken)return;
-      const offers=universe.offers.filter(r=>(f.kind!==UNIFIED_FORMULA_KIND||periodMatches(r,view.period))&&(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
-      const evaluate=f.kind===UNIFIED_FORMULA_KIND?evaluateUnifiedFormula:evaluateFootballStrategy;
+      const offers=universe.offers.filter(r=>(!unified||periodMatches(r,view.period))&&(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
+      const evaluate=f.kind===PRICE_FORMULA_KIND?evaluatePriceFormula:f.kind===UNIFIED_FORMULA_KIND?evaluateUnifiedFormula:evaluateFootballStrategy;
       const result=evaluate({events:universe.events,offers},f,{entities:data.entities,universe:universe.name});
       rows=result.alerts.filter(r=>periodMatches(r,view.period));summary=summarizeFootballAlerts(rows);
-      if(unified){const coverage=result.coverage;$('trades-coverage').value=`${num(coverage.candidateCount??coverage.quoteGroups,0)} cuotas evaluadas · ${num(coverage.unknownCandidates,0)} sin datos`;}
+      if(unified){const coverage=result.coverage;$('trades-coverage').value=`${num(coverage.candidateCount??coverage.quoteGroups,0)} ${f.kind===PRICE_FORMULA_KIND&&f.mode==='coverage'?'repartos evaluados':'cuotas evaluadas'} · ${num(coverage.unknownCandidates,0)} sin datos`;}
     }else{
       await data.ensureOffers(view.period);if(token!==tradeToken)return;
       selected=matchAndRank(data.offers.filter(r=>offerMatches(r,view)),f.expression,{onePerMatch:f.onePerMatch});
@@ -153,10 +154,24 @@ async function refreshTrades(){
 }
 function showAlert(key){
   const r=alertByKey.get(key);if(!r)return;
+  if(appliedFormula.kind===PRICE_FORMULA_KIND){showPriceAlert(r);return;}
   const cell=(label,value)=>`<div><span>${label}</span><strong>${value}</strong></div>`;
   const status={market_quote_missing:'Sin cuota para esta apuesta',probability_history_insufficient:'Muestra previa insuficiente',probability_missing:'Sin probabilidad',player_history_missing:'Sin historial del jugador en ese partido',player_result_missing:'Sin estadística individual',player_membership_missing:'Plantel histórico no verificado',result_missing:'Resultado pendiente',period_corners_missing:'Sin córners de ese período',push_probability_missing:'Sin probabilidad de devolución',combination_void_rules_missing:'Faltan reglas de devolución de la combinada',player_participation_rules_missing:'Falta participación del jugador',selected_team_missing:'Equipo no identificado en el partido',outside_empirical_cohort:'Fuera del filtro de la muestra',cards_settlement_missing:'Sin tarjetas liquidadas con las reglas del mercado',shots_result_missing:'Sin datos de remates',shots_on_target_result_missing:'Sin datos de remates al arco',offsides_result_missing:'Sin datos de fuera de juego',corners_result_missing:'Sin datos de córners',period_cards_missing:'Sin tarjetas de ese período',period_shots_missing:'Sin remates de ese período',period_shots_on_target_missing:'Sin remates al arco de ese período',period_offsides_missing:'Sin fuera de juego de ese período',half_time_result_missing:'Sin resultado del primer tiempo',goal_order_missing:'Sin orden de los goles',goalscorer_order_missing:'Sin orden de los goleadores',asian_quarter_line_unsupported:'Línea de hándicap no disponible',market_rules_missing:'Sin liquidación para este mercado'};
   $('trade-details').innerHTML=`<h3>${esc(r.home)} — ${esc(r.away)}</h3><p>${date(r.date)} · ${esc(r.actionLabel)}</p><div class="football-detail-grid">${r.contextOdds?cell('Cuota local',num(r.contextOdds.home))+cell('Cuota empate',num(r.contextOdds.draw))+cell('Cuota visitante',num(r.contextOdds.away)):''}${cell('Cuota de la apuesta',num(r.odds))}${cell('Probabilidad estimada',pct(r.probability))}${cell(r.probabilitySource==='reference'?'Referencias':'Partidos previos',r.probabilityN==null?'—':num(r.probabilityN,0))}${cell('Probabilidad de equilibrio',pct(r.breakEven===undefined?(r.odds?1/r.odds:null):r.breakEven))}${cell('Importe',num(r.stake)+' u')}${cell('EV estimado',pct(r.ev,true))}${cell('Ganancia esperada',r.expectedProfit==null?'—':signed(r.expectedProfit)+' u')}${cell(r.isScenario?'Beneficio simulado':'Beneficio histórico',r.profit==null?'—':signed(r.profit)+' u')}</div>${r.ev!=null?`<output>EV = ${pct(r.probability)} × ${num(r.odds)}${r.pushProbability?' + '+pct(r.pushProbability):''} − 1 = ${pct(r.ev,true)}<br>Ganancia esperada = ${num(r.stake)} × ${pct(r.ev)} = ${signed(r.expectedProfit)} u</output>`:''}${r.statuses?.length?`<ul>${r.statuses.map(key=>`<li>${esc(status[key]||'Dato no disponible')}</li>`).join('')}</ul>`:''}`;
   $('trade-dialog').showModal();
+}
+function showPriceAlert(r){
+  const field=(label,value)=>`<label>${esc(label)}<input type="text" readonly value="${esc(value)}" title="${esc(value)}" aria-label="${esc(label)}"></label>`;
+  const labels={home:'Local',draw:'Empate',away:'Visitante',yes:'Sí',no:'No',home_draw:'1X',draw_away:'X2',home_away:'12',over:'Más de',under:'Menos de',odd:'Impar',even:'Par',none:'Ninguno'};
+  const fields=[field('Partido',`${r.home} — ${r.away}`),field('Fecha',date(r.date)),field('Operación',r.actionLabel),field('Importe total (u)',num(r.stake)),field('EV (%)',r.ev==null?'Sin probabilidad de referencia':num(r.ev*100)),field('Beneficio esperado (u)',r.expectedProfit==null?'Sin probabilidad de referencia':signed(r.expectedProfit)),field('ROI de la operación (%)',r.profit==null?'Pendiente':num(r.profit/r.stake*100)),field(r.isScenario?'Beneficio simulado (u)':'Beneficio histórico (u)',signed(r.profit))];
+  if(r.legs){
+    fields.push(field('Pago mínimo (u)',num(r.minPayout)),field('Beneficio mínimo (u)',signed(r.minProfit)),field('Retorno mínimo (%)',num(r.minReturn*100)),field('Suma de inversas',num(r.inverseSum,6)));
+    for(const [outcome,payment]of Object.entries(r.payoutByOutcome||{}))fields.push(field(`Pago si ${labels[outcome]||outcome} (u)`,num(payment)));
+    for(const [i,leg]of r.legs.entries())fields.push(field(`Apuesta ${i+1}`,labels[leg.selection]||leg.selection),field(`Casa ${i+1}`,data.books.get(leg.book)||leg.book),field(`Cuota ${i+1}`,num(leg.effectiveOdds)),field(`Importe ${i+1} (u)`,num(leg.stake)),field(`Captura ${i+1}`,leg.capturedAt||leg.snapshotId||'Sin captura'),field(`Reglas ${i+1}`,leg.rulesId||'Sin reglas'));
+  }else{
+    const v=r.contextValues||{};fields.push(field('Casa',data.books.get(r.book)||r.book),field('Cuota',num(r.odds)),field('Pago al acertar (u)',num(v.gross_payout)),field('Pago de equilibrio (u)',num(v.fair_payout)),field('Ventaja de pago (u)',signed(v.payout_edge)),field('Probabilidad de referencia (%)',r.probability==null?'Sin referencia':num(r.probability*100)),field('Casas de referencia',num(r.probabilityN,0)),field('EV',`p × cuota + p devolución − 1 − costo`));
+  }
+  $('trade-details').innerHTML=`<div class="entry-form record-filter-form wk-field-grid football-builder-fields">${fields.join('')}</div>`;$('trade-dialog').showModal();
 }
 function showTrade(key){
   const [event,book,selection]=key.split('|'),rows=data.byEvent.get(Number(event))||[],r=rows.find(r=>r.book===book&&r.side===Number(selection));if(!r)return;
@@ -202,7 +217,7 @@ function initializeEntityTables(){
 }
 
 async function initialize(){
-  tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',9,formulaRow,f=>[f.name,formulaDescription(f)]);
+  tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',10,formulaRow,f=>[f.name,formulaDescription(f)]);
   tables.years=new Table('years','años',6,y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(y.meanEV)}">${pct(y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`,y=>y.year,'Año');
   tables.dictionary=new Table('dictionary','campos',3,f=>`<tr><td>${esc(f.name)}${f.label?`<span class="football-sub">${esc(f.label)}</span>`:''}</td><td>${esc(f.formula||f.description)}</td><td>${f.preMatch===false?'Resultado':'Condición'}</td></tr>`,f=>[f.name,f.label,f.formula,f.description],'Nombre o cálculo');
   builder=mountFootballAlertBuilder($('formula-builder'),{onSave:definition=>{
@@ -211,7 +226,7 @@ async function initialize(){
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
-    await data.initialize();formulas=seedFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList(false);initializeEntityTables();
+    await data.initialize();formulas=seedPriceFormulaLibrary(formulas,data.entities);entityPresentation=initEntityPresentation(document,data.entities,data.badges);ready=true;builder.setEntities(data.entities);refreshFormulaList(false);initializeEntityTables();
     for(const id of ['events','offers','trades','formulas'])$(`${id}-league`).innerHTML='<option value="">Todas las ligas</option>'+data.entities.leagues.map(l=>`<option value="${esc(l.id)}">${esc(l.name)}</option>`).join('');
     const bookOptions=[...new Set(data.manifest.books.map(b=>b.name))].map(name=>`<option value="${esc(data.manifest.books.filter(b=>b.name===name).map(b=>b.code).join('|'))}">${esc(name)}</option>`).join('');
     for(const id of ['offers','trades'])$(`${id}-book`).innerHTML='<option value="">Todas las casas</option>'+bookOptions;
@@ -237,7 +252,7 @@ document.addEventListener('click',event=>{
     if(use.closest('[data-formula-row]')){const view=scope('formulas'),rule=formulas.find(f=>f.id===use.dataset.use);if(rule){setStrategyBooks(rule,view.book);for(const key of ['period','league','book'])$(`trades-${key}`).value=view[key];initCommonSimpleSelects(document);}}
     const wasOpen=$('trades-panel').open;$('trades-panel').open=true;if(wasOpen)refreshTrades();$('trades-panel').scrollIntoView({behavior:'smooth',block:'start'});
   }
-  if(edit||duplicate){const f=formulas.find(f=>f.id===(edit?.dataset.edit||duplicate.dataset.duplicate));if(f?.kind==='football-alert'||f?.kind===UNIFIED_FORMULA_KIND){builder.edit(duplicate?{...f,id:null,name:f.name+' · copia'}:f);$('create-title').textContent='Crear fórmula';$('create-panel').open=true;$('create-panel').scrollIntoView({behavior:'smooth',block:'start'});}}
+  if(edit||duplicate){const f=formulas.find(f=>f.id===(edit?.dataset.edit||duplicate.dataset.duplicate));if(f?.kind==='football-alert'||f?.kind===UNIFIED_FORMULA_KIND||f?.kind===PRICE_FORMULA_KIND){builder.edit(duplicate?{...f,id:null,name:f.name+' · copia'}:f);$('create-title').textContent='Crear fórmula';$('create-panel').open=true;$('create-panel').scrollIntoView({behavior:'smooth',block:'start'});}}
   const alert=event.target.closest('[data-alert]');if(alert)showAlert(alert.dataset.alert);if(row)showTrade(row.dataset.trade);
 });
 document.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)&&event.target.matches('[data-alert]')){event.preventDefault();showAlert(event.target.dataset.alert);}if(['Enter',' '].includes(event.key)&&event.target.matches('[data-trade]')){event.preventDefault();showTrade(event.target.dataset.trade);}});

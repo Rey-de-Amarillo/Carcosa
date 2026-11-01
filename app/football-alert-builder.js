@@ -1,4 +1,6 @@
 import {mountUnifiedFormulaEditor} from './football-formula-editor.js';
+import {mountPriceFormulaEditor} from './football-price-editor.js';
+import {PRICE_FORMULA_KIND} from './football-price-engine.js';
 import {newSituationsDraft,newSituationSelection,situationsDraftFromAlert,compileSituationsAlert} from './football-situations.js';
 import {FOOTBALL_MARKET_CATALOG,marketDefinition,marketSelectionChoices,marketLineChoices,defaultMarketSelection,footballMarketLabel} from './football-market-catalog.js';
 /** Football alert authoring: entity context, price trigger, bet and valuation. */
@@ -398,19 +400,20 @@ export function mountLegacyFootballAlertBuilder(container,{entities={},onSave=()
   render();return {edit,reset,getDefinition,setEntities};
 }
 
-/** Existing alerts keep their exact editor and meaning; new rules use one tree. */
+/** Saved rule kinds retain their editor; new formulas use payment mathematics. */
 export function mountFootballAlertBuilder(container,options={}){
-  let catalog=options.entities||{},current,legacy=false;
-  function activate(useLegacy){
-    legacy=useLegacy;
+  let catalog=options.entities||{},current,mode;
+  function activate(nextMode){
+    mode=nextMode;
     const surface=container.ownerDocument.createElement('div');surface.className='football-builder-host';
     container.replaceChildren(surface);
-    current=(legacy?mountLegacyFootballAlertBuilder:mountUnifiedFormulaEditor)(surface,{...options,entities:catalog,onCancel:()=>{if(legacy)activate(false);options.onCancel?.();}});
+    const mount=mode==='football-alert'?mountLegacyFootballAlertBuilder:mode==='football-formula'?mountUnifiedFormulaEditor:mountPriceFormulaEditor;
+    current=mount(surface,{...options,entities:catalog,onCancel:()=>{if(mode!==PRICE_FORMULA_KIND)activate(PRICE_FORMULA_KIND);options.onCancel?.();}});
   }
-  activate(false);
+  activate(PRICE_FORMULA_KIND);
   return {
-    edit(rule){const useLegacy=rule.kind==='football-alert';if(useLegacy!==legacy)activate(useLegacy);current.edit(rule);},
-    reset(){if(legacy)activate(false);else current.reset();},
+    edit(rule){if(rule.kind!==mode)activate(rule.kind);current.edit(rule);},
+    reset(){if(mode!==PRICE_FORMULA_KIND)activate(PRICE_FORMULA_KIND);else current.reset();},
     getDefinition(){return current.getDefinition();},
     setEntities(next){catalog=next||{};current.setEntities(catalog);},
   };

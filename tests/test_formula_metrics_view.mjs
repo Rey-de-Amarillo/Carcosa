@@ -87,6 +87,19 @@ const uncalculated=filterAndSortFormulas(formulas,new Map(),{sort:'ev_desc'});
 assert.equal(uncalculated.length,formulas.length,'loading a fresh metric scope does not remove its formulas');
 assert.deepEqual(filterAndSortFormulas(formulas,new Map(),{minROI:0}),[],'a requested metric filter requires an actual metric');
 
+// A payoff floor is separate from EV: rounded cover payments can differ,
+// leaving EV unknown while every possible result retains a positive return.
+const covers=[{id:'high',name:'High'},{id:'low',name:'Low'},{id:'negative',name:'Negative'},{id:'none',name:'None'},{id:'loading',name:'Loading'}];
+const coverMetrics=new Map([
+  ['high',{state:'ready',meanEV:null,meanMinReturn:.03}],
+  ['low',{state:'ready',meanEV:null,meanMinReturn:.01}],
+  ['negative',{state:'ready',meanEV:null,meanMinReturn:-.05}],
+  ['none',{state:'ready',meanEV:.1,meanMinReturn:null}],
+  ['loading',{state:'loading',meanMinReturn:99}],
+]);
+assert.deepEqual(ids(filterAndSortFormulas(covers,coverMetrics,{sort:'minReturn_desc'})),['high','low','negative','loading','none']);
+assert.deepEqual(ids(filterAndSortFormulas(covers,coverMetrics,{sort:'minReturn_asc'})),['negative','low','high','loading','none']);
+
 assert.deepEqual(formulas,originalFormulas,'ranking cannot reorder or alter source formulas');
 assert.deepEqual(metrics,originalMetrics,'ranking cannot rewrite the metric cache');
 for(const formula of view())assert.ok(formulas.includes(formula),'results retain the saved formula identity');

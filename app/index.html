@@ -68,7 +68,7 @@
             <label>Período<select id="formulas-period"><option value="test">2022–2026</option><option value="validation">2018–2021</option><option value="all">2018–2026</option></select></label>
             <label>Liga<select id="formulas-league"><option value="">Todas las ligas</option></select></label>
             <label>Casa<select id="formulas-book"><option value="">Todas las casas</option></select></label>
-            <label>Ordenar<select id="formulas-sort"><option value="ev_desc">EV mayor</option><option value="roi_desc">ROI mayor</option><option value="profit_desc">Beneficio mayor</option><option value="n_desc">Más apuestas</option><option value="winRate_desc">Mayor acierto</option><option value="odds_desc">Cuota media mayor</option><option value="name_asc">Nombre A–Z</option></select></label>
+            <label>Ordenar<select id="formulas-sort"><option value="ev_desc">EV mayor</option><option value="minReturn_desc">Retorno mínimo medio mayor</option><option value="roi_desc">ROI mayor</option><option value="profit_desc">Beneficio mayor</option><option value="n_desc">Más apuestas</option><option value="winRate_desc">Mayor acierto</option><option value="odds_desc">Cuota media mayor</option><option value="name_asc">Nombre A–Z</option></select></label>
             <label>EV mínimo (%)<input id="formulas-min-ev" type="number" step="any" placeholder="0"></label>
             <label>ROI mínimo (%)<input id="formulas-min-roi" type="number" step="any" placeholder="0"></label>
             <label>Apuestas mínimas<input id="formulas-min-n" type="number" min="0" step="1" placeholder="0"></label>
@@ -76,7 +76,7 @@
           </form>
           <div id="formulas-toolbar" class="record-pagination-toolbar record-pagination-toolbar-with-search"></div>
           <div class="football-formula-grid-scroll"><div id="formulas-table" role="table" aria-label="Fórmulas guardadas" class="football-formula-grid">
-            <div class="wk-grid-head wk-grid-row" role="row"><div role="columnheader">Nombre / fórmula</div><div role="columnheader" data-number>EV estimado</div><div role="columnheader" data-number>ROI</div><div role="columnheader" data-number>Beneficio (u)</div><div role="columnheader" data-number>Apuestas</div><div role="columnheader" data-number>Acierto</div><div role="columnheader" data-number>Cuota media</div><div role="columnheader" data-number>Sin datos</div><div role="columnheader" aria-label="Acciones"></div></div>
+            <div class="wk-grid-head wk-grid-row" role="row"><div role="columnheader">Nombre / fórmula</div><div role="columnheader" data-number>EV estimado</div><div role="columnheader" data-number>Retorno mínimo medio</div><div role="columnheader" data-number>ROI</div><div role="columnheader" data-number>Beneficio (u)</div><div role="columnheader" data-number>Operaciones</div><div role="columnheader" data-number>Acierto</div><div role="columnheader" data-number>Cuota media</div><div role="columnheader" data-number>Sin datos</div><div role="columnheader" aria-label="Acciones"></div></div>
             <div data-grid-body class="wk-row-list" role="rowgroup"></div>
           </div></div>
         </div>

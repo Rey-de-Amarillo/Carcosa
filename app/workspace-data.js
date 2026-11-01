@@ -1,5 +1,6 @@
 /** Derived, indexed football tables. Prices and probabilities retain source precision. */
 import {UNIFIED_FORMULA_KIND} from './football-unified-formula.js';
+import {PRICE_FORMULA_KIND} from './football-price-engine.js';
 export const periodMatches=(row,period)=>period==='all'||(period==='test'?row.date>='2022-01-01':row.date<'2022-01-01');
 export async function readData(path,gzip=false){
   const response=await fetch(`data/${path}`);if(!response.ok)throw new Error(`No se pudo cargar ${path} (${response.status}).`);
@@ -21,7 +22,11 @@ export class FootballData {
       if(this.loading.has(part.year))return this.loading.get(part.year);
       const pending=readData(part.path,true).then(table=>{
         const c=Object.fromEntries(table.columns.map((key,i)=>[key,i]));
-        for(const r of table.rows){const e=this.events[r[c.event]];const row={id:e.id,event:r[c.event],date:e.date,league:e.league,home:e.home,away:e.away,book:r[c.book],side:r[c.side],odds:r[c.odds],probability:r[c.probability],referenceMean:r[c.reference_mean],referenceSd:r[c.reference_sd],references:r[c.references],ev:r[c.ev],won:r[c.won]===true,profit:r[c.profit],ownProbability:r[c.own_probability],bookmakerMargin:r[c.bookmaker_margin]};
+        // Retain contract provenance verbatim; optional aliases only copy
+        // source values. A date of the match is never a quote capture time.
+        for(const r of table.rows){const raw=Object.fromEntries(table.columns.map((key,index)=>[key,r[index]])),e=this.events[raw.event];const row={...raw,id:e.id,event:raw.event,date:e.date,league:e.league,home:e.home,away:e.away,book:raw.book,side:raw.side,odds:raw.odds,probability:raw.probability,referenceMean:raw.referenceMean??raw.reference_mean,referenceSd:raw.referenceSd??raw.reference_sd,references:raw.references,ev:raw.ev,won:typeof raw.won==='boolean'?raw.won:null,profit:raw.profit,ownProbability:raw.ownProbability??raw.own_probability,bookmakerMargin:raw.bookmakerMargin??raw.bookmaker_margin};
+          if(raw.quoteId!=null||raw.id!=null)row.quoteId=raw.quoteId??raw.id;
+          for(const [canonical,alias] of [['referenceProbability','reference_probability'],['pushProbability','push_probability'],['snapshotId','snapshot_id'],['rulesId','rules_id']])if(row[canonical]==null&&raw[alias]!=null)row[canonical]=raw[alias];
           this.offers.push(row);if(!this.byEvent.has(row.event))this.byEvent.set(row.event,[]);this.byEvent.get(row.event).push(row);}
         this.loaded.add(part.year);
       }).finally(()=>this.loading.delete(part.year));this.loading.set(part.year,pending);return pending;
@@ -47,7 +52,7 @@ export class FootballData {
     return quotedMarkets.has(a.market)||(a.market==='match_result'&&a.period!=='full')||legacyCombination||observationNeedsArchive&&actionSupported;
   }
   async strategyUniverse(rule){
-    if(rule.kind===UNIFIED_FORMULA_KIND)return this.unifiedStrategyUniverse();
+    if([UNIFIED_FORMULA_KIND,PRICE_FORMULA_KIND].includes(rule.kind))return this.unifiedStrategyUniverse();
     if(this.usesGoalArchive(rule)){
       const payload=await this.ensureMarketHistory();return {...payload,name:'Archivo de marcadores y goles · Singapore Pools'};
     }
