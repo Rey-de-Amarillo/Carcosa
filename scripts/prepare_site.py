@@ -55,10 +55,12 @@ No requiere probabilidades deportivas ni precios de otras casas. Reparte el
 importe, redondea a centavos y comprueba el pago más bajo de todos los casos,
 incluida doble oportunidad con pagos superpuestos.
 
-Los contratos deben cubrir todos los resultados y compartir evento, período,
-línea y reglas compatibles. Sin tiempo y reglas verificables, las capturas
-históricas quedan sin evaluar. La calculadora manual se identifica como escenario.
-El retorno mínimo calculado y el ROI histórico son métricas separadas. Las
+Las cotizaciones se agrupan por evento, casa, mercado, período y línea. Un grupo
+completo sin precios ambiguos puede calcularse como escenario de archivo aunque
+falten tiempo o reglas verificables. No prueba simultaneidad ni posibilidad de
+ejecución. Los grupos incompletos o ambiguos quedan sin evaluar y se conservan
+las marcas originales sin inventar capturas. El retorno mínimo y el ROI de
+escenarios se distinguen de una captura verificada. Las
 fórmulas propias anteriores se conservan en el archivo; se respalda la colección
 antes de reemplazar ejemplos automáticos sin editar.
 

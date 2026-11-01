@@ -21,9 +21,9 @@
 .formula-builder-conditions{display:grid;gap:13px}
 #trade-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
 #trade-metrics .kpi-card{min-width:0}
-.football-formula-grid{min-width:1230px}
+.football-formula-grid{min-width:1390px}
 .football-formula-grid-scroll{overflow-x:auto}
-.football-formula-grid :is(.wk-grid-head,.wk-grid-row){grid-template-columns:minmax(260px,2.8fr) repeat(8,minmax(78px,1fr)) minmax(200px,1.7fr);min-width:0}
+.football-formula-grid :is(.wk-grid-head,.wk-grid-row){grid-template-columns:minmax(300px,2.8fr) repeat(7,minmax(96px,1fr)) minmax(190px,1.6fr) minmax(200px,1.7fr);min-width:0}
 .football-formula-grid>[data-grid-body]{display:grid}
 .football-formula-grid .wk-grid-row>*{min-width:0;overflow-wrap:anywhere}
 .football-formula-grid [data-number]{text-align:right}

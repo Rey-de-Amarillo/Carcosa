@@ -1,6 +1,7 @@
 /** Historical formula metrics, cached independently of grid order and search. */
 import {UNIFIED_FORMULA_KIND,evaluateUnifiedFormula} from './football-unified-formula.js';
 import {PRICE_FORMULA_KIND,evaluatePriceFormula} from './football-price-engine.js';
+import {isPaymentFormula} from './football-price-library.js';
 import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strategy-engine.js';
 import {matchAndRank,summarize} from './formula-engine.js';
 import {periodMatches} from './workspace-data.js';
@@ -17,8 +18,8 @@ export function formulaMetricsKey(rule,scope={}){
   const {id,name,...definition}=rule;
   return JSON.stringify([definition,normalizeMetricsScope(scope)]);
 }
-export function metricsFromSummary(summary,unknownCandidates=null){
-  return Object.freeze({n:summary.n,meanEV:nullable(summary.meanEV),meanMinReturn:nullable(summary.meanMinReturn),meanMinPayout:nullable(summary.meanMinPayout),meanMinProfit:nullable(summary.meanMinProfit),expectedPriced:summary.expectedPriced??0,roi:nullable(summary.roi),profit:nullable(summary.profit),settledPriced:summary.settledPriced??0,winRate:nullable(summary.winRate),meanOdds:nullable(summary.meanOdds),unknownCandidates:nullable(unknownCandidates),scenario:Boolean(summary.isScenario)});
+export function metricsFromSummary(summary,unknownCandidates=null,coverage={}){
+  return Object.freeze({n:summary.n,meanEV:nullable(summary.meanEV),meanMinReturn:nullable(summary.meanMinReturn),meanMinPayout:nullable(summary.meanMinPayout),meanMinProfit:nullable(summary.meanMinProfit),expectedPriced:summary.expectedPriced??0,roi:nullable(summary.roi),profit:nullable(summary.profit),settledPriced:summary.settledPriced??0,winRate:nullable(summary.winRate),meanOdds:nullable(summary.meanOdds),unknownCandidates:nullable(unknownCandidates),scenarioCandidates:nullable(coverage?.scenarioCandidates),verifiedCandidates:nullable(coverage?.verifiedCandidates),scenario:Boolean(summary.isScenario)});
 }
 const hasSidePrices=node=>node?.type==='group'?(node.children||[]).some(hasSidePrices):['home_odds','draw_odds','away_odds'].includes(node?.field);
 
@@ -73,8 +74,8 @@ export class FormulaMetricsEngine {
       const index=this.scopeIndexes.get(scopeKey)||this.remember(this.scopeIndexes,scopeKey,createOfferIndex(universe.offers,view),this.scopeLimit);
       // Coverage needs all complementary contracts in the selected scope. A
       // single-market/branch optimization could silently remove a portfolio leg.
-      const result=evaluatePriceFormula({events:universe.events,offers:index.offers},rule,{entities:this.data.entities,universe:universe.name,summaryOnly:true,immutableUniverse:true});
-      metrics=metricsFromSummary(result.summary,result.coverage.unknownCandidates);
+      const result=evaluatePriceFormula({events:universe.events,offers:index.offers},rule,{entities:this.data.entities,universe:universe.name,summaryOnly:true,immutableUniverse:true,archiveScenario:isPaymentFormula(rule)});
+      metrics=metricsFromSummary(result.summary,result.coverage.unknownCandidates,result.coverage);
     }else if(rule.kind===UNIFIED_FORMULA_KIND){
       const universe=await this.data.unifiedStrategyUniverse(),scopeKey=JSON.stringify(view);
       const index=this.scopeIndexes.get(scopeKey)||this.remember(this.scopeIndexes,scopeKey,createOfferIndex(universe.offers,view),this.scopeLimit);

@@ -139,6 +139,36 @@ function selectionsFor(a,structure){
 }
 function coverageValues(payment){return {odds:null,gross_payout:null,profit_if_win:null,ev:payment.roundedEV,expected_profit:payment.roundedEV==null?null:payment.roundedMinProfit,expected_payout:payment.roundedEV==null?null:payment.roundedMinPayout,reference_probability:null,references:null,dispersion:null,fair_payout:null,payout_edge:null,inverse_sum:payment.inverseSum,min_payout:payment.roundedMinPayout,min_profit:payment.roundedMinProfit,min_return:payment.roundedMinReturn};}
 
+// Even the best continuous allocation cannot be improved by rounding stakes
+// and rounding every ticket's payout down. Reject only proven-false branches;
+// all other fields/relations remain unknown until the full calculation.
+function impossibleCoverage(node,upper){
+  if(node.type==='group'){let missing=false;for(const child of node.children){const result=impossibleCoverage(child,upper);if(node.operator==='Y'&&result===false)return false;if(node.operator==='O'&&result===true)return true;if(result==null)missing=true;}return missing?null:node.operator==='Y';}
+  if(!['min_return','min_profit'].includes(node.field)||!['>','>='].includes(node.operator))return null;
+  const value=upper[node.field];if(!finite(value))return null;
+  const tolerance=1e-9*Math.max(1,Math.abs(value),Math.abs(node.value));return value<node.value-tolerance?false:null;
+}
+const portfolioId=(entry,legs)=>JSON.stringify([String(entry.event.id),...legs.map(r=>[r.q.book,quoteSnapshot(r.q),r.time,r.rec.key,r.q.odds])]);
+function prepareCoveragePortfolios(groups,baseUnknown){
+  const portfolios=[],seen=new Set();let quoteGroups=baseUnknown,unknown=baseUnknown;
+  for(const group of groups.values()){
+    function* windows(){if(!group.timed){yield group.records;return;}const ordered=[...group.records].sort((a,b)=>a.time-b.time);let start=0,end=0;while(end<ordered.length){const at=ordered[end].time;while(end<ordered.length&&ordered[end].time===at)end++;while(at-ordered[start].time>60000)start++;yield ordered.slice(start,end);}}
+    for(const records of windows()){
+      const best=new Map(),conflicts=new Map();let ambiguous=false;
+      for(const r of records){if(!r.live){if(!group.timed)ambiguous=true;continue;}const key=String(r.q.book)+'\u001f'+r.rec.action.selection;if(conflicts.has(key)&&conflicts.get(key)!==r.q.odds&&!group.timed)ambiguous=true;conflicts.set(key,r.q.odds);const previous=best.get(r.rec.action.selection);if(!previous||r.q.odds>previous.q.odds||r.q.odds===previous.q.odds&&(r.time??0)>(previous.time??0))best.set(r.rec.action.selection,r);}
+      if(group.timed){best.clear();const latest=new Map();for(const r of records){const key=String(r.q.book)+'\u001f'+r.rec.action.selection,previous=latest.get(key);latest.set(key,previous&&previous.time===r.time?(!r.live||!previous.live?{...r,live:false}:r.q.odds<previous.q.odds?r:previous):r);}for(const r of latest.values()){if(!r.live)continue;const previous=best.get(r.rec.action.selection);if(!previous||r.q.odds>previous.q.odds)best.set(r.rec.action.selection,r);}}
+      quoteGroups++;if(ambiguous||!group.selections.every(s=>best.has(s))){unknown++;continue;}
+      const legs=group.selections.map(s=>best.get(s)),times=legs.map(r=>r.time).filter(x=>x!=null);
+      if(times.length>1&&Math.max(...times)-Math.min(...times)>60000){unknown++;continue;}
+      const id=portfolioId(group.entry,legs);if(seen.has(id))continue;seen.add(id);
+      portfolios.push({entry:group.entry,selections:group.selections,legs,scenario:group.scenario,missingCapture:group.missingCapture,inverse:legs.reduce((sum,r)=>sum+1/r.q.odds,0)});
+    }
+  }
+  // The immutable archive needs only complete portfolios after preparation;
+  // discard repeated raw-group maps and their large string keys.
+  groups.clear();return {portfolios,quoteGroups,unknown};
+}
+
 /** The same supplied prices and budget always give the same calculation.
  * Bookmaker names, probabilities, references and historical results are not
  * inputs. Rounded ticket amounts/payments are used for every rule predicate.
@@ -182,7 +212,7 @@ export function evaluatePriceFormula(universe,rawRule,options={}){
   const rule=normalizePriceFormula(rawRule),entities=options.entities||{},events=list(universe?.events);
   const source=Array.isArray(universe?.offers)?universe.offers:[...list(universe?.marketQuotes),...events.flatMap((event,index)=>list(event.marketQuotes).map(q=>({...q,event:index})))];
   const prepared=prepareSource(events,source,options.immutableUniverse===true),{entries,entryIndices,recordIndices,records:contractRecords}=prepared;
-  const catalog=settlementCatalog(entities),settled=new Map(),alerts=[],seen=new Set();let candidateEvents=new Set(),candidates=0,unknown=0,failed=0;
+  const catalog=settlementCatalog(entities),settled=new Map(),alerts=[],seen=new Set();let candidateEvents=new Set(),candidates=0,unknown=0,failed=0,scenarioCandidates=0,verifiedCandidates=0,missingCaptureCandidates=0;
   function outcome(entry,rec){const key=`${entry.index}\u001f${rec.key}`;if(!settled.has(key))settled.set(key,settleFootballAction(entry.event,rec.action,{}, {_catalog:catalog}));return settled.get(key);}
   const getOutcomeProfit=(entry,rec,odds,stake)=>{const result=outcome(entry,rec),won=result.outcome==='win'?true:result.outcome==='loss'?false:result.outcome==='push'?'push':null;return {result,won,profit:won==null?null:(won===true?(odds-1)*stake:won===false?-stake:0)-stake*rule.costRate};};
   if(rule.mode==='value'){
@@ -200,52 +230,49 @@ export function evaluatePriceFormula(universe,rawRule,options={}){
       if(!options.summaryOnly)row.sourceQuote=clone(q);alerts.push(row);
     }
   }else{
-    // A missing snapshot is not an implicit shared snapshot. Keep those groups
-    // only to report unknown coverage, never to manufacture simultaneous odds.
-    const preparationKey=`${rule.structure}|${rule.bookPolicy}`;let coverage=prepared.coverageGroups.get(preparationKey);
+    // The optional archive scenario computes recorded same-book arithmetic;
+    // it does not assert that unverified quotes were simultaneously available.
+    const archiveScenario=options.archiveScenario===true&&rule.bookPolicy==='same_book';
+    const preparationKey=`${rule.structure}|${rule.bookPolicy}|${archiveScenario?'archive-scenario':'strict'}`;let coverage=prepared.coverageGroups.get(preparationKey);
     if(!coverage){
       const groups=new Map(),missingGroups=new Set(),contextEvents=new Set();
       for(let i=0;i<source.length;i++){const q=source[i];if(entryIndices[i]<0)continue;const entry=entries[entryIndices[i]],rec=contractRecords[recordIndices[i]],selections=selectionsFor(rec.action,rule.structure);if(!selections||!selections.includes(rec.action.selection))continue;
         const live=validOdds(q.odds)&&q.active!==false&&q.suspended!==true,a=rec.action,snapshot=quoteSnapshot(q),time=quoteTime(q);
         // Invalid prices and suspensions remain in timed histories as tombstones.
-        if(!live&&time==null&&!snapshot)continue;
+        if(!live&&time==null&&!snapshot&&!archiveScenario)continue;
         contextEvents.add(entry.index);const rules=rulesKey(q),base=JSON.stringify([entry.index,a.market,a.period,a.line??null,a.team??null,a.teamId??null,rules,rule.bookPolicy==='same_book'?String(q.book):null]),key=base+'\u001f'+(snapshot?`snapshot:${snapshot}`:time!=null?'time':'missing');
-        if(!rules||!snapshot&&time==null){missingGroups.add(key);continue;}
-        if(!groups.has(key))groups.set(key,{entry,selections,records:[],snapshot,timed:!snapshot&&time!=null});groups.get(key).records.push({q,rec,time,live});
+        const unverified=!rules||!snapshot&&time==null;
+        if(unverified&&!archiveScenario){missingGroups.add(key);continue;}
+        if(!groups.has(key))groups.set(key,{entry,selections,records:[],snapshot,timed:!snapshot&&time!=null,scenario:unverified,missingCapture:!snapshot&&time==null});groups.get(key).records.push({q,rec,time,live});
       }
       coverage={groups,unknown:missingGroups.size,contextEvents};prepared.coverageGroups.set(preparationKey,coverage);
     }
-    const {groups}=coverage;candidateEvents=coverage.contextEvents;candidates+=coverage.unknown;unknown+=coverage.unknown;
-    for(const group of groups.values()){
-      function* windows(){if(!group.timed){yield group.records;return;}const ordered=[...group.records].sort((a,b)=>a.time-b.time);let start=0,end=0;while(end<ordered.length){const at=ordered[end].time;while(end<ordered.length&&ordered[end].time===at)end++;while(at-ordered[start].time>60000)start++;yield ordered.slice(start,end);}}
-      const batches=windows();
-      for(const records of batches){
-        const best=new Map(),conflicts=new Map();let ambiguous=false;
-        for(const r of records){if(!r.live){if(!group.timed)ambiguous=true;continue;}const key=String(r.q.book)+'\u001f'+r.rec.action.selection;if(conflicts.has(key)&&conflicts.get(key)!==r.q.odds){if(!group.timed)ambiguous=true;}conflicts.set(key,r.q.odds);
-          const previous=best.get(r.rec.action.selection);if(!previous||r.q.odds>previous.q.odds||r.q.odds===previous.q.odds&&(r.time??0)>(previous.time??0))best.set(r.rec.action.selection,r);
-        }
-        // A time window may have multiple updates of the same ticket. Only its
-        // latest update was active at the end of that window.
-        if(group.timed){best.clear();const latest=new Map();for(const r of records){const key=String(r.q.book)+'\u001f'+r.rec.action.selection,previous=latest.get(key);latest.set(key,previous&&previous.time===r.time?(!r.live||!previous.live?{...r,live:false}:r.q.odds<previous.q.odds?r:previous):r);}for(const r of latest.values()){if(!r.live)continue;const previous=best.get(r.rec.action.selection);if(!previous||r.q.odds>previous.q.odds)best.set(r.rec.action.selection,r);}}
-        candidates++;if(ambiguous||!group.selections.every(s=>best.has(s))){unknown++;continue;}
-        const legs=group.selections.map(s=>best.get(s)),times=legs.map(r=>r.time).filter(x=>x!=null);
-        if(times.length>1&&Math.max(...times)-Math.min(...times)>60000){unknown++;continue;}
-        const id=JSON.stringify([String(group.entry.event.id),...legs.map(r=>[r.q.book,quoteSnapshot(r.q),r.time,r.rec.key,r.q.odds])]);if(seen.has(id))continue;seen.add(id);
+    if(!coverage.portfolios){coverage={contextEvents:coverage.contextEvents,...prepareCoveragePortfolios(coverage.groups,coverage.unknown)};prepared.coverageGroups.set(preparationKey,coverage);}
+    candidateEvents=coverage.contextEvents;candidates+=coverage.quoteGroups;unknown+=coverage.unknown;
+    for(const group of coverage.portfolios){
+        const {legs}=group;
+        if(group.scenario){scenarioCandidates++;if(group.missingCapture)missingCaptureCandidates++;}else verifiedCandidates++;
+        const inverse=group.inverse/(1-rule.oddsDrop);
+        const idealRatio=rule.structure==='double_chance'?Math.max(2/inverse,...legs.map(r=>1/(inverse-1/(r.q.odds*(1-rule.oddsDrop))))):1/inverse;
+        const upper={min_return:idealRatio-1-rule.costRate,min_payout:rule.stake*idealRatio,min_profit:rule.stake*(idealRatio-1-rule.costRate)};
+        if(impossibleCoverage(rule.expression,upper)===false){failed++;continue;}
         const payment=calculatePaymentCoverage({odds:legs.map(r=>r.q.odds),budget:rule.stake,structure:rule.structure,costRate:rule.costRate,oddsDrop:rule.oddsDrop}),values=coverageValues(payment),match=matches(rule.expression,values);
         if(match!==true){match==null?unknown++:failed++;continue;}
+        const id=portfolioId(group.entry,legs);
         const outcomes=legs.map((r,i)=>{const x=getOutcomeProfit(group.entry,r.rec,payment.effectiveOdds[i],payment.roundedStakes[i]),stake=payment.roundedStakes[i];const payout=x.won==null?null:x.won===true?Math.floor((stake*payment.effectiveOdds[i]+1e-10)*100)/100:x.won==='push'?stake:0;return {...x,payout,profit:payout==null?null:payout-stake-stake*rule.costRate};}),hasResult=outcomes.every(x=>x.payout!=null),profit=hasResult?outcomes.reduce((sum,x)=>sum+x.payout,0)-payment.totalCost:null;
         // Per-ticket fees sum exactly to budget*costRate, never charged twice.
         const outcomeLabels=rule.structure==='double_chance'?['home','draw','away']:group.selections,payoutByOutcome=Object.fromEntries(Object.values(payment.roundedPayoutByOutcome).map((v,i)=>[outcomeLabels[i],v])),book=[...new Set(legs.map(r=>String(r.q.book)))].join('|');
-        const row={...baseRow(group.entry,book),id,market:legs[0].rec.action.market,period:legs[0].rec.action.period,selection:'coverage',actionLabel:`Cobertura · ${group.selections.join(' / ')}`,contextOdds:null,contextValues:values,odds:null,probability:null,pushProbability:null,probabilityN:null,probabilitySource:payment.roundedConstantPayout?'constant_payoff':null,reference:[],ev:values.ev,expectedProfit:values.expected_profit,stake:rule.stake,won:profit==null?null:profit>EPS?true:profit<-EPS?false:'push',outcome:profit==null?null:profit>EPS?'win':profit<-EPS?'loss':'push',profit,quoteSource:'manual',isScenario:true,breakEven:null,status:profit==null?'result_missing':'ready',statuses:profit==null?['result_missing']:[],triggered:true,minPayout:payment.roundedMinPayout,minProfit:payment.roundedMinProfit,minReturn:payment.roundedMinReturn,inverseSum:payment.inverseSum,payoutByOutcome,
-          legs:legs.map((r,i)=>({book:String(r.q.book),odds:r.q.odds,effectiveOdds:payment.effectiveOdds[i],stake:payment.roundedStakes[i],selection:r.rec.action.selection,market:r.rec.action.market,period:r.rec.action.period,line:r.rec.action.line??null,rulesId:rulesKey(r.q),snapshotId:quoteSnapshot(r.q)||null,capturedAt:r.q.capturedAt??r.q.captured_at??r.q.timestamp??r.q.createdAt??null,sourceId:r.q.quoteId??r.q.id??null,profit:outcomes[i].profit,...(!options.summaryOnly?{sourceQuote:clone(r.q)}:{})}))};
+        const statuses=[...(group.scenario?['capture_unverified']:[]),...(profit==null?['result_missing']:[])];
+        const row={...baseRow(group.entry,book),id,market:legs[0].rec.action.market,period:legs[0].rec.action.period,selection:'coverage',actionLabel:`Cobertura · ${group.selections.join(' / ')}`,contextOdds:null,contextValues:values,odds:null,probability:null,pushProbability:null,probabilityN:null,probabilitySource:payment.roundedConstantPayout?'constant_payoff':null,reference:[],ev:values.ev,expectedProfit:values.expected_profit,stake:rule.stake,won:profit==null?null:profit>EPS?true:profit<-EPS?false:'push',outcome:profit==null?null:profit>EPS?'win':profit<-EPS?'loss':'push',profit,quoteSource:'manual',isScenario:true,captureVerified:!group.scenario,scenarioBasis:group.scenario?'archive_unverified_capture':'verified_quote_cohort',breakEven:null,status:statuses[0]||'ready',statuses,triggered:true,minPayout:payment.roundedMinPayout,minProfit:payment.roundedMinProfit,minReturn:payment.roundedMinReturn,inverseSum:payment.inverseSum,payoutByOutcome,
+          legs:legs.map((r,i)=>({book:String(r.q.book),odds:r.q.odds,effectiveOdds:payment.effectiveOdds[i],stake:payment.roundedStakes[i],selection:r.rec.action.selection,market:r.rec.action.market,period:r.rec.action.period,line:r.rec.action.line??null,rulesId:rulesKey(r.q)||null,snapshotId:quoteSnapshot(r.q)||null,capturedAt:r.q.capturedAt??r.q.captured_at??r.q.timestamp??r.q.createdAt??null,sourceId:r.q.quoteId??r.q.id??null,profit:outcomes[i].profit,...(!options.summaryOnly?{sourceQuote:clone(r.q)}:{})}))};
         alerts.push(row);
-      }
     }
   }
   let result=alerts;
   if(rule.onePerMatch){const best=new Map();for(const row of alerts){const previous=best.get(row.eventId),score=rule.mode==='coverage'?row.minReturn:row.ev;if(!previous||(finite(score)?score:-Infinity)>(finite(rule.mode==='coverage'?previous.minReturn:previous.ev)?(rule.mode==='coverage'?previous.minReturn:previous.ev):-Infinity)||score===(rule.mode==='coverage'?previous.minReturn:previous.ev)&&row.id<previous.id)best.set(row.eventId,row);}result=[...best.values()];}
   result.sort((a,b)=>a.date.localeCompare(b.date)||a.eventId.localeCompare(b.eventId)||a.book.localeCompare(b.book)||a.id.localeCompare(b.id));
   const summary=summarizeFootballAlerts(result);
+  summary.scenarioEvaluated=scenarioCandidates;summary.captureVerified=scenarioCandidates>0?false:verifiedCandidates>0?true:null;
   for(const [field,key] of [['minReturn','meanMinReturn'],['minPayout','meanMinPayout'],['minProfit','meanMinProfit']]){const values=result.map(row=>row[field]).filter(finite);summary[key]=values.length?values.reduce((sum,x)=>sum+x,0)/values.length:null;}
-  return {alerts:options.summaryOnly?[]:result,summary,coverage:{events:events.length,contextEvents:candidateEvents.size,quoteGroups:candidates,conditionGroups:result.length,matchedGroups:result.length,alerts:result.length,priced:result.length,probability:result.filter(r=>r.probability!=null).length,valued:result.filter(r=>r.ev!=null).length,settled:result.filter(r=>r.profit!=null).length,missingQuote:0,missingProbability:result.filter(r=>r.ev==null).length,missingConditionValues:unknown,unknownCandidates:unknown,falseCandidates:failed,universe:options.universe||null}};
+  return {alerts:options.summaryOnly?[]:result,summary,coverage:{events:events.length,contextEvents:candidateEvents.size,quoteGroups:candidates,conditionGroups:result.length,matchedGroups:result.length,alerts:result.length,priced:result.length,probability:result.filter(r=>r.probability!=null).length,valued:result.filter(r=>r.ev!=null).length,settled:result.filter(r=>r.profit!=null).length,missingQuote:0,missingProbability:result.filter(r=>r.ev==null).length,missingConditionValues:unknown,unknownCandidates:unknown,falseCandidates:failed,scenarioCandidates,verifiedCandidates,missingCaptureCandidates,universe:options.universe||null}};
 }
