@@ -11,7 +11,7 @@ const centAmount=x=>Number.isSafeInteger(Math.round(x*100))&&Math.abs(x*100-Math
 let serial=0;
 const number=(x,label)=>{if(x==null||String(x).trim()===''||!Number.isFinite(Number(x)))throw new Error(`Completá ${label}.`);return Number(x);};
 export function newPriceCondition(field=''){return {type:'condition',id:`price-condition-${++serial}`,field,operator:'>=',value:null};}
-export function newPriceFormula(){return {kind:PRICE_FORMULA_KIND,version:1,id:null,name:'',stake:100,mode:'value',structure:'two_outcomes',bookPolicy:'same_book',costRate:0,oddsDrop:0,onePerMatch:true,expression:{type:'group',id:'price-group-1',operator:'Y',children:[newPriceCondition()]}};}
+export function newPriceFormula(){return {kind:PRICE_FORMULA_KIND,version:1,id:null,name:'',stake:100,mode:'coverage',structure:'two_outcomes',bookPolicy:'same_book',costRate:0,oddsDrop:0,onePerMatch:true,expression:{type:'group',id:'price-group-1',operator:'Y',children:[{...newPriceCondition('min_return'),operator:'>',value:0}]}};}
 export function normalizePriceFormula(raw){
   if(!raw||raw.kind&&raw.kind!==PRICE_FORMULA_KIND)throw new Error('La fórmula no pertenece al editor de pagos.');
   if(raw.version!=null&&raw.version!==1)throw new Error('La versión de la fórmula no es compatible.');
@@ -84,12 +84,12 @@ export function calculatePaymentCoverage({odds,budget=100,structure='two_outcome
   const stakes=weights.map(w=>w*budget),payouts=returns(matrix,stakes),cost=budget*costRate,totalCost=budget+cost;
   const labels=size===2?['first','second']:['home','draw','away'];
   const payoutByOutcome=Object.fromEntries(labels.map((label,i)=>[label,payouts[i]])),profitByOutcome=Object.fromEntries(labels.map((label,i)=>[label,payouts[i]-totalCost]));
-  const minPayout=Math.min(...payouts),minProfit=minPayout-totalCost,minReturn=minProfit/budget,constantPayout=Math.max(...payouts)-minPayout<=EPS*Math.max(1,budget);
+  const minPayout=Math.min(...payouts),minProfit=minPayout-totalCost,minReturn=minProfit/budget,constantPayout=structure!=='double_chance'||weights.every(w=>w>0);
   const centBudget=Math.round(budget*100),cents=weights.map(w=>Math.floor(w*centBudget));
   const order=weights.map((w,i)=>({i,r:w*centBudget-cents[i]})).sort((a,b)=>b.r-a.r||a.i-b.i);
   const remainder=centBudget-cents.reduce((a,b)=>a+b,0);for(let i=0;i<remainder;i++)cents[order[i%size].i]++;
-  const roundedStakes=cents.map(c=>c/100),roundedPayouts=matrix.map(row=>row.reduce((s,p,i)=>s+Math.floor((p*roundedStakes[i]+1e-10)*100)/100,0));
-  const roundedMinPayout=Math.min(...roundedPayouts),roundedMinProfit=roundedMinPayout-totalCost,roundedMinReturn=roundedMinProfit/budget,roundedConstantPayout=Math.max(...roundedPayouts)-roundedMinPayout<=EPS*Math.max(1,budget);
+  const roundedStakes=cents.map(c=>c/100),roundedPayoutCents=matrix.map(row=>row.reduce((s,p,i)=>s+Math.floor((p*roundedStakes[i]+1e-10)*100),0)),roundedPayouts=roundedPayoutCents.map(c=>c/100);
+  const roundedMinPayout=Math.min(...roundedPayouts),roundedMinProfit=roundedMinPayout-totalCost,roundedMinReturn=roundedMinProfit/budget,roundedConstantPayout=roundedPayoutCents.every(c=>c===roundedPayoutCents[0]);
   return {structure,budget,odds:[...odds],effectiveOdds,weights,stakes,cost,totalCost,matrix,payoutByOutcome,profitByOutcome,inverseSum,minPayout,minProfit,minReturn,constantPayout,
     ev:constantPayout?minReturn:null,expectedProfit:constantPayout?minProfit:null,expectedPayout:constantPayout?minPayout:null,isScenario:true,
     roundedStakes,roundedPayoutByOutcome:Object.fromEntries(labels.map((label,i)=>[label,roundedPayouts[i]])),roundedMinPayout,roundedMinProfit,roundedMinReturn,roundedConstantPayout,roundedEV:roundedConstantPayout?roundedMinReturn:null,
@@ -138,6 +138,25 @@ function selectionsFor(a,structure){
   return null;
 }
 function coverageValues(payment){return {odds:null,gross_payout:null,profit_if_win:null,ev:payment.roundedEV,expected_profit:payment.roundedEV==null?null:payment.roundedMinProfit,expected_payout:payment.roundedEV==null?null:payment.roundedMinPayout,reference_probability:null,references:null,dispersion:null,fair_payout:null,payout_edge:null,inverse_sum:payment.inverseSum,min_payout:payment.roundedMinPayout,min_profit:payment.roundedMinProfit,min_return:payment.roundedMinReturn};}
+
+/** The same supplied prices and budget always give the same calculation.
+ * Bookmaker names, probabilities, references and historical results are not
+ * inputs. Rounded ticket amounts/payments are used for every rule predicate.
+ */
+export function evaluatePaymentFormula(rawRule,{odds,budget}={}){
+  const raw=rawRule||newPriceFormula(),rule=normalizePriceFormula({...raw,name:raw.name||'Cálculo de pagos',stake:budget??raw.stake??100,mode:raw.mode||'coverage'});
+  if(rule.mode!=='coverage')throw new Error('La calculadora usa fórmulas de pagos.');
+  const payment=calculatePaymentCoverage({odds,budget:rule.stake,structure:rule.structure,costRate:rule.costRate,oddsDrop:rule.oddsDrop}),values=coverageValues(payment),payoutByOutcome=payment.roundedPayoutByOutcome;
+  const profitByOutcome=Object.fromEntries(Object.entries(payoutByOutcome).map(([key,payout])=>[key,payout-payment.totalCost]));
+  const maxPayout=Math.max(...Object.values(payoutByOutcome)),maxProfit=maxPayout-payment.totalCost,maxReturn=maxProfit/payment.budget;
+  return {...payment,...values,odds:[...payment.odds],fields:values,contextValues:values,match:matches(rule.expression,values),
+    stakes:[...payment.roundedStakes],sumStakes:payment.roundedStakes.reduce((sum,x)=>sum+Math.round(x*100),0)/100,payoutByOutcome,profitByOutcome,
+    minPayout:payment.roundedMinPayout,minProfit:payment.roundedMinProfit,minReturn:payment.roundedMinReturn,maxPayout,maxProfit,maxReturn,
+    constantPayout:payment.roundedConstantPayout,ev:values.ev,expectedProfit:values.expected_profit,expectedPayout:values.expected_payout,
+    evLowerBound:payment.roundedMinReturn,ev_lower_bound:payment.roundedMinReturn,evIsExact:payment.roundedConstantPayout,
+    evBasis:payment.roundedConstantPayout?'constant_payoff':'minimum_return_bound',evLabel:payment.roundedConstantPayout?'EV exacto':'Piso del retorno',
+    theoretical:{stakes:payment.stakes,payoutByOutcome:payment.payoutByOutcome,profitByOutcome:payment.profitByOutcome,minPayout:payment.minPayout,minProfit:payment.minProfit,minReturn:payment.minReturn,ev:payment.ev}};
+}
 
 // Workers explicitly opt in for their immutable archive. Direct evaluations of
 // mutable/live inputs always prepare afresh, so updates cannot reuse stale data.
@@ -227,6 +246,6 @@ export function evaluatePriceFormula(universe,rawRule,options={}){
   if(rule.onePerMatch){const best=new Map();for(const row of alerts){const previous=best.get(row.eventId),score=rule.mode==='coverage'?row.minReturn:row.ev;if(!previous||(finite(score)?score:-Infinity)>(finite(rule.mode==='coverage'?previous.minReturn:previous.ev)?(rule.mode==='coverage'?previous.minReturn:previous.ev):-Infinity)||score===(rule.mode==='coverage'?previous.minReturn:previous.ev)&&row.id<previous.id)best.set(row.eventId,row);}result=[...best.values()];}
   result.sort((a,b)=>a.date.localeCompare(b.date)||a.eventId.localeCompare(b.eventId)||a.book.localeCompare(b.book)||a.id.localeCompare(b.id));
   const summary=summarizeFootballAlerts(result);
-  const minimumReturns=result.map(row=>row.minReturn).filter(finite);summary.meanMinReturn=minimumReturns.length?minimumReturns.reduce((sum,x)=>sum+x,0)/minimumReturns.length:null;
+  for(const [field,key] of [['minReturn','meanMinReturn'],['minPayout','meanMinPayout'],['minProfit','meanMinProfit']]){const values=result.map(row=>row[field]).filter(finite);summary[key]=values.length?values.reduce((sum,x)=>sum+x,0)/values.length:null;}
   return {alerts:options.summaryOnly?[]:result,summary,coverage:{events:events.length,contextEvents:candidateEvents.size,quoteGroups:candidates,conditionGroups:result.length,matchedGroups:result.length,alerts:result.length,priced:result.length,probability:result.filter(r=>r.probability!=null).length,valued:result.filter(r=>r.ev!=null).length,settled:result.filter(r=>r.profit!=null).length,missingQuote:0,missingProbability:result.filter(r=>r.ev==null).length,missingConditionValues:unknown,unknownCandidates:unknown,falseCandidates:failed,universe:options.universe||null}};
 }

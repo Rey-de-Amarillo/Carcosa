@@ -1,5 +1,7 @@
 import {mountUnifiedFormulaEditor} from './football-formula-editor.js';
 import {mountPriceFormulaEditor} from './football-price-editor.js';
+import {mountReferencePriceFormulaEditor} from './football-reference-price-editor.js';
+import {isPaymentFormula} from './football-price-library.js';
 import {PRICE_FORMULA_KIND} from './football-price-engine.js';
 import {newSituationsDraft,newSituationSelection,situationsDraftFromAlert,compileSituationsAlert} from './football-situations.js';
 import {FOOTBALL_MARKET_CATALOG,marketDefinition,marketSelectionChoices,marketLineChoices,defaultMarketSelection,footballMarketLabel} from './football-market-catalog.js';
@@ -407,12 +409,12 @@ export function mountFootballAlertBuilder(container,options={}){
     mode=nextMode;
     const surface=container.ownerDocument.createElement('div');surface.className='football-builder-host';
     container.replaceChildren(surface);
-    const mount=mode==='football-alert'?mountLegacyFootballAlertBuilder:mode==='football-formula'?mountUnifiedFormulaEditor:mountPriceFormulaEditor;
+    const mount=mode==='football-alert'?mountLegacyFootballAlertBuilder:mode==='football-formula'?mountUnifiedFormulaEditor:mode==='reference-price'?mountReferencePriceFormulaEditor:mountPriceFormulaEditor;
     current=mount(surface,{...options,entities:catalog,onCancel:()=>{if(mode!==PRICE_FORMULA_KIND)activate(PRICE_FORMULA_KIND);options.onCancel?.();}});
   }
   activate(PRICE_FORMULA_KIND);
   return {
-    edit(rule){if(rule.kind!==mode)activate(rule.kind);current.edit(rule);},
+    edit(rule){const next=rule.kind===PRICE_FORMULA_KIND&&!isPaymentFormula(rule)?'reference-price':rule.kind;if(next!==mode)activate(next);current.edit(rule);},
     reset(){if(mode!==PRICE_FORMULA_KIND)activate(PRICE_FORMULA_KIND);else current.reset();},
     getDefinition(){return current.getDefinition();},
     setEntities(next){catalog=next||{};current.setEntities(catalog);},

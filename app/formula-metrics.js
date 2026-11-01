@@ -18,7 +18,7 @@ export function formulaMetricsKey(rule,scope={}){
   return JSON.stringify([definition,normalizeMetricsScope(scope)]);
 }
 export function metricsFromSummary(summary,unknownCandidates=null){
-  return Object.freeze({n:summary.n,meanEV:nullable(summary.meanEV),meanMinReturn:nullable(summary.meanMinReturn),expectedPriced:summary.expectedPriced??0,roi:nullable(summary.roi),profit:nullable(summary.profit),settledPriced:summary.settledPriced??0,winRate:nullable(summary.winRate),meanOdds:nullable(summary.meanOdds),unknownCandidates:nullable(unknownCandidates),scenario:Boolean(summary.isScenario)});
+  return Object.freeze({n:summary.n,meanEV:nullable(summary.meanEV),meanMinReturn:nullable(summary.meanMinReturn),meanMinPayout:nullable(summary.meanMinPayout),meanMinProfit:nullable(summary.meanMinProfit),expectedPriced:summary.expectedPriced??0,roi:nullable(summary.roi),profit:nullable(summary.profit),settledPriced:summary.settledPriced??0,winRate:nullable(summary.winRate),meanOdds:nullable(summary.meanOdds),unknownCandidates:nullable(unknownCandidates),scenario:Boolean(summary.isScenario)});
 }
 const hasSidePrices=node=>node?.type==='group'?(node.children||[]).some(hasSidePrices):['home_odds','draw_odds','away_odds'].includes(node?.field);
 

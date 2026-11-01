@@ -1,9 +1,9 @@
-/** Independent mathematical, authoring and migration regressions. */
+/** Archived reference-formula authoring and safe payment migration regressions. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {PRICE_FORMULA_KIND,newPriceFormula,normalizePriceFormula,evaluatePriceFormula,calculatePaymentCoverage,PRICE_CONDITION_FIELDS} from '../app/football-price-engine.js';
-import {mountPriceFormulaEditor,PRICE_FORMULA_CATEGORIES} from '../app/football-price-editor.js';
-import {buildPriceFormulaLibrary,seedPriceFormulaLibrary,PRICE_LIBRARY_BACKUP_KEY} from '../app/football-price-library.js';
+import {mountReferencePriceFormulaEditor as mountPriceFormulaEditor,PRICE_FORMULA_CATEGORIES} from '../app/football-reference-price-editor.js';
+import {buildReferencePriceFormulaLibrary as buildPriceFormulaLibrary,seedPriceFormulaLibrary,PRICE_LIBRARY_BACKUP_KEY} from '../app/football-price-library.js';
 import {buildFootballFormulaLibrary} from '../app/football-formula-library.js';
 import {STRATEGY_STORAGE_KEY,defaultScoreAlert,loadStrategies,saveStrategies} from '../app/strategy-store.js';
 const entities=JSON.parse(readFileSync(new URL('../app/data/entities.json',import.meta.url)));
@@ -179,7 +179,7 @@ for(const state of [{active:false},{suspended:true}])for(const odds of [2.1,null
 assert.equal(evaluatePriceFormula({events,offers:[first,last]},coverage).alerts.length,1,'an actually active aligned pair remains eligible');
 const noTimes=[first,last].map(({capturedAt,...quote})=>quote);
 assert.equal(evaluatePriceFormula({events,offers:noTimes},coverage).alerts.length,0,'matching event/day cannot manufacture simultaneous prices');
-const ownReference={...newPriceFormula(),name:'QA referencia',expression:{type:'group',id:'root',operator:'Y',children:[condition('ev',0)]}};
+const ownReference={...newPriceFormula(),mode:'value',name:'QA referencia',expression:{type:'group',id:'root',operator:'Y',children:[condition('ev',0)]}};
 assert.equal(evaluatePriceFormula({events,offers:[{...first,probability:.8,references:['A','EXTERNAL']}]},ownReference).alerts.length,0,'self-including reference cannot create EV');
 const uniqueReferences={...first,probability:.8,references:['R1','R1','R2']};
 assert.equal(evaluatePriceFormula({events,offers:[uniqueReferences]}, {...ownReference,expression:{type:'group',id:'root',operator:'Y',children:[condition('references',3)]}}).alerts.length,0,'repeated book IDs do not increase independent reference count');
@@ -196,7 +196,7 @@ const existing=[old[0],editedOld,customOld,oldDefault,customAlert,editedPrice],b
 const values=new Map(),storage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value))};
 const merged=seedPriceFormulaLibrary(existing,entities,storage);
 assert.equal(JSON.stringify(existing),before,'migration cannot mutate caller-owned criteria');
-assert.equal(merged.length,123);assert.equal(merged.filter(rule=>rule.kind===PRICE_FORMULA_KIND).length,120);
+assert.equal(merged.length,124);assert.equal(merged.filter(rule=>rule.kind===PRICE_FORMULA_KIND).length,121);
 assert.deepEqual(JSON.parse(values.get(PRICE_LIBRARY_BACKUP_KEY)),existing,'the complete original collection is backed up before replacement');
 for(const original of [editedOld,customOld,customAlert,editedPrice])assert.deepEqual(merged.find(rule=>rule.id===original.id),original,'user definition is preserved exactly');
 assert.ok(!merged.some(rule=>rule.id===old[0].id));assert.ok(!merged.some(rule=>rule.id===oldDefault.id));
@@ -205,4 +205,4 @@ const backup=values.get(PRICE_LIBRARY_BACKUP_KEY),resaved=saveStrategies(merged,
 assert.deepEqual(seedPriceFormulaLibrary(loadStrategies(storage),entities,storage),resaved,'reload never replaces edited mathematical or historical user formulas');
 assert.equal(values.get(PRICE_LIBRARY_BACKUP_KEY),backup,'repeat seed never overwrites the original backup');
 assert.equal(new Set(merged.map(rule=>rule.id)).size,merged.length);
-console.log('Price formula QA: 120 math-only recipes, four canonical field mothers, exact editor/state/percent roundtrips, safe migration, conservative cents/DC and suspended-quote provenance passed.');
+console.log('Archived reference QA: 120 preserved reference definitions, exact editor/state/percent roundtrips, safe payment migration, conservative cents/DC and suspended-quote provenance passed.');

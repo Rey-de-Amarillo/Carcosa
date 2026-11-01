@@ -15,7 +15,7 @@ assets = ['index.html', 'styles.css', 'app.js', 'formula-engine.js',
           'formula-builder.js', 'workspace-data.js', 'entity-presentation.js',
           'football-alert-builder.js', 'football-formula-editor.js', 'football-unified-formula.js',
           'football-formula-library.js',
-          'football-price-engine.js', 'football-price-editor.js', 'football-price-library.js',
+          'football-price-engine.js', 'football-price-editor.js', 'football-reference-price-editor.js', 'football-price-library.js',
           'formula-metrics.js', 'formula-metrics-worker.js', 'formula-metrics-view.js',
           'football-market-catalog.js', 'football-situations.js', 'football-strategy-engine.js', 'strategy-store.js',
           'data/entities.json', 'data/entity-badges.json', 'data/football-market-history.json',
@@ -41,23 +41,26 @@ for relative in assets:
     shutil.copy2(source / relative, dest)
 (root / 'site/README.md').write_text('''# WorKraken · Fútbol
 
-Espacio privado de datos y fórmulas: 1X2, probabilidades de otras casas sin
-margen, EV estimado y rendimiento de las jugadas históricas coincidentes.
+Espacio privado de cuotas, importes, fórmulas y pagos de fútbol.
 
-El creador matemático reúne cuotas, importes, pagos, valor esperado y cobertura
-en una sola fórmula con condiciones y grupos unidos por Y/O. Los desplegables
-madre contienen campos del tamaño original de Workraken. Incluye 120 fórmulas
-iniciales basadas en relaciones de precio; las fórmulas propias se conservan.
-La grilla incluye búsqueda, paginación y filtros por EV, ROI y muestra.
+El creador matemático trabaja con las cuotas de una misma casa y calcula el
+pago en cada resultado posible. Sus campos son suma inversa, pago mínimo,
+beneficio mínimo y retorno mínimo, unidos por Y/O. Las mismas cuotas producen
+el mismo cálculo con cualquier equipo o casa. Usa los campos originales de
+Workraken y una grilla con búsqueda, paginación y orden por métricas.
 
-EV = probabilidad de referencia × cuota + probabilidad de devolución − 1 − costo.
-La casa evaluada se excluye de las referencias. La cobertura reparte el importe
-y evalúa el pago total en cada resultado posible, incluida doble oportunidad
-con pagos superpuestos. Los registros deben tener contratos compatibles y
-captura verificable; sin ella no se presenta un arbitraje histórico. La
-calculadora manual y las variantes de costo/cuota se identifican como escenarios.
-Los datos ausentes permanecen nulos. EV estimado y ROI histórico son métricas
-separadas. Las fórmulas anteriores mantienen su evaluación y pueden editarse.
+Incluye 120 fórmulas iniciales: tres estructuras de resultados, cinco retornos
+mínimos y ocho variantes de costo o caída de cuota, con importe inicial 100.
+No requiere probabilidades deportivas ni precios de otras casas. Reparte el
+importe, redondea a centavos y comprueba el pago más bajo de todos los casos,
+incluida doble oportunidad con pagos superpuestos.
+
+Los contratos deben cubrir todos los resultados y compartir evento, período,
+línea y reglas compatibles. Sin tiempo y reglas verificables, las capturas
+históricas quedan sin evaluar. La calculadora manual se identifica como escenario.
+El retorno mínimo calculado y el ROI histórico son métricas separadas. Las
+fórmulas propias anteriores se conservan en el archivo; se respalda la colección
+antes de reemplazar ejemplos automáticos sin editar.
 
 Datos derivados de Football-Data.co.uk, para uso personal privado. La carpeta
 dist no incluye claves, archivos originales ni conexiones autenticadas.

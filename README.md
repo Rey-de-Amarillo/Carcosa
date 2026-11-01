@@ -1,26 +1,26 @@
 # Kraken Edge
 
-Laboratorio privado de probabilidades deportivas: descarga resultados reales, compara modelos con cuotas, reproduce decisiones históricas y registra por qué observa o descarta cada selección. La app y el motor funcionan con **Python 3.10 o posterior, sin dependencias externas**, y el presupuesto de datos es **sólo fuentes gratuitas**.
+Laboratorio privado de cuotas y pagos deportivos: crea fórmulas sobre importes, reparto y beneficio en cada resultado posible. Conserva las herramientas históricas de investigación del proyecto. La app y el motor funcionan con **Python 3.10 o posterior, sin dependencias externas**, y el presupuesto de datos es **sólo fuentes gratuitas**.
 
 [Abrir la app privada publicada](https://kraken-edge-joaquin.workraken.chatgpt.site) · [Abrir la app local](http://127.0.0.1:8765). La primera muestra una captura privada; la segunda necesita iniciar el servidor de esta computadora.
 
 ## Interfaz actual de fútbol
 
-El creador matemático combina cuotas, importes, pagos, EV y cobertura en una sola fórmula con uniones Y/O y grupos anidados. Sus condiciones no dependen de la identidad de equipos o jugadores. Los desplegables madre contienen los campos y usan los paneles originales de Workraken, todos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar; las fórmulas propias anteriores se conservan.
+El creador matemático combina cuotas, importes y pagos de una misma casa en una sola fórmula con uniones Y/O y grupos anidados. Sus condiciones son suma inversa, pago mínimo, beneficio mínimo y retorno mínimo; funcionan con cualquier equipo y cualquier casa que ofrezca los mismos contratos y cuotas. Los desplegables madre contienen los campos originales de Workraken, todos del mismo tamaño y sin texto explicativo suelto. Las fórmulas se pueden guardar, editar y duplicar.
 
-Incluye 120 fórmulas guardadas iniciales, editables y duplicables, que se agregan sin reemplazar las propias. La grilla permite buscar, paginar, ordenar y filtrar por EV, ROI y rendimiento de las cotizaciones coincidentes.
+Incluye 120 fórmulas de pagos: tres estructuras de resultados, cinco retornos mínimos y ocho variantes de costo o caída de cuota. Todas trabajan con una sola casa y un importe inicial de 100. La grilla permite buscar, paginar y ordenar sus métricas. Las fórmulas propias anteriores se conservan en el archivo; al reemplazar ejemplos automáticos sin editar se guarda una copia completa de la colección anterior.
 
-La evaluación por valor usa `EV = probabilidad de referencia × cuota + probabilidad de devolución − 1 − costo`, con referencias que excluyen la casa evaluada. Los pagos esperados y beneficios se calculan sobre el importe de la fórmula. La suma de probabilidades implícitas de una sola casa no se convierte en una probabilidad independiente.
+La cobertura reparte el importe y calcula cuánto se cobra en cada resultado posible. Admite dos resultados excluyentes, tres resultados excluyentes y doble oportunidad con pagos superpuestos. Para resultados excluyentes, `S = Σ(1/cuota)`, `importe_i = presupuesto/(cuota_i × S)` y `pago = presupuesto/S`. El motor redondea los importes a centavos y comprueba el beneficio más bajo después de costos y cambios de cuota. La fórmula puede exigir que ese beneficio y su retorno sean positivos.
 
-La cobertura reparte el presupuesto y calcula el pago total en cada resultado posible. Admite particiones de dos o tres resultados y doble oportunidad con pagos superpuestos. Para resultados excluyentes, `S = Σ(1/cuota)`, `importe_i = presupuesto/(cuota_i × S)` y `pago = presupuesto/S`; sólo hay retorno mínimo positivo si ese pago supera el importe y los costos. Las cotizaciones deben compartir evento, mercado, período, línea, reglas compatibles y captura verificable. Sin captura no se presenta arbitraje histórico: queda sin evaluar. Los cálculos manuales y los cambios de costo/cuota se identifican como escenarios.
-
-La fórmula filtra cotizaciones reales del histórico; el resultado sólo se usa para liquidarlas. EV estimado y ROI histórico son métricas separadas. Los datos ausentes quedan sin evaluar.
+El cálculo usa las cuotas y los pagos de los contratos elegidos en esa casa. No necesita probabilidades deportivas ni precios de otras casas. Los contratos deben cubrir todos los resultados con evento, período, línea y reglas compatibles. Las capturas del archivo necesitan tiempo y reglas verificables; si faltan quedan sin evaluar. Los importes manuales y sus pagos se identifican como escenarios. El retorno mínimo calculado y el ROI histórico se mantienen separados.
 
 La interfaz abre con `python3 server.py` en http://127.0.0.1:8765. Los datos derivados necesarios están incluidos; las claves y los archivos locales de investigación quedan fuera del repositorio.
 
-Comprobaciones del creador: `node tests/test_football_price_engine.mjs`, `node tests/test_price_formula_integration.mjs`, `node tests/test_unified_formula_core.mjs` y `node tests/test_formula_field_layout.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
+Comprobaciones del creador: `node tests/test_football_price_engine.mjs`, `node tests/test_payment_formula_library.mjs`, `node tests/test_price_formula_integration.mjs`, `node tests/test_unified_formula_core.mjs` y `node tests/test_formula_field_layout.mjs`. Las pruebas de ledger y de planteles históricos necesitan los archivos originales locales no versionados.
 
-**Versión 0.2, revisión del 30/10/2026:** hay un nuevo modelo de goles ajustado por adversario y marcadores bajos, consenso multicasa sin margen, liquidación exacta de hándicaps y modelos separados de primer tiempo, córners y amarillas. El catálogo distingue **53 tipos de apuesta**, sus datos y sus límites; hay **16 evaluaciones numéricas** por mercado. Catalogar un mercado no implica tener un pronóstico entrenado o una estrategia rentable para él.
+## Herramientas históricas conservadas
+
+**Versión 0.2, revisión del 30/10/2026:** hay un modelo de goles ajustado por adversario y marcadores bajos, consenso multicasa sin margen, liquidación exacta de hándicaps y modelos separados de primer tiempo, córners y amarillas. El catálogo distingue **53 tipos de apuesta**, sus datos y sus límites; hay **16 evaluaciones numéricas** por mercado. Catalogar un mercado no implica tener un pronóstico entrenado o una estrategia rentable para él.
 
 El modelo estructural mejoró el log loss de **0,999166 a 0,991979** sobre los mismos 9.992 partidos. En la selección de 2022–2023, la especificación más precisa fue **consenso power con peso estructural cero**: se utiliza información de precios; no se presenta como un pronóstico deportivo independiente que supere a las casas.
 

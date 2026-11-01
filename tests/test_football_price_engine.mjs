@@ -1,16 +1,18 @@
 import assert from 'node:assert/strict';
-import {PRICE_FORMULA_KIND,PRICE_CONDITION_FIELDS,newPriceFormula,newPriceCondition,normalizePriceFormula,formatPriceFormula,calculatePaymentCoverage,evaluatePriceFormula} from '../app/football-price-engine.js';
+import {PRICE_FORMULA_KIND,PRICE_CONDITION_FIELDS,newPriceFormula,newPriceCondition,normalizePriceFormula,formatPriceFormula,calculatePaymentCoverage,evaluatePaymentFormula,evaluatePriceFormula} from '../app/football-price-engine.js';
 
 let serial=0;
 const c=(field,value,operator='>=')=>({type:'condition',id:`c${++serial}`,field,value,operator});
 const g=(operator,...children)=>({type:'group',id:`g${++serial}`,operator,children});
-const rule=(expression,extra={})=>({...newPriceFormula(),id:'r',name:'Pagos',expression,...extra});
+const rule=(expression,extra={})=>({...newPriceFormula(),id:'r',name:'Pagos',mode:'value',expression,...extra});
 const event=(id='e',extra={})=>({id,date:'2026-10-30',league:'L',home:'Cualquiera',away:'Otro',home_score:2,away_score:1,...extra});
 const evaluate=(expression,quotes,extra={},events=[event()])=>evaluatePriceFormula({events,offers:quotes},rule(expression,extra));
 const q=(selection,odds,extra={})=>({event:0,book:'B',market:'btts',period:'full',selection,odds,rulesId:'book-btts-regulation-v1',snapshotId:'one',...extra});
 const close=(a,b,tolerance=1e-9)=>assert.ok(Math.abs(a-b)<tolerance,`${a} != ${b}`);
 
 assert.equal(PRICE_FORMULA_KIND,'football-price');assert.equal(newPriceFormula().stake,100);assert.equal(newPriceCondition().field,'');
+assert.equal(newPriceFormula().mode,'coverage');assert.equal(newPriceFormula().bookPolicy,'same_book');
+assert.equal(newPriceFormula().expression.children[0].field,'min_return');assert.equal(newPriceFormula().expression.children[0].operator,'>');assert.equal(newPriceFormula().expression.children[0].value,0);
 assert.equal(PRICE_CONDITION_FIELDS.includes('team'),false);assert.equal(PRICE_CONDITION_FIELDS.includes('player'),false);
 const normalized=normalizePriceFormula(rule(g('Y',c('ev',.02),{...c('',null)},g('O'))));
 assert.equal(normalized.expression.children.length,1);assert.deepEqual(normalizePriceFormula(normalized),normalized);
@@ -52,6 +54,30 @@ assert.throws(()=>calculatePaymentCoverage({odds:[2,2],budget:100.006}),/dos dec
 const centBudget=calculatePaymentCoverage({odds:[2,2],budget:100.01});close(centBudget.roundedStakes.reduce((sum,x)=>sum+x,0),centBudget.totalCost);
 assert.equal(calculatePaymentCoverage({odds:[2,2],budget:100-1e-11}).roundedMinProfit,0,'floating representation dust cannot create profit by understating the cash outlay');
 
+// Current formulas use only supplied odds and money, regardless of bookmaker.
+const supplied={odds:[2.1,2.1],budget:100},paymentRule={...newPriceFormula(),name:'Sólo pagos'};
+const fromBet365=evaluatePaymentFormula(paymentRule,{...supplied,book:'Bet365',probability:.01,references:[]});
+const fromAnother=evaluatePaymentFormula(paymentRule,{...supplied,book:'Otra casa',probability:.99,references:['irrelevante']});
+assert.deepEqual(fromBet365,fromAnother,'same prices and amounts give identical results without reference books');
+assert.equal(fromBet365.match,true);close(fromBet365.sumStakes,100);close(fromBet365.minPayout,105);close(fromBet365.minProfit,5);
+assert.deepEqual(fromBet365.odds,[2.1,2.1]);
+close(fromBet365.ev,.05);close(fromBet365.evLowerBound,.05);assert.equal(fromBet365.evIsExact,true);assert.equal(fromBet365.evBasis,'constant_payoff');
+assert.equal(fromBet365.fields.reference_probability,null);assert.equal(fromBet365.fields.references,null);
+assert.equal(evaluatePaymentFormula(newPriceFormula(),{odds:[2,1.75]}).match,false,'a fresh payment formula works before naming or saving');
+const paymentUnequal=evaluatePaymentFormula({...paymentRule,structure:'double_chance'},{odds:[2.2,2.2,1.01]});
+assert.equal(paymentUnequal.match,true);assert.equal(paymentUnequal.ev,null);assert.equal(paymentUnequal.expectedProfit,null);assert.equal(paymentUnequal.evIsExact,false);
+assert.equal(paymentUnequal.evBasis,'minimum_return_bound');assert.equal(paymentUnequal.evLabel,'Piso del retorno');close(paymentUnequal.evLowerBound,paymentUnequal.minReturn);
+assert.equal(paymentUnequal.maxReturn>paymentUnequal.minReturn,true);assert.equal(paymentUnequal.maxPayout>paymentUnequal.minPayout,true);
+const largeRounded=evaluatePaymentFormula({...paymentRule,structure:'three_outcomes'},{odds:[3.2,3.2,3.2],budget:100000000000});
+assert.equal(largeRounded.maxPayout>largeRounded.minPayout,true);assert.equal(largeRounded.ev,null,'large budgets cannot use a relative tolerance to turn unequal cash payments into exact EV');
+const exactOnly={...paymentRule,expression:g('Y',c('ev',0,'>'))};
+assert.equal(evaluatePaymentFormula({...exactOnly,structure:'double_chance'},{odds:[2.2,2.2,1.01]}).match,null,'a lower bound cannot masquerade as an exact EV field');
+assert.equal(evaluatePaymentFormula(paymentRule,{odds:[2.00001,2.00001]}).match,false,'cent rounding still governs pure rule evaluation');
+close(evaluatePaymentFormula(paymentRule,{odds:[2.1,2.1],budget:200}).minProfit,10);
+const mixedPayment={...paymentRule,expression:g('O',g('Y',c('min_return',.1),c('min_profit',10)),g('Y',c('inverse_sum',1,'<'),c('min_return',0,'>')))};
+assert.equal(evaluatePaymentFormula(mixedPayment,supplied).match,true,'numeric Y/O expressions apply to the supplied payment portfolio');
+assert.throws(()=>evaluatePaymentFormula(rule(g('Y',c('ev',0))),supplied),/fórmulas de pagos/,'legacy reference-value formulas retain their separate evaluator');
+
 // Monetary EV comes only from external reference probabilities, before filters.
 const value=q('yes',2,{probability:.55,references:['R1','R2','R3'],referenceSd:.02});
 let r=evaluate(g('Y',c('ev',.05),c('references',3),c('gross_payout',190)),[value]);
@@ -84,6 +110,7 @@ r=evaluate(g('Y',c('min_return',.01)),positive,{mode:'coverage'});
 assert.equal(r.alerts.length,1);assert.equal(r.alerts[0].legs.length,2);assert.equal(r.summary.n,1);
 close(r.summary.stake,100);close(r.summary.profit,5);close(r.summary.roi,.05);close(r.summary.meanEV,.05);
 close(r.summary.meanMinReturn,.05);
+close(r.summary.meanMinPayout,105);close(r.summary.meanMinProfit,5);
 assert.equal(r.alerts[0].quoteSource,'manual');assert.equal(r.alerts[0].isScenario,true);
 assert.deepEqual(r.alerts[0].payoutByOutcome,{yes:105,no:105});assert.deepEqual(r.alerts[0].legs.map(l=>l.sourceId),['q1','q2']);
 const full=evaluatePriceFormula({events:[event()],offers:positive},rule(g('Y',c('min_return',0)),{mode:'coverage'}));
@@ -127,4 +154,5 @@ assert.deepEqual(evaluatePriceFormula(immutableUniverse,immutableRule,{immutable
 
 const empty=evaluate(g('Y',c('ev',0)),[]);assert.equal(empty.summary.n,0);assert.equal(empty.summary.meanEV,null);assert.equal(empty.summary.roi,null);
 assert.equal(empty.summary.meanMinReturn,null);assert.equal(evaluate(g('Y',c('ev',0)),[value]).summary.meanMinReturn,null);
+for(const key of ['meanMinPayout','meanMinProfit']){assert.equal(empty.summary[key],null);assert.equal(evaluate(g('Y',c('ev',0)),[value]).summary[key],null);}
 console.log('Football price engine: monetary EV, complete coverage, rounding, provenance, Y/O, and Bet365 prices verified.');

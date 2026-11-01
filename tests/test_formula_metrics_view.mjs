@@ -104,3 +104,9 @@ assert.deepEqual(formulas,originalFormulas,'ranking cannot reorder or alter sour
 assert.deepEqual(metrics,originalMetrics,'ranking cannot rewrite the metric cache');
 for(const formula of view())assert.ok(formulas.includes(formula),'results retain the saved formula identity');
 console.log('Formula metrics view: percentage filters, zero/negative values, ready scope, nulls last, all numeric sorts, stable ties and immutable inputs passed.');
+
+{
+  const rules=[{id:'floor-low',name:'Low'},{id:'floor-high',name:'High'},{id:'floor-missing',name:'Missing'}];
+  const estimates=new Map([['floor-low',{state:'ready',meanMinReturn:.01}],['floor-high',{state:'ready',meanMinReturn:.05}],['floor-missing',{state:'ready',meanMinReturn:null}]]);
+  assert.deepEqual(filterAndSortFormulas(rules,estimates,{sort:'minReturn_desc',minReturn:2}).map(f=>f.id),['floor-high'],'minimum return input is a percentage and missing floors are excluded');
+}

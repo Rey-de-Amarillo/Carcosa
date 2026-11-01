@@ -5,7 +5,7 @@ import {evaluateFootballStrategy,summarizeFootballAlerts} from './football-strat
 import {initEntityPresentation} from './entity-presentation.js';
 import {FootballData,periodMatches} from './workspace-data.js';
 import {UNIFIED_FORMULA_KIND,formatUnifiedFormula,evaluateUnifiedFormula} from './football-unified-formula.js';
-import {seedPriceFormulaLibrary} from './football-price-library.js';
+import {seedPriceFormulaLibrary,isPaymentFormula} from './football-price-library.js';
 import {PRICE_FORMULA_KIND,formatPriceFormula,evaluatePriceFormula} from './football-price-engine.js';
 import {filterAndSortFormulas} from './formula-metrics-view.js';
 import {initExpandableFilterSearch,filterSearchMatches} from './vendor/workraken/search.js';
@@ -22,7 +22,7 @@ const cls=n=>n>0?'football-positive':n<0?'football-negative':'';
 const pair=(e,a,b)=>e[a]==null||e[b]==null?'—':`${e[a]}–${e[b]}`;
 const data=new FootballData();let ready=false,formulas=loadStrategies(),builder,active=formulas[0].id,selected=[],appliedFormula=formulas[0],tradeToken=0,offerToken=0,messageTimer,currentSummary,alertByKey=new Map(),goalToken=0,entityPresentation=null;
 const tables={};
-const formulaMetrics=new Map();let formulaWorker,formulaMetricsRequest=0,formulaMetricsScope='',formulaMetricErrors=0,formulaMetricFatal='';
+const formulaMetrics=new Map();let formulaWorker,formulaMetricsRequest=0,formulaMetricsScope='',formulaMetricErrors=0,formulaMetricFatal='',formulaMetricsTotal=0;
 function notify(text){$('message').textContent=text;$('message').hidden=false;clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('message').hidden=true,2800);}
 function searchHTML(id,label,placeholder){return `<div class="expandable-filter-search is-expanded" data-filter-search data-filter-search-always-expanded role="search" aria-label="Buscar ${label}"><button class="expandable-filter-search-toggle" type="button" data-filter-search-toggle aria-label="Buscar ${label}" aria-expanded="true" aria-controls="${id}-search" title="Buscar ${label}"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 4.5 4.5"/></svg></button><span class="expandable-filter-search-field"><input id="${id}-search" type="search" data-filter-search-input aria-label="Buscar ${label}" aria-hidden="false" autocomplete="off" placeholder="${placeholder}" tabindex="0"><button class="expandable-filter-search-clear" type="button" data-filter-search-clear aria-label="Limpiar búsqueda de ${label}" title="Limpiar búsqueda" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 7 10 10"/><path d="m17 7-10 10"/></svg></button></span><span class="record-page-announcement" data-search-status role="status" aria-live="polite" aria-atomic="true"></span></div>`;}
 // Markup retained from Workraken templates/_pagination.html. Domain callbacks only.
@@ -63,40 +63,47 @@ const stakeOf=f=>f.kind==='football-alert'?f.action.stake:f.stake;
 function describeAction(action,context={}){return footballSelectionLabel(action,data.entities||{},context);}
 function conditionLabel(condition){const signal=ALERT_SIGNALS.find(s=>s.id===condition.field),percent=signal?.unit==='percentage',value=v=>percent?pct(v):num(v),name=condition.selection?footballSelectionLabel(condition.selection,data.entities):signal?.name||condition.field;return `${name} ${condition.ui?.operator==='around'?value(condition.ui.value)+' ± '+value(condition.ui.margin):condition.operator==='between'?value(condition.min)+'–'+value(condition.max):condition.operator+' '+value(condition.value)}`;}
 function formulaDescription(f){return f.kind===PRICE_FORMULA_KIND?formatPriceFormula(f):f.kind===UNIFIED_FORMULA_KIND?formatUnifiedFormula(f,data.entities||{}):f.kind==='football-alert'?f.conditions.map(conditionLabel).join(' · ')+' → '+describeAction(f.action,f.context):'Resultado 1X2 · mayor EV';}
+function displayedFormulas(){const collection=$('formulas-collection')?.value||'current';return formulas.filter(f=>collection==='all'||(collection==='archive'?!isPaymentFormula(f):isPaymentFormula(f)));}
 function formulaRow(f){
-  const unified=f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND,domain=f.kind==='football-alert',raw=formulaMetrics.get(f.id),m=raw?.state==='ready'?raw:null;
-  const state=raw?.state==='error'?'Error':raw?.state==='loading'?'Calculando…':'Pendiente',cell=(text,kind='',extra='')=>`<div role="cell" data-number class="${kind}">${text}${extra}</div>`;
+  const editable=['football-alert',UNIFIED_FORMULA_KIND,PRICE_FORMULA_KIND].includes(f.kind),raw=formulaMetrics.get(f.id),m=raw?.state==='ready'?raw:null;
+  const state=raw?.state==='error'?'Error':raw?.state==='loading'?'Calculando…':'Pendiente',cell=(value,kind='',extra='')=>`<div role="cell" data-number class="${kind}">${value}${extra}</div>`;
   const hint=text=>`<span class="football-sub">${esc(text)}</span>`;
-  return `<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" data-formula-row="${esc(f.id)}"><div role="cell"><strong>${esc(f.name)}</strong>${hint(formulaDescription(f))}</div>${cell(m?pct(m.meanEV,true):'—',cls(m?.meanEV),hint(m?`${num(m.expectedPriced,0)} con EV`:state))}${cell(m?pct(m.meanMinReturn,true):'—',cls(m?.meanMinReturn))}${cell(m?pct(m.roi,true):'—',cls(m?.roi),m?hint(`${m.scenario?'Simulado · ':''}${num(m.settledPriced,0)} liquidadas`):'')}${cell(m&&m.profit!=null?signed(m.profit):'—',cls(m?.profit))}${cell(m?num(m.n,0):'—')}${cell(m?pct(m.winRate):'—')}${cell(m?num(m.meanOdds):'—')}${cell(m?num(m.unknownCandidates,0):'—','',raw?.state==='error'?hint(raw.message):'')}<div role="cell" class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${domain||unified?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></div>`;
+  const status=!isPaymentFormula(f)?'Anterior':!m?state:m.n?'Pagos calculados':m.unknownCandidates?'Faltan capturas simultáneas':'Sin coincidencias';
+  return `<div role="row" class="wk-grid-row wk-row-outline wk-row-surface" data-formula-row="${esc(f.id)}"><div role="cell"><strong>${esc(f.name)}</strong>${hint(formulaDescription(f))}</div>${cell(m?pct(m.meanMinReturn,true):'—',cls(m?.meanMinReturn))}${cell(m?num(m.meanMinPayout):'—')}${cell(m?pct(m.roi,true):'—',cls(m?.roi),m?hint(`${m.scenario?'Simulado · ':''}${num(m.settledPriced,0)} liquidadas`):'')}${cell(m&&m.profit!=null?signed(m.profit):'—',cls(m?.profit))}${cell(m?num(m.n,0):'—')}${cell(m?pct(m.winRate):'—')}${cell(m?num(m.unknownCandidates,0):'—')}${cell(esc(status),'',raw?.state==='error'?hint(raw.message):'')}<div role="cell" class="football-row-actions"><button type="button" class="mini-button" data-use="${esc(f.id)}">Usar</button>${editable?`<button type="button" class="mini-button" data-edit="${esc(f.id)}">Editar</button><button type="button" class="mini-button" data-duplicate="${esc(f.id)}">Duplicar</button>`:''}</div></div>`;
 }
 function refreshFormulaGrid(resetPage=false){
   if(!tables.formulas)return;
-  tables.formulas.setRows(filterAndSortFormulas(formulas,formulaMetrics,{sort:$('formulas-sort').value,minEV:$('formulas-min-ev').value,minROI:$('formulas-min-roi').value,minN:$('formulas-min-n').value}),{resetPage});
+  tables.formulas.setRows(filterAndSortFormulas(displayedFormulas(),formulaMetrics,{sort:$('formulas-sort').value,minReturn:$('formulas-min-return').value,minROI:$('formulas-min-roi').value,minN:$('formulas-min-n').value}),{resetPage});
 }
-function refreshFormulaList(evaluate=true){refreshFormulaGrid();const value=$('trades-formula').value||active;$('trades-formula').innerHTML=formulas.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');$('trades-formula').value=formulas.some(f=>f.id===value)?value:formulas[0].id;if(evaluate&&ready&&$('formulas-panel').open)calculateFormulaMetrics();}
+function refreshFormulaList(evaluate=true){
+  refreshFormulaGrid();const list=displayedFormulas(),value=$('trades-formula').value||active;
+  $('trades-formula').innerHTML=list.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('');
+  $('trades-formula').value=list.some(f=>f.id===value)?value:list[0]?.id||'';
+  if(evaluate&&ready&&$('formulas-panel').open)calculateFormulaMetrics();
+}
 function calculateFormulaMetrics(){
   if(!ready||!$('formulas-panel').open)return;
-  const requestId=++formulaMetricsRequest,view=scope('formulas'),key=JSON.stringify(view);
-  formulaMetricErrors=0;formulaMetricFatal='';
+  const candidates=displayedFormulas(),requestId=++formulaMetricsRequest,view=scope('formulas'),key=JSON.stringify({...view,collection:$('formulas-collection').value});
+  formulaMetricErrors=0;formulaMetricFatal='';formulaMetricsTotal=candidates.length;
   if(key!==formulaMetricsScope){formulaMetrics.clear();formulaMetricsScope=key;}
-  for(const f of formulas)formulaMetrics.set(f.id,{state:'loading'});
-  refreshFormulaGrid();$('formulas-progress').value=`Calculando 0/${formulas.length}`;
+  for(const f of candidates)formulaMetrics.set(f.id,{state:'loading'});
+  refreshFormulaGrid();$('formulas-progress').value=`Calculando 0/${formulaMetricsTotal}`;
   if(!formulaWorker){
     formulaWorker=new Worker(new URL('./formula-metrics-worker.js',import.meta.url),{type:'module'});
     formulaWorker.onmessage=({data:message})=>{
       if(message.requestId!==formulaMetricsRequest)return;
       if(message.type==='metric'){formulaMetrics.set(message.id,{...message.metrics,state:'ready'});refreshFormulaGrid();}
       else if(message.type==='progress')$('formulas-progress').value=`Calculando ${message.completed}/${message.total}`;
-      else if(message.type==='complete'){$('formulas-progress').value=formulaMetricFatal||(formulaMetricErrors?`${formulas.length-formulaMetricErrors} evaluadas · ${formulaMetricErrors} sin evaluar`:`${formulas.length} fórmulas evaluadas`);refreshFormulaGrid();}
+      else if(message.type==='complete'){$('formulas-progress').value=formulaMetricFatal||(formulaMetricErrors?`${formulaMetricsTotal-formulaMetricErrors} evaluadas · ${formulaMetricErrors} sin evaluar`:`${formulaMetricsTotal} fórmulas evaluadas`);refreshFormulaGrid();}
       else if(message.type==='error'){
         if(message.id){formulaMetricErrors++;formulaMetrics.set(message.id,{state:'error',message:message.message});}
-        else {formulaMetricFatal=message.message;for(const f of formulas)formulaMetrics.set(f.id,{state:'error',message:message.message});$('formulas-progress').value=message.message;}
+        else {formulaMetricFatal=message.message;for(const f of displayedFormulas())formulaMetrics.set(f.id,{state:'error',message:message.message});$('formulas-progress').value=message.message;}
         refreshFormulaGrid();
       }
     };
-    formulaWorker.onerror=event=>{for(const f of formulas)formulaMetrics.set(f.id,{state:'error',message:event.message||'No se pudieron calcular las métricas.'});$('formulas-progress').value='No se pudieron calcular las métricas.';refreshFormulaGrid();formulaWorker.terminate();formulaWorker=null;};
+    formulaWorker.onerror=event=>{for(const f of displayedFormulas())formulaMetrics.set(f.id,{state:'error',message:event.message||'No se pudieron calcular las métricas.'});$('formulas-progress').value='No se pudieron calcular las métricas.';refreshFormulaGrid();formulaWorker.terminate();formulaWorker=null;};
   }
-  formulaWorker.postMessage({type:'evaluate',requestId,formulas,scope:view});
+  formulaWorker.postMessage({type:'evaluate',requestId,formulas:candidates,scope:view});
 }
 function refreshEvents(){
   if(!ready)return;const from=$('events-from').value,to=$('events-to').value,league=$('events-league').value,result=$('events-result').value;
@@ -119,6 +126,8 @@ function setStrategyBooks(f,preferredBook){
   $('trades-book').value=options.some(([key])=>key===old)?old:'';
 }
 function renderAlertRow(r){
+  if(isPaymentFormula(appliedFormula))return `<tr role="button" tabindex="0" data-alert="${esc(r.id)}|${esc(r.book)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}</td><td>${esc(r.actionLabel)}</td><td>${esc(data.books.get(r.book)||r.book)}</td><td data-number>${num(r.stake)}</td><td data-number>${num(r.minPayout)}</td><td data-number class="${cls(r.minReturn)}">${pct(r.minReturn,true)}</td><td data-number class="${cls(r.minProfit)}">${signed(r.minProfit)}</td><td>${r.profit==null?'Pendiente':'Simulado'}</td><td data-number class="${cls(r.profit)}">${signed(r.profit)}</td></tr>`;
+
   const pastResultMissing=r.won==null&&r.date<(data.entities?.asOf||new Date().toISOString()).slice(0,10);
   const missingHistory=pastResultMissing||r.statuses?.some(s=>/player_history|player_membership|period_corners|participation|combination_void/.test(s));
   const outcome=r.won===true?'Ganada':r.won===false?'Perdida':r.won==='push'?'Devuelta':missingHistory?'Sin dato':'Pendiente';
@@ -126,8 +135,8 @@ function renderAlertRow(r){
   return `<tr role="button" tabindex="0" data-alert="${esc(r.id)}|${esc(r.book)}" aria-label="Ver alerta ${esc(r.home)} contra ${esc(r.away)}"><td>${date(r.date)}</td><td class="football-match">${matchHTML(r)}<span class="football-sub">${leagueHTML(r.league)}</span></td><td>${esc(r.actionLabel)}${r.contextOdds?`<span class="football-sub">1: ${num(r.contextOdds.home)} · X: ${num(r.contextOdds.draw)} · 2: ${num(r.contextOdds.away)}</span>`:''}</td><td>${esc(data.books.get(r.book)||r.book)}${r.isScenario?`<span class="football-sub">${r.legs?'Reparto simulado':'Escenario matemático'}</span>`:''}</td><td data-number>${num(r.odds)}</td><td data-number>${pct(r.probability)}${sample}</td><td data-number class="${cls(r.ev)}">${pct(r.ev,true)}</td><td data-number class="${cls(r.expectedProfit)}">${r.expectedProfit==null?'—':signed(r.expectedProfit)+' u'}</td><td>${outcome}</td><td data-number class="${cls(r.profit)}">${r.profit==null?'—':signed(r.profit)+' u'}</td></tr>`;
 }
 async function refreshTrades(){
-  if(!ready)return;const token=++tradeToken,f=formulas.find(f=>f.id===$('trades-formula').value);if(!f)return;
-  const unified=f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND;$('trades-coverage-field').hidden=!unified;$('trades-coverage').value=unified?'Buscando…':'';
+  if(!ready)return;const token=++tradeToken,f=formulas.find(f=>f.id===$('trades-formula').value);if(!f){tables.trades.setRows([]);$('trade-metrics').hidden=true;$('results-panel').hidden=true;$('trades-export').disabled=true;$('trades-coverage').value='';return;}
+  const payment=isPaymentFormula(f),unified=f.kind===UNIFIED_FORMULA_KIND||f.kind===PRICE_FORMULA_KIND;setPaymentTradeHeaders(payment);$('trades-coverage-field').hidden=!unified;$('trades-coverage').value=unified?'Buscando…':'';
   setStrategyBooks(f);initCommonSimpleSelects(document);const view=scope('trades');tables.trades.loading('Buscando coincidencias…');$('trades-export').disabled=true;$('trade-metrics').hidden=true;$('results-panel').hidden=true;
   try{
     let rows,summary;
@@ -136,7 +145,7 @@ async function refreshTrades(){
       const offers=universe.offers.filter(r=>(!unified||periodMatches(r,view.period))&&(!view.league||r.league===view.league)&&(!view.book||view.book.split('|').includes(r.book)));
       const evaluate=f.kind===PRICE_FORMULA_KIND?evaluatePriceFormula:f.kind===UNIFIED_FORMULA_KIND?evaluateUnifiedFormula:evaluateFootballStrategy;
       const result=evaluate({events:universe.events,offers},f,{entities:data.entities,universe:universe.name});
-      rows=result.alerts.filter(r=>periodMatches(r,view.period));summary=summarizeFootballAlerts(rows);
+      rows=result.alerts.filter(r=>periodMatches(r,view.period));summary=f.kind===PRICE_FORMULA_KIND?result.summary:summarizeFootballAlerts(rows);
       if(unified){const coverage=result.coverage;$('trades-coverage').value=`${num(coverage.candidateCount??coverage.quoteGroups,0)} ${f.kind===PRICE_FORMULA_KIND&&f.mode==='coverage'?'repartos evaluados':'cuotas evaluadas'} · ${num(coverage.unknownCandidates,0)} sin datos`;}
     }else{
       await data.ensureOffers(view.period);if(token!==tradeToken)return;
@@ -146,11 +155,25 @@ async function refreshTrades(){
     }
     appliedFormula={...f};active=f.id;currentSummary=summary;alertByKey=new Map(rows.map(r=>[`${r.id}|${r.book}`,r]));
     tables.trades.setRows(rows.toReversed());$('trades-export').disabled=false;$('trade-metrics').hidden=false;$('results-panel').hidden=false;
-    const valued=summary.expectedPriced??summary.n;
-    $('trade-metrics').innerHTML=metric('Alertas',num(summary.n,0))+metric(`EV estimado · ${num(valued,0)}`,pct(summary.meanEV,true))+metric('Ganancia esperada',summary.expectedProfit==null?'—':`${signed(summary.expectedProfit)} u`)+metric(summary.isScenario?'ROI simulado':'ROI histórico',pct(summary.roi,true));
-    $('trades-count').textContent=`${num(summary.n,0)} alertas · ${num(valued,0)} con EV · ${summary.profit==null?'—':signed(summary.profit)+' u'} ${summary.isScenario?'simuladas':'realizadas'}`;
+    if(payment){
+      $('trade-metrics').className='entry-form record-filter-form wk-field-grid';
+      const field=(label,value)=>`<label>${esc(label)}<input type="text" readonly value="${esc(value)}"></label>`;
+      $('trade-metrics').innerHTML=field('Operaciones',num(summary.n,0))+field('Retorno mínimo medio',pct(summary.meanMinReturn,true))+field('Pago mínimo medio (u)',num(summary.meanMinPayout))+field('ROI retrospectivo simulado',pct(summary.roi,true));
+      $('trades-count').textContent=`${num(summary.n,0)} operaciones simuladas`;
+      for(const year of summary.years){const sample=rows.filter(r=>String(r.date).slice(0,4)===String(year.year)&&Number.isFinite(r.minReturn));year.meanMinReturn=sample.length?sample.reduce((n,r)=>n+r.minReturn,0)/sample.length:null;}
+    }else{
+      $('trade-metrics').className='kpi-grid kpi-grid-wide parking-occupancy-kpis';
+      const valued=summary.expectedPriced??summary.n;
+      $('trade-metrics').innerHTML=metric('Alertas',num(summary.n,0))+metric(`EV estimado · ${num(valued,0)}`,pct(summary.meanEV,true))+metric('Ganancia esperada',summary.expectedProfit==null?'—':`${signed(summary.expectedProfit)} u`)+metric(summary.isScenario?'ROI simulado':'ROI histórico',pct(summary.roi,true));
+      $('trades-count').textContent=`${num(summary.n,0)} alertas · ${num(valued,0)} con EV · ${summary.profit==null?'—':signed(summary.profit)+' u'} ${summary.isScenario?'simuladas':'realizadas'}`;
+    }
     tables.years.setRows(summary.years);
   }catch(e){if(token===tradeToken){tables.trades.loading(e.message);if(unified)$('trades-coverage').value=e.message;}}
+}
+function setPaymentTradeHeaders(payment){
+  const names=payment?['Fecha','Partido','Operación','Casa','Importe total','Pago mínimo','Retorno mínimo','Beneficio mínimo','Resultado','Beneficio simulado']:['Fecha','Partido','Apuesta','Casa','Cuota apuesta','Probabilidad','EV estimado','Ganancia esperada','Resultado','Beneficio'];
+  $('trades-table').querySelectorAll('thead th').forEach((cell,i)=>cell.textContent=names[i]);
+  $('years-table').querySelectorAll('thead th')[3].textContent=payment?'Retorno mínimo medio':'EV estimado';
 }
 function showAlert(key){
   const r=alertByKey.get(key);if(!r)return;
@@ -163,7 +186,8 @@ function showAlert(key){
 function showPriceAlert(r){
   const field=(label,value)=>`<label>${esc(label)}<input type="text" readonly value="${esc(value)}" title="${esc(value)}" aria-label="${esc(label)}"></label>`;
   const labels={home:'Local',draw:'Empate',away:'Visitante',yes:'Sí',no:'No',home_draw:'1X',draw_away:'X2',home_away:'12',over:'Más de',under:'Menos de',odd:'Impar',even:'Par',none:'Ninguno'};
-  const fields=[field('Partido',`${r.home} — ${r.away}`),field('Fecha',date(r.date)),field('Operación',r.actionLabel),field('Importe total (u)',num(r.stake)),field('EV (%)',r.ev==null?'Sin probabilidad de referencia':num(r.ev*100)),field('Beneficio esperado (u)',r.expectedProfit==null?'Sin probabilidad de referencia':signed(r.expectedProfit)),field('ROI de la operación (%)',r.profit==null?'Pendiente':num(r.profit/r.stake*100)),field(r.isScenario?'Beneficio simulado (u)':'Beneficio histórico (u)',signed(r.profit))];
+  const payment=isPaymentFormula(appliedFormula);
+  const fields=[field('Partido',`${r.home} — ${r.away}`),field('Fecha',date(r.date)),field('Operación',r.actionLabel),field('Importe total (u)',num(r.stake)),...(!payment?[field('EV (%)',r.ev==null?'Sin probabilidad de referencia':num(r.ev*100)),field('Beneficio esperado (u)',r.expectedProfit==null?'Sin probabilidad de referencia':signed(r.expectedProfit))]:[]),field('ROI de la operación (%)',r.profit==null?'Pendiente':num(r.profit/r.stake*100)),field(r.isScenario?'Beneficio simulado (u)':'Beneficio histórico (u)',signed(r.profit))];
   if(r.legs){
     fields.push(field('Pago mínimo (u)',num(r.minPayout)),field('Beneficio mínimo (u)',signed(r.minProfit)),field('Retorno mínimo (%)',num(r.minReturn*100)),field('Suma de inversas',num(r.inverseSum,6)));
     for(const [outcome,payment]of Object.entries(r.payoutByOutcome||{}))fields.push(field(`Pago si ${labels[outcome]||outcome} (u)`,num(payment)));
@@ -218,11 +242,11 @@ function initializeEntityTables(){
 
 async function initialize(){
   tables.events=new Table('events','partidos',10,eventRow,matchSearch);tables.offers=new Table('offers','cuotas',9,r=>offerRow(r),matchSearch);tables.trades=new Table('trades','alertas',10,renderAlertRow,matchSearch);tables.formulas=new Table('formulas','fórmulas',10,formulaRow,f=>[f.name,formulaDescription(f)]);
-  tables.years=new Table('years','años',6,y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(y.meanEV)}">${pct(y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`,y=>y.year,'Año');
+  tables.years=new Table('years','años',6,y=>`<tr><td>${y.year}</td><td>${y.n}</td><td>${y.wins} · ${pct(y.winRate)}</td><td class="${cls(isPaymentFormula(appliedFormula)?y.meanMinReturn:y.meanEV)}">${pct(isPaymentFormula(appliedFormula)?y.meanMinReturn:y.meanEV,true)}</td><td class="${cls(y.roi)}">${pct(y.roi,true)}</td><td class="${cls(y.profit)}">${y.profit==null?'—':signed(y.profit)+' u'}</td></tr>`,y=>y.year,'Año');
   tables.dictionary=new Table('dictionary','campos',3,f=>`<tr><td>${esc(f.name)}${f.label?`<span class="football-sub">${esc(f.label)}</span>`:''}</td><td>${esc(f.formula||f.description)}</td><td>${f.preMatch===false?'Resultado':'Condición'}</td></tr>`,f=>[f.name,f.label,f.formula,f.description],'Nombre o cálculo');
   builder=mountFootballAlertBuilder($('formula-builder'),{onSave:definition=>{
     const f={...definition,id:definition.id||crypto.randomUUID()},next=formulas.some(x=>x.id===f.id)?formulas.map(x=>x.id===f.id?f:x):[...formulas,f];
-    formulas=saveStrategies(next,data.entities);active=f.id;refreshFormulaList();$('trades-formula').value=f.id;initCommonSimpleSelects(document);builder.reset();$('create-title').textContent='Crear fórmula';$('create-panel').open=false;$('formulas-panel').open=true;if($('trades-panel').open)refreshTrades();
+    formulas=saveStrategies(next,data.entities);active=f.id;$('formulas-collection').value=isPaymentFormula(f)?'current':'archive';refreshFormulaList();$('trades-formula').value=f.id;initCommonSimpleSelects(document);builder.reset();$('create-title').textContent='Crear fórmula';$('create-panel').open=false;$('formulas-panel').open=true;if($('trades-panel').open)refreshTrades();
   },onCancel:()=>{$('create-title').textContent='Crear fórmula';$('create-panel').open=false;}});
   refreshFormulaList();setView();initDatePicker({root:document});initCommonSimpleSelects(document);initFloatingDropdowns(document);
   try{
@@ -240,8 +264,8 @@ async function initialize(){
 window.addEventListener('hashchange',setView);
 $('formulas-panel').addEventListener('toggle',()=>{if($('formulas-panel').open)calculateFormulaMetrics();});
 $('formulas-filters').addEventListener('submit',event=>event.preventDefault());
-$('formulas-filters').addEventListener('change',event=>{if(['formulas-period','formulas-league','formulas-book'].includes(event.target.id))calculateFormulaMetrics();else refreshFormulaGrid(true);});
-$('formulas-filters').addEventListener('input',event=>{if(['formulas-min-ev','formulas-min-roi','formulas-min-n'].includes(event.target.id))refreshFormulaGrid(true);});
+$('formulas-filters').addEventListener('change',event=>{if(event.target.id==='formulas-collection'){refreshFormulaList();if($('trades-panel').open)refreshTrades();}else if(['formulas-period','formulas-league','formulas-book'].includes(event.target.id))calculateFormulaMetrics();else refreshFormulaGrid(true);});
+$('formulas-filters').addEventListener('input',event=>{if(['formulas-min-return','formulas-min-roi','formulas-min-n'].includes(event.target.id))refreshFormulaGrid(true);});
 for(const [id,refresh]of [['events',refreshEvents],['offers',refreshOffers],['trades',refreshTrades],['players',refreshPlayers],['goals',refreshGoals]]){
   $(`${id}-panel`).addEventListener('toggle',()=>{if($(`${id}-panel`).open)refresh();});$(`${id}-filters`).addEventListener('change',refresh);$(`${id}-filters`).addEventListener('submit',e=>e.preventDefault());
 }
@@ -260,7 +284,7 @@ $('close-dialog').onclick=()=>$('trade-dialog').close();$('trade-dialog').onclic
 $('goals-export').onclick=()=>exportCSV(tables.goals,[['fecha',r=>r.date],['local',r=>r.home],['visitante',r=>r.away],['mercado',r=>r.quote.market],['periodo',r=>r.quote.period],['seleccion',r=>marketSelection(r.quote)],['cuota',r=>r.quote.odds],['casa',()=> 'Singapore Pools']],'workraken-marcadores.csv');
 $('events-export').onclick=()=>exportCSV(tables.events,data.manifest.tables.events.columns.map(key=>[key,r=>r[key]]),'workraken-partidos.csv');
 $('offers-export').onclick=()=>exportCSV(tables.offers,offerColumns,'workraken-cuotas.csv');
-$('trades-export').onclick=()=>exportCSV(tables.trades,[['fecha',r=>r.date],['local',r=>r.home],['visitante',r=>r.away],['casa',r=>r.book],['apuesta',r=>r.actionLabel],['cuota_apuesta',r=>r.odds],['probabilidad',r=>r.probability],['muestra_previa',r=>r.probabilityN],['probabilidad_fuente',r=>r.probabilitySource],['ev',r=>r.ev],['importe',r=>r.stake],['ganancia_esperada',r=>r.expectedProfit],['beneficio',r=>r.profit],['precio',r=>r.isScenario?'ingresado':'archivo'],['alerta',()=>appliedFormula.name]],'workraken-alertas.csv');
+$('trades-export').onclick=()=>exportCSV(tables.trades,isPaymentFormula(appliedFormula)?[['fecha',r=>r.date],['partido',r=>r.home+' — '+r.away],['casa',r=>r.book],['importe',r=>r.stake],['pago_minimo',r=>r.minPayout],['beneficio_minimo',r=>r.minProfit],['retorno_minimo',r=>r.minReturn],['pagos_por_resultado',r=>JSON.stringify(r.payoutByOutcome)],['apuestas',r=>JSON.stringify(r.legs)],['beneficio_simulado',r=>r.profit],['formula',()=>appliedFormula.name]]:[['fecha',r=>r.date],['local',r=>r.home],['visitante',r=>r.away],['casa',r=>r.book],['apuesta',r=>r.actionLabel],['cuota_apuesta',r=>r.odds],['probabilidad',r=>r.probability],['muestra_previa',r=>r.probabilityN],['probabilidad_fuente',r=>r.probabilitySource],['ev',r=>r.ev],['importe',r=>r.stake],['ganancia_esperada',r=>r.expectedProfit],['beneficio',r=>r.profit],['precio',r=>r.isScenario?'ingresado':'archivo'],['alerta',()=>appliedFormula.name]],'workraken-alertas.csv');
 const shell=document.querySelector('[data-app-shell]');
 document.querySelector('[data-sidebar-toggle]').onclick=event=>{const collapsed=shell.classList.toggle('is-sidebar-collapsed');event.currentTarget.setAttribute('aria-expanded',String(!collapsed));event.currentTarget.setAttribute('aria-label',collapsed?'Expandir módulos':'Contraer módulos');};
 document.querySelector('[data-theme-toggle]').onclick=event=>{const dark=shell.classList.toggle('is-dark-mode');document.documentElement.dataset.theme=dark?'dark':'light';event.currentTarget.setAttribute('aria-pressed',String(dark));event.currentTarget.setAttribute('aria-label',dark?'Activar modo claro':'Activar modo oscuro');event.currentTarget.title=dark?'Modo claro':'Modo oscuro';event.currentTarget.querySelector('.sidebar-theme-toggle-label').textContent=dark?'Modo claro':'Modo oscuro';};
